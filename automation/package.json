@@ -1,0 +1,36 @@
+{
+  "name": "automation",
+  "version": "1.0.0",
+  "description": "automation testing for GSF AMVP",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "formatSteps": "prettier --write \"cypress\\e2e\\steps\"",
+    "formatSupport": "prettier --write \"cypress\\support\"",
+    "formatPages": "prettier --write \"cypress\\e2e\\pages\"",
+    "formatLarge": "prettier --write \"cypress\\e2e\""
+  },
+  "author": "GRJ",
+  "license": "ISC",
+  "dependencies": {
+    "axe-core": "^4.10.3",
+    "axe-html-reporter": "^2.2.11",
+    "axios": "^1.9.0",
+    "cypress": "^13.17.0",
+    "cypress-axe": "^1.6.0",
+    "cypress-cucumber-preprocessor": "^4.3.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "xml2js": "^0.6.2"
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "step_definitions": "cypress/e2e/steps"
+  },
+  "devDependencies": {
+    "mocha-junit-reporter": "^2.2.1",
+    "prettier": "^3.3.3"
+  }
+}

@@ -1,0 +1,32 @@
+/**CSS File converted from the Registry App **/
+th {
+  border-right: 0px;
+  border-left: 0px;
+  border-top: 0px;
+  background-color: transparent;
+  vertical-align: bottom;
+  padding-bottom: 12px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+  padding-left: 8px;
+  padding-right: 8px;
+  white-space: nowrap;
+  color: var(--color-table-header);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Open Sans", Verdana, Geneva, Tahoma, sans-serif;
+  text-transform: uppercase;
+}
+
+tr {
+  color: inherit;
+  height: 48px;
+  display: table-row;
+  outline: none;
+  vertical-align: middle;
+}
+
+td {
+  border-top: 1px var(--border-color-table-row) solid;
+}

@@ -1,0 +1,32 @@
+.table-container {
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.pub-project-name {
+  margin-bottom: 2rem !important;
+}
+
+.pub-request-name {
+  margin-top: 2rem !important;
+}
+
+.pub-doc-tbl {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.pub-doc-tr th,
+.pub-doc-tr td {
+  padding: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Left-align for Document Name */
+.pub-doc-tr th:first-child,
+.pub-doc-tr td:first-child {
+  text-align: left;
+  width: 50%;
+}

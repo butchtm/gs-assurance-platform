@@ -1,0 +1,30 @@
+
+terraform {
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.31"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "gs-assurance-terraform-state-$GS_ENV_NAME"
+    key            = "gs-state"
+    region         = "eu-central-1"
+    dynamodb_table = "gs-assurance-tf-state-lock-$GS_ENV_NAME"
+    encrypt        = true
+  }
+}
+
+provider "aws" {
+  region = "eu-central-1"
+  default_tags {
+    tags = {
+      Environment = "$GS_ENV_NAME"
+      Service     = "GS Assurance Platform"
+      Org         = "CACI"
+      Terraform   = true
+    }
+  }
+}

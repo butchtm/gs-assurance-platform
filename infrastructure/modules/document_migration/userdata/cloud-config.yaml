@@ -1,0 +1,35 @@
+package_update: true
+package_upgrade: true
+
+users:
+  - name: ec2-user
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyswlVYq3vwGUYj5aY3WVswNiFzELSDCWjeh3wsG69V gitlab
+
+runcmd:
+  - curl -O https://downloads.rclone.org/v1.64.0/rclone-v1.64.0-linux-arm64.rpm
+  - sudo rpm -i rclone-v1.64.0-linux-arm64.rpm
+  - chown -R ec2-user:ec2-user /home/ec2-user
+  - chmod 700 /home/ec2-user
+
+write_files:
+  - path: /home/ec2-user/.config/rclone/rclone.conf
+    permissions: "0644"
+    owner: ec2-user:ec2-user
+    content: |
+      [gs_sc_azure_source]
+      type = azureblob
+      account = AZStorageAccount
+      sas_url = %SAS_URL_PLACEHOLDER%
+
+      [gs_aws_target]
+      type = s3
+      provider = AWS
+      env_auth = true
+      region = eu-central-1

@@ -1,0 +1,47 @@
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <springProfile name="local | test">
+        <property name="CONSOLE_LOG_PATTERN" value="%d{HH:mm:ss} %clr(%X{x-correlation-id}){faint} %clr(%X{username}){faint} %clr(${HOSTNAME}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%thread]){faint} %cyan(%-40.40logger{39}) : %msg%n" />
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    </springProfile>
+
+    <springProfile name="!(local | test)">
+        <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <logLevel/>
+                    <message/>
+                    <loggerName/>
+                    <threadName/>
+                    <stackTrace/>
+                    <mdc/>
+                    <pattern>
+                        <pattern>{"hostname": "${HOSTNAME}"}</pattern>
+                    </pattern>
+                    <timestamp/>
+                    <version/>
+                </providers>
+            </encoder>
+        </appender>
+
+        <springProperty name="snsArn" source="logging.sns.arn"/>
+        <springProperty name="snsRegion" source="logging.sns.region"/>
+        <springProperty name="maxMessageLength" source="logging.sns.max-message-length"/>
+        <springProperty name="environment" source="spring.profiles.active"/>
+        <appender name="SNS" class="org.goldstandard.assurance.api.logging.appender.SnsLogAppender">
+            <topicArn>${snsArn}</topicArn>
+            <snsRegion>${snsRegion}</snsRegion>
+            <maxMessageLength>${maxMessageLength}</maxMessageLength>
+            <environment>${environment}</environment>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="jsonConsoleAppender" />
+            <appender-ref ref="SNS" />
+        </root>
+    </springProfile>
+</configuration>

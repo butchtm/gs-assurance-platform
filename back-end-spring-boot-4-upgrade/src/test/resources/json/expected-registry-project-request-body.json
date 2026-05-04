@@ -1,0 +1,61 @@
+{
+  "project_id": 1234,
+  "poa_id": null,
+  "sustaincert_id": 1234,
+  "name": "test project name",
+  "description": "test project description",
+  "status": "NEW_PROJECT",
+  "gsf_standards_version": "Gold Standard for the Global Goals",
+  "country_code": "XZ",
+  "estimated_annual_credits": 987,
+  "crediting_period_start_date": "2024-01-01",
+  "crediting_period_end_date": "2028-01-01",
+  "methodology": "ACM0001 Flaring or use of landfill gas",
+  "carbon_stream": "GS_CER",
+  "type": "A_R",
+  "size": "Large Scale",
+  "sustaincert_url": "http://localhost:3001/projects/GS1234",
+  "sustainable_development_goals": [
+    "AFFORDABLE_AND_CLEAN_ENERGY",
+    "ZERO_HUNGER"
+  ],
+  "project_developer": "test account name",
+  "programme_of_activities": "POA",
+  "design_certification_date": "2025-01-01",
+  "crediting_periods": [
+    {
+      "id": 1,
+      "start_date": "2024-01-01",
+      "end_date": "2025-12-31",
+      "methodologies": [
+        {
+          "id": 1,
+          "description": "AMC1 - methodology 1",
+          "version": 1.1
+        },
+        {
+          "id": 2,
+          "description": "AMC2 - methodology 2",
+          "version": 2.1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "start_date": "2026-01-01",
+      "end_date": "2028-01-01",
+      "methodologies": [
+        {
+          "id": 1,
+          "description": "AMC1 - methodology 1",
+          "version": 1.1
+        },
+        {
+          "id": 2,
+          "description": "AMC2 - methodology 2",
+          "version": 2.1
+        }
+      ]
+    }
+  ]
+}

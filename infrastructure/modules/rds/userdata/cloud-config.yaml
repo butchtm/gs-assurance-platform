@@ -1,0 +1,65 @@
+users:
+  - name: gitlab
+    shell: /usr/sbin/nologin
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGyswlVYq3vwGUYj5aY3WVswNiFzELSDCWjeh3wsG69V gitlab
+  - name: ec2-user
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+      - ssh-rsa REPLACE_WITH_YOUR_SSH_PUBLIC_KEY user@example.com
+
+write_files:
+  # Configure sshd to listen on 22 and 443 - gitlab runner allows 80/443 egress only
+  - path: /etc/ssh/sshd_config.d/10-ports.conf
+    owner: root:root
+    permissions: "0644"
+    content: |
+      Port 22
+      Port 443
+  - path: /tmp/auditd.rules
+    owner: root:root
+    content: |
+      -D
+      -a exit,always -F arch=b64 -S execve
+      -a exit,always -F arch=b32 -S execve
+  - path: /tmp/cw-agent-config.json
+    owner: root:root
+    content: |
+      {
+          "agent": {
+              "region": "eu-central-1"
+          },
+          "logs": {
+              "logs_collected": {
+                  "files": {
+                      "collect_list": [
+                          {
+                              "file_path": "/var/log/audit/audit.log",
+                              "log_group_name": "${cw_log_group}",
+                              "timestamp_format": "%Y-%m-%d %H:%M:%S",
+                              "timezone": "UTC"
+                          }
+                      ]
+                  }
+              }
+          }
+      }
+runcmd:
+  # SELINUX needs to know that 443 is an ssh port
+  - [semanage, port, -m, -t, ssh_port_t, -p, tcp, "443"]
+  - [systemctl, restart, sshd]
+  - [mv, /tmp/auditd.rules, /etc/audit/rules.d/audit.rules]
+  - [service, auditd, restart]
+  - [
+      mv,
+      /tmp/cw-agent-config.json,
+      /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json,
+    ]
+  - [systemctl, --now, enable, amazon-cloudwatch-agent]
+
+packages:
+  - amazon-cloudwatch-agent

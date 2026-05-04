@@ -1,0 +1,198 @@
+spring:
+  profiles:
+    active: test
+  main:
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  jpa:
+    properties:
+      hibernate:
+        default_schema: gs
+        show_sql: false
+  datasource:
+    password: ${DB_PASSWORD:changeme}
+    username: postgres
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:postgres;MODE=PostgreSQL;NON_KEYWORDS=user;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT EXISTS gs"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:local/public.pem
+
+management:
+  info:
+    git:
+      mode: FULL
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+user-sync:
+  check-cron: '-'
+  sync-interval: 0
+
+s3:
+  region-name: "eu-central-1"
+  bucket-name:
+    document: "gs-ssrnc-dcmts-development"
+    download: "gs-ssrnc-dwlds-development"
+
+cognito:
+  app:
+    client:
+      id: 'dummy-client-id'
+  region:
+    name: 'eu-central-1'
+  user-pool:
+    id: 'STUBBED'
+
+file:
+  extension:
+    whitelist:
+      # archives
+      - zip
+      - rar
+      - "7z"
+
+      # images
+      - gif
+      - png
+      - bmp
+      - jpg
+      - jpeg
+      - jpe
+      - tiff
+      - tif
+      - dng
+      - jfif
+
+      # documents
+      - doc
+      - docx
+      - pdf
+      - txt
+      - htm
+      - html
+
+      # spreadsheets
+      - xls
+      - xlsx
+      - xlsm
+      - xlsb
+      - csv
+
+      # presentations
+      - ppt
+      - pptx
+
+      # GIS / shapefile
+      - shp
+      - shx
+      - dbf
+
+      # email
+      - msg
+      - eml
+
+      # media / video
+      - mov
+      - mp4
+      - mpeg
+      - spv
+
+      # config & misc
+      - ini
+      - xml
+      - tmp
+      - sav
+
+notification:
+  source: 'test@goldstandard.org'
+  contact-mapping:
+    enabled: false # emailSender bean is mocked so contact mapping is not required
+  ses:
+    region:
+      name: 'eu-central-1'
+
+accounts:
+  armTeam:
+    id: 7
+  registryTeam:
+    id: 8
+  financeTeam:
+    id: 9
+
+cache:
+  cacheLengthInMinutes: 1
+
+public-rate-limit:
+  enabled: ${PUBLIC_RATE_LIMIT_ENABLED:true}
+  allowlist:
+    v4CDIRs: ${PUBLIC_RATE_LIMIT_ALLOWLIST_V4_CDIRS:}
+  comment:
+    pathPatterns: /**/public/comments
+    requestsPerInterval: 1
+    refillInterval: pt60m
+  commentPiiAnalysis:
+    pathPatterns: /**/public/pii-analysis
+    requestsPerInterval: 1
+    refillInterval: pt60m
+  document:
+    pathPatterns: /**/public/documents/**
+    requestsPerInterval: 1
+    refillInterval: pt60m
+  projectDocument:
+    pathPatterns: /**/public/project-documents/**
+    requestsPerInterval: 1
+    refillInterval: pt60m
+
+registry:
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+sdg.tool:
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+comprehend:
+  region: "eu-central-1"
+  typesToIgnore: "DATE_TIME"
+  scoreThreshold: 0.80
+  scoreThresholdOverrides:
+    name: 0.90
+    email: 0.85
+  dataAccessRoleArn: ""
+  poll-for-completion:
+    check-cron: '-'
+    sync-interval: 0
+textract:
+  region: "eu-central-1"
+
+stakeholder-consultation:
+  send-notification:
+    check-cron: '-'
+    sync-interval: 0
+
+conversation:
+  send-notification:
+    check-cron: '-'
+    sync-interval: 0
+
+system-user:
+  uuid: 'c6644b74-f52e-4dd5-9008-108dfb05ec40'
+  username: 'System'
+
+web:
+  ui-hostname: 'http://localhost:3000'

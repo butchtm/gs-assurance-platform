@@ -1,0 +1,53 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: gs
+        show_sql: false
+        format_sql: true
+
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    password: ${DB_PASSWORD:changeme}
+    url: jdbc:postgresql://localhost:5432/assurance_db
+    username: postgres
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.eu-central-1.amazonaws.com/REPLACE_WITH_COGNITO_POOL_ID
+
+notification:
+  contact-mapping:
+    enabled: true
+
+cognito:
+  region.name: eu-central-1
+  user-pool.id:
+  app.client.id:
+
+stubbed.users:
+  gs-admin.subs: ${GS_ADMIN_SUBS:1733de0e-81bd-40e6-9688-9f13e0b026b3}
+  project-developer.subs: ${PROJECT_DEVELOPER_SUBS:3cc4c10a-d2a0-447f-ba61-ac00940a8cbf}
+  arm-team.subs: ${ARM_TEAM_SUBS:85e5caae-8818-4ccf-9d11-c927bcb14169}
+  gs-registry.subs: ${GS_REGISTRY_SUBS:95227bdd-0695-4961-b0cf-61e40d8e7597}
+  gs-finance.subs: ${GS_FINANCE_SUBS:f0488311-0947-4065-8ffc-492fb4bcf63a}
+  gs-reviewer.subs: ${GS_REVIEWER_SUBS:d09a8ff1-a08f-469e-9642-d4ff78bd1ff6}
+  vvb.subs: ${VVB_SUBS:6f9629ab-2744-4393-9916-72d96910439b}
+  tac.subs: ${TAC_SUBS:83cd2396-be2c-4789-8473-472079027e06}
+  support.subs: ${SUPPORT_SUBS:dd411542-6041-453c-ac00-eb002cf14476}
+
+registry:
+  ui.host: http://localhost:3002
+  project.api.link-template: http://localhost:3001/project-documents/%s
+
+jodconverter:
+  local:
+    enabled: false
+
+logging.level:
+  org.jooq:
+    tools.LoggerListener: debug

@@ -1,0 +1,18 @@
+.deployment:
+  stage: deploy
+  image: nexus.iig.caci.co.uk/docker-runner:26.1.2
+  services:
+    - name: docker:20.10.23-dind
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+    - apk update
+    - apk add --no-cache python3 py3-pip
+    - python3 -m venv .venv && source .venv/bin/activate
+    - pip3 install --upgrade pip && pip3 install --no-cache-dir awscli && rm -rf /var/cache/apk/*
+    - docker login --username AWS ${ECR_REPOSITORY_URL} -p $(aws ecr get-login-password --region ${AWS_DEFAULT_REGION})
+  script:
+    - docker build --build-arg NEXUS_PREFIX=${NEXUS_PREFIX} --build-arg ENVIRONMENT=${ENVIRONMENT} -t ${ECR_REPOSITORY_URL}/ecr-frontend-ui-${ENVIRONMENT}:${IMAGE_TAG} .
+    - docker push ${ECR_REPOSITORY_URL}/ecr-frontend-ui-${ENVIRONMENT}:${IMAGE_TAG}
+    - if [[ "$ENVIRONMENT" == "development" ]]; then aws ecs update-service --cluster assurance-services-${ENVIRONMENT} --service assurance-ui-2-${ENVIRONMENT} --force-new-deployment --region ${AWS_DEFAULT_REGION}; fi
+

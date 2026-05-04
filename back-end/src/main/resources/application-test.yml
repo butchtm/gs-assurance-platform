@@ -1,0 +1,64 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        default_schema: gs
+        show_sql: false
+  output:
+    ansi:
+      enabled: ALWAYS
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:postgres;MODE=PostgreSQL;NON_KEYWORDS=user;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT EXISTS gs"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:local/public.pem
+
+s3:
+  region-name: "eu-central-1"
+  bucket-name:
+    document: "gs-ssrnc-dcmts-development"
+    download: "gs-ssrnc-dwlds-development"
+
+cognito.app.client.id: dummy-client-id
+
+user-sync:
+  check-cron: '-'
+  sync-interval: 0
+
+accounts:
+  armTeam.id: 7
+  registryTeam.id: 8
+  financeTeam.id: 9
+
+registry:
+  ui.host: http://localhost:3002
+  project.api.link-template: http://localhost:3001/project-documents/%s
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+sdg.tool:
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+jodconverter:
+  local:
+    enabled: false
+
+web:
+  ui-hostname: http://localhost:3000
+
+logging.level:
+  org.jooq:
+    tools.LoggerListener: debug
+    Constants: off

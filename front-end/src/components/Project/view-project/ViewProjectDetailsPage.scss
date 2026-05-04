@@ -1,0 +1,41 @@
+.project-details-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: "Open Sans", Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.page-title {
+  text-align: center;
+  color: #00babe;
+}
+
+.project-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.project-detail {
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.project-detail label {
+  font-weight: bold;
+  color: #6c6c6c;
+}
+
+.project-detail span {
+  float: right;
+  color: #333;
+}
+
+.sdg-icons-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,32 @@
+{
+  "steps": [
+    {
+      "title": "Project(s) Information",
+      "schema": {
+        "type": "object",
+        "required": [
+          "project"
+        ],
+        "properties": {
+          "project": {
+            "type": "object",
+            "properties": {
+              "gsid": {
+                "type": "string",
+                "title": "GSID"
+              },
+              "title": {
+                "type": "string",
+                "title": "Title"
+              },
+              "registryLink": {
+                "type": "string",
+                "title": "Registry Link"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

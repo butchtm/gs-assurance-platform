@@ -1,0 +1,146 @@
+{
+  "gsid": "GS1001",
+  "name": "Project 1",
+  "requests": [
+    {
+      "id": 1,
+      "name": "review name 1",
+      "index": 0,
+      "requestType": "Preliminary Review",
+      "documents": [
+        {
+          "id": "7d11f7c8-ce66-3613-be1e-130167c28c31",
+          "filename": "document_7d11f7c8-ce66-3613-be1e-130167c28c31",
+          "access": null,
+          "category": null,
+          "type": null,
+          "uploadedTimestamp": "2023-12-05T16:11:00+05:30",
+          "modifiedTimestamp": null,
+          "isLatest": null,
+          "displayCategoryType": "Supporting",
+          "isMissing": null
+        }
+      ],
+      "comments": [
+        {
+          "id": 1,
+          "submittedComment": "test comment: review name 1",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": "2023-10-30T11:42:12.4948Z",
+      "consultationEndDate": "2023-11-13T11:42:12.4948Z"
+    },
+    {
+      "id": 3,
+      "name": "review name 2",
+      "index": 0,
+      "requestType": "Preliminary Review",
+      "documents": [],
+      "comments": [
+        {
+          "id": 3,
+          "submittedComment": "test comment: review name 2",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": "2023-10-30T11:42:12.4948Z",
+      "consultationEndDate": "2023-11-13T11:42:12.4948Z"
+    },
+    {
+      "id": 5,
+      "name": "review name 3",
+      "index": 0,
+      "requestType": "Preliminary Review",
+      "documents": [],
+      "comments": [
+        {
+          "id": 5,
+          "submittedComment": "test comment: review name 3",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": "2023-10-30T11:42:12.4948Z",
+      "consultationEndDate": "2023-11-13T11:42:12.4948Z"
+    },
+    {
+      "id": 2,
+      "name": "review name 1",
+      "index": 1,
+      "requestType": "Design Certification Project",
+      "documents": [
+        {
+          "id": "e550d31d-bb9c-35f0-8ce3-fa87c8e79746",
+          "filename": "document_e550d31d-bb9c-35f0-8ce3-fa87c8e79746",
+          "access": null,
+          "category": null,
+          "type": null,
+          "uploadedTimestamp": "2023-12-05T16:11:00+05:30",
+          "modifiedTimestamp": "2023-12-06T16:11:00+05:30",
+          "isLatest": null,
+          "displayCategoryType": "Supporting",
+          "isMissing": null
+        }
+      ],
+      "comments": [
+        {
+          "id": 2,
+          "submittedComment": "test comment: review name 1",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": null,
+      "consultationEndDate": null
+    },
+    {
+      "id": 4,
+      "name": "review name 2",
+      "index": 1,
+      "requestType": "Design Certification Project",
+      "documents": [],
+      "comments": [
+        {
+          "id": 4,
+          "submittedComment": "test comment: review name 2",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": null,
+      "consultationEndDate": null
+    },
+    {
+      "id": 6,
+      "name": "review name 3",
+      "index": 1,
+      "requestType": "Design Certification Project",
+      "documents": [],
+      "comments": [
+        {
+          "id": 6,
+          "submittedComment": "test comment: review name 3",
+          "uploadedByName": "test name",
+          "uploadedDate": "2023-10-30T11:42:12.4948Z",
+          "anonymous": false,
+          "addressed": false
+        }
+      ],
+      "consultationStartDate": null,
+      "consultationEndDate": null
+    }
+  ]
+}

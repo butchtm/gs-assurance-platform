@@ -1,0 +1,164 @@
+variables:
+  AWS_DEFAULT_REGION: eu-central-1
+
+include:
+  local: .gitlab-ci-template.yml
+
+image: #default image this pipeline should use
+  name: hashicorp/terraform:latest
+  entrypoint:
+    - "/usr/bin/env"
+    - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+before_script:
+  - export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+
+stages:
+  - static-tf-analysis
+  - deploy_resources
+
+dev_terraform_validate_plan:
+  stage: static-tf-analysis
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${DEV_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${DEV_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${DEV_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${DEV_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${DEV_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export GS_ENV_NAME="development"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform --version
+    - TF_LOG=DEBUG terraform init
+    - terraform validate
+    - terraform plan -var-file="development.tfvars"
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+
+staging_terraform_validate_plan:
+  stage: static-tf-analysis
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${STAGING_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${STAGING_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${STAGING_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${STAGING_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${STAGING_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+    - export GS_ENV_NAME="staging"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform --version
+    - terraform init
+    - terraform validate
+    - terraform plan -var-file="staging.tfvars"
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "staging"'
+
+production_terraform_validate_plan:
+  stage: static-tf-analysis
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${PROD_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${PROD_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${PROD_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${PROD_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${PROD_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+    - export GS_ENV_NAME="production"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform --version
+    - terraform init
+    - terraform validate
+    - terraform plan -var-file="production.tfvars"
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "production"'
+
+development_terraform_security_check:
+  extends: .terraform-security-check
+  variables:
+    TF_VAR_FILE_NAME: "development"
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+
+staging_production_terraform_security_check:
+  extends: .terraform-security-check
+  variables:
+    TF_VAR_FILE_NAME: "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+  rules:
+    - if: "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(production|staging)$/"
+
+development_terraform_code_analysis:
+  extends: .terraform-code-analysis
+  variables:
+    TF_VAR_FILE_NAME: "development"
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+
+staging_production_terraform_code_analysis:
+  extends: .terraform-code-analysis
+  variables:
+    TF_VAR_FILE_NAME: "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+  rules:
+    - if: "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^(production|staging)$/"
+
+dev_deploy_resources:
+  stage: deploy_resources
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${DEV_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${DEV_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${DEV_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${DEV_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${DEV_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export GS_ENV_NAME="development"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform init
+    - terraform apply -auto-approve -var-file="development.tfvars"
+  after_script:
+    - terraform state unlock || true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+staging_deploy_resources:
+  stage: deploy_resources
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${STAGING_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${STAGING_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${STAGING_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${STAGING_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${STAGING_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+    - export GS_ENV_NAME="staging"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform init
+    - terraform apply -auto-approve -var-file="staging.tfvars"
+  after_script:
+    - terraform state unlock || true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+
+production_deploy_resources:
+  stage: deploy_resources
+  before_script:
+    - export AWS_ACCESS_KEY_ID="${PROD_AWS_ACCESS_KEY_ID}"
+    - export AWS_SECRET_ACCESS_KEY="${PROD_AWS_SECRET_ACCESS_KEY}"
+    - export TF_VAR_registry_project_api_token="${PROD_REGISTRY_PROJECT_API_TOKEN}"
+    - export TF_VAR_sdg_tool_project_api_token="${PROD_SDG_TOOL_PROJECT_API_TOKEN}"
+    - export TF_VAR_azure_storage_finance_connection_string="${PROD_AZURE_STORAGE_FINANCE_CONNECTION_STRING}"
+    - export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}"
+    - export GS_ENV_NAME="production"
+    - apk add --no-cache gettext
+  script:
+    - ./set_tf_env.sh
+    - terraform init
+    - terraform apply -auto-approve -var-file="production.tfvars"
+  after_script:
+    - terraform state unlock || true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "production"'

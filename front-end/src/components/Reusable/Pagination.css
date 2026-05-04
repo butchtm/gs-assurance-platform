@@ -1,0 +1,11 @@
+.pagination-container .active {
+  background-color: var(--color-accent-teal-primary);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+}
+
+.pagination-container button {
+  margin: 5px;
+}

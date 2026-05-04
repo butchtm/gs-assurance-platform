@@ -1,0 +1,132 @@
+variables:
+  GIT_STRATEGY: clone
+  GIT_DEPTH: 0
+
+include:
+  local: .gitlab-ci-template.yml
+
+image: nexus.iig.caci.co.uk/node:20.19.0
+
+cache:
+  paths:
+    - coverage/
+
+stages:
+  - build
+  - dependency-check
+  - test-jest
+  - static-analysis
+  - deploy
+
+build:
+  stage: build
+  before_script:
+    - npm ci
+  script:
+    - npm run build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH =~ /^release-.*$/
+    - if: "$CI_COMMIT_TAG"
+
+license-check:
+  image: nexus.iig.caci.co.uk/node-runner
+  stage: dependency-check
+  script:
+    - license-check.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+vulnerability-check:
+  stage: static-analysis
+  before_script:
+    - apt-get update
+  script:
+    - npm install -g better-npm-audit
+    - better-npm-audit audit --registry=https://registry.npmjs.org --level moderate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+lint-and-style:
+  stage: static-analysis
+  before_script:
+    - npm ci
+  script:
+    - npm run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+unused-exports:
+  stage: static-analysis
+  before_script:
+    - npm ci
+  script:
+    - ./node_modules/.bin/ts-unused-exports tsconfig.json --ignoreFiles="ReactMarkdownMock"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+sonar:
+  image: nexus.iig.caci.co.uk/gitlab-sonar
+  stage: static-analysis
+  script:
+    - gitlab-sonar-scanner
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+test-jest:
+  stage: test-jest
+  before_script:
+    - npm ci
+  script:
+    - npm run test:ci
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/ #Extracts coverage from junit.xml
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - coverage/lcov.info
+      - coverage/lcov-report/*/*.html
+      - coverage/execution-report.xml
+
+deploy_to_dev:
+  extends: .deployment
+  variables:
+    ENVIRONMENT: "development"
+    AWS_ACCESS_KEY_ID: "${DEV_AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY: "${DEV_AWS_SECRET_ACCESS_KEY}"
+    ECR_REPOSITORY_URL: "${DEV_ECR_REPOSITORY_URL}"
+    IMAGE_TAG: "latest"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+deploy_to_staging:
+  extends: .deployment
+  variables:
+    ENVIRONMENT: "staging"
+    AWS_ACCESS_KEY_ID: "${STAGING_AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY: "${STAGING_AWS_SECRET_ACCESS_KEY}"
+    ECR_REPOSITORY_URL: "${STAGING_ECR_REPOSITORY_URL}"
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      variables:
+        IMAGE_TAG: "${CI_COMMIT_TAG}"
+
+deploy_to_production:
+  extends: .deployment
+  variables:
+    ENVIRONMENT: "production"
+    AWS_ACCESS_KEY_ID: "${PROD_AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY: "${PROD_AWS_SECRET_ACCESS_KEY}"
+    ECR_REPOSITORY_URL: "${PRODUCTION_ECR_REPOSITORY_URL}"
+    IMAGE_TAG: "$CI_COMMIT_TAG"
+  rules:
+    - if: "$CI_COMMIT_TAG"

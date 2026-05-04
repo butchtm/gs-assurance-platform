@@ -1,0 +1,76 @@
+{
+  "steps": [
+    {
+      "title": "Project(s) Information",
+      "schema": {
+        "type": "object",
+        "required": [
+          "projectTitles",
+          "projectGsids",
+          "projectRegistryLinks",
+          "reportCompletionDate",
+          "monitoringPeriod",
+          "verificationInProgress"
+        ],
+        "properties": {
+          "projectTitles": {
+            "type": "string",
+            "title": "1. Title of Project / VPA(s)",
+            "description": "If you are submitting an annual report for a project or number of VPAs, please include the name of all VPAs as well"
+          },
+          "projectGsids": {
+            "type": "string",
+            "title": "2. GS ID(s)"
+          },
+          "projectRegistryLinks": {
+            "type": "string",
+            "title": "3. GS Registry Project Link(s)"
+          },
+          "reportCompletionDate": {
+            "type": "string",
+            "format": "date",
+            "title": "4. Date of completion of the report"
+          },
+          "monitoringPeriod": {
+            "type": "object",
+            "title": "5. Which monitoring period is the annual report being submitted for?",
+            "required": ["startDate", "endDate"],
+            "properties": {
+              "startDate": {
+                "type": "string",
+                "format": "date",
+                "title": "Start Date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date",
+                "title": "End Date"
+              }
+            }
+          },
+          "verificationInProgress": {
+            "type": "boolean",
+            "title": "6. Is a verification in progress for this monitoring period?",
+            "description": "Annual reports are still required by the end of the calendar year if a verification is in progress but not complete. Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.39 and 5.1.42",
+            "oneOf": [
+              {
+                "const": true,
+                "title": "Yes"
+              },
+              {
+                "const": false,
+                "title": "No"
+              }
+            ],
+            "default": false
+          }
+        }
+      },
+      "uiSchema": {
+        "verificationInProgress": {
+          "ui:widget": "radio"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,237 @@
+spring:
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        show_sql: false
+        generate_statistics: false
+        session.events.log.LOG_QUERIES_SLOWER_THAN_MS: 500
+  main:
+    banner-mode: "off"
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+  freemarker:
+    check-template-location: false
+  datasource.hikari:
+    leak-detection-threshold: 15000
+    maximum-pool-size: 10
+    minimum-idle: 10
+  data.rest.detection-strategy: annotated
+
+server:
+  servlet:
+    contextPath: '/api'
+
+management:
+  info.git.mode: FULL
+  endpoints:
+    web:
+      exposure.include: health,info
+
+s3:
+  region-name: "eu-central-1"
+  bucket-name:
+    document: "gs-ssrnc-dcmts-development"
+    download: "gs-ssrnc-dwlds-development"
+    pii-scanning: "gs-ssrnc-scan-development"
+
+azure.storage:
+  finance:
+    connection-string: ${AZURE_STORAGE_FINANCE_CONNECTION_STRING:}
+    container-name:
+      sales-order: "assureancesalesorderintegration"
+      project-contract: "assuranceprojectintegration"
+
+user-sync:
+  # cron expression to schedule how often to check if user-sync should run
+  # checks every 5 minutes
+  check-cron: '0 */5 * ? * *'
+  # how often a user-sync should be run (in seconds)
+  sync-interval: 295
+
+cognito:
+  region:
+    name: 'eu-central-1'
+  user-pool:
+    id: 'CHANGE-ME'
+
+file:
+  extension:
+    whitelist:
+      # archives
+      - zip
+      - rar
+      - "7z"
+
+      # images
+      - gif
+      - png
+      - bmp
+      - jpg
+      - jpeg
+      - jpe
+      - tiff
+      - tif
+      - dng
+      - jfif
+
+      # documents
+      - doc
+      - docx
+      - pdf
+      - txt
+      - htm
+      - html
+
+      # spreadsheets
+      - xls
+      - xlsx
+      - xlsm
+      - xlsb
+      - csv
+
+      # presentations
+      - ppt
+      - pptx
+
+      # GIS / shapefile
+      - shp
+      - shx
+      - dbf
+
+      # email
+      - msg
+      - eml
+
+      # media / video
+      - mov
+      - mp4
+      - mpeg
+      - spv
+
+      # config & misc
+      - ini
+      - xml
+      - tmp
+      - sav
+
+notification:
+  source: 'no-reply@goldstandard.org'
+  contact-mapping:
+    # set to false to use real email addresses rather than mapping to test email addresses
+    enabled: true
+  ses:
+    region:
+      name: 'eu-central-1'
+
+cache:
+  cacheLengthInMinutes: 60
+
+accounts:
+  armTeam.id: 1
+  registryTeam.id: 2
+  financeTeam.id: 3
+
+public-rate-limit:
+  enabled: ${PUBLIC_RATE_LIMIT_ENABLED:true}
+  allowlist:
+    # CACI primary VPN, CACI secondary VPN, IIG GitLab CI runners
+    v4CDIRs: ${PUBLIC_RATE_LIMIT_ALLOWLIST_V4_CDIRS:46.149.111.41/32,149.107.71.41/32,46.149.111.0/24}
+  comment:
+    pathPatterns: /**/public/comments
+    requestsPerInterval: 10
+    refillInterval: pt30m
+  commentPiiAnalysis:
+    pathPatterns: /**/public/pii-analysis
+    requestsPerInterval: 10
+    refillInterval: pt30m
+  document:
+    pathPatterns: /**/public/documents/**
+    requestsPerInterval: 10
+    refillInterval: pt1m
+  projectDocument:
+    pathPatterns: /**/public/project-documents/**
+    requestsPerInterval: 10
+    refillInterval: pt1m
+
+registry:
+  project.api.link-template: http://localhost:3001/project-documents/%s
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+sdg.tool:
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes: 429,500,502,503,504
+
+d365:
+  update:
+    interval: pt30m
+    retryInterval: pt2h
+    maxRetries: 20
+    maxRequests: 200
+    abortCodes:
+
+comprehend:
+  detectEntitiesCharLimit: ${COMPREHEND_CHAR_LIMIT:100000}
+  region: "eu-central-1"
+  typesToIgnore: "DATE_TIME"
+  defaultScoreThreshold: 0.50
+  dataAccessRoleArn: ${COMPREHEND_DATA_ACCESS_ROLE_ARN:}
+  poll-for-completion:
+    # cron expression to schedule how often to check if ComprehendJobService should run
+    # checks every 5 minutes
+    check-cron: '0 */5 * ? * *'
+    # how often ComprehendJobService should be run (in seconds)
+    sync-interval: 295
+
+textract:
+  region: "eu-central-1"
+  pollingRate: ${TEXTRACT_POLLING_RATE:5000}
+
+document:
+  piiScanningEnabled: ${DOCUMENT_PII_SCANNING_ENABLED:true}
+
+jodconverter:
+  local:
+    office-home: ${LIBRE_OFFICE_DIR:/usr/lib/libreoffice} # For Windows this will likely be C:/Program Files/LibreOffice
+    enabled: true
+
+stakeholder-consultation:
+  send-notification:
+    # cron expression to schedule how often to check if ConsultationNotificationProcess should run
+    # checks every day at 5pm
+    check-cron: '0 0 17 * * *'
+    # how often ConsultationNotificationProcess should be run (in seconds)
+    sync-interval: 82800 # 23 hours
+
+conversation:
+  send-notification:
+    check-cron: '0 0 5 * * MON-FRI'
+    sync-interval: 82800 # 23 hours
+
+system-user:
+  uuid: '18ef573d-765e-496f-a8d8-253ad0663113'
+  username: 'System'
+
+web:
+  ui-hostname: ${WEB_UI_HOSTNAME:http://localhost:3000}
+
+logging.level:
+  org.jooq:
+    Constants: off
+
+logging:
+  sns:
+    arn: ${LOGGING_SNS_ARN:}
+    region: ${LOGGING_SNS_REGION:eu-central-1}
+    max-message-length: ${LOGGING_SNS_MAX_MESSAGE_LENGTH:8000}

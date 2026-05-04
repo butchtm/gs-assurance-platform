@@ -1,0 +1,187 @@
+{
+  "schema": {
+    "title": "Test Form",
+    "type": "object",
+    "required": ["firstName", "lastName", "email"],
+    "properties": {
+      "firstName": {
+        "type": "string",
+        "title": "First Name",
+        "description": "Enter your first name"
+      },
+      "lastName": {
+        "type": "string",
+        "title": "Last Name",
+        "description": "Enter your last name"
+      },
+      "email": {
+        "type": "string",
+        "format": "email",
+        "title": "Email Address",
+        "description": "Enter a valid email address"
+      },
+      "age": {
+        "type": "integer",
+        "title": "Age",
+        "minimum": 0,
+        "maximum": 120,
+        "description": "Enter your age"
+      },
+      "bio": {
+        "type": "string",
+        "title": "Biography",
+        "description": "Tell us about yourself"
+      },
+      "skills": {
+        "type": "array",
+        "title": "Skills",
+        "items": {
+          "type": "string",
+          "enum": ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Java"]
+        },
+        "uniqueItems": true,
+        "description": "Select your skills"
+      },
+      "experience": {
+        "type": "string",
+        "title": "Experience Level",
+        "enum": ["Beginner", "Intermediate", "Advanced", "Expert"],
+        "description": "Select your experience level"
+      },
+      "favoriteColors": {
+        "type": "array",
+        "title": "Favorite Colors (Multi-Select Autocomplete)",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Red",
+            "Blue",
+            "Green",
+            "Yellow",
+            "Purple",
+            "Orange",
+            "Pink",
+            "Brown",
+            "Black",
+            "White",
+            "Gray",
+            "Turquoise"
+          ]
+        },
+        "uniqueItems": true,
+        "description": "Select your favorite colors from dropdown"
+      },
+      "preferredLanguages": {
+        "type": "array",
+        "title": "Preferred Programming Languages (Multi-Select)",
+        "items": {
+          "type": "string",
+          "enum": [
+            "JavaScript",
+            "TypeScript",
+            "Python",
+            "Java",
+            "C#",
+            "C++",
+            "Go",
+            "Rust",
+            "PHP",
+            "Ruby",
+            "Swift",
+            "Kotlin",
+            "Dart"
+          ]
+        },
+        "uniqueItems": true,
+        "description": "Select multiple programming languages"
+      },
+      "birthDate": {
+        "type": "string",
+        "format": "date",
+        "title": "Birth Date",
+        "description": "Select your birth date"
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date",
+        "title": "Project Start Date",
+        "description": "When would you like to start?"
+      },
+      "settings": {
+        "type": "object",
+        "title": "Settings",
+        "properties": {
+          "newsletter": {
+            "type": "boolean",
+            "title": "Subscribe to Newsletter",
+            "default": false
+          },
+          "notifications": {
+            "type": "boolean",
+            "title": "Enable Notifications",
+            "default": true
+          }
+        }
+      }
+    }
+  },
+  "uiSchema": {
+    "firstName": {
+      "ui:autocomplete": "given-name"
+    },
+    "lastName": {
+      "ui:autocomplete": "family-name"
+    },
+    "email": {
+      "ui:autocomplete": "email"
+    },
+    "bio": {
+      "ui:widget": "textarea",
+      "ui:options": {
+        "rows": 4
+      }
+    },
+    "skills": {
+      "ui:widget": "ChipMultiSelectWidget"
+    },
+    "experience": {
+      "ui:widget": "radio"
+    },
+    "favoriteColors": {
+      "ui:widget": "ChipMultiSelectWidget"
+    },
+    "preferredLanguages": {
+      "ui:widget": "ChipMultiSelectWidget"
+    },
+    "birthDate": {
+      "ui:widget": "date",
+      "ui:options": {
+        "yearsRange": [1920, 2010]
+      }
+    },
+    "startDate": {
+      "ui:widget": "date"
+    },
+    "settings": {
+      "ui:options": {
+        "label": true
+      }
+    }
+  },
+  "initialFormData": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "age": 30,
+    "skills": ["JavaScript", "TypeScript", "React"],
+    "experience": "Intermediate",
+    "favoriteColors": ["Blue", "Green"],
+    "preferredLanguages": ["JavaScript", "TypeScript", "Python"],
+    "birthDate": "1994-03-15",
+    "startDate": "2025-02-01",
+    "settings": {
+      "newsletter": false,
+      "notifications": true
+    }
+  }
+}

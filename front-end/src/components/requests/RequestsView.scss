@@ -1,0 +1,160 @@
+.requests-view {
+  position: relative;
+}
+
+.drop-down {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 2px solid lightgray;
+  margin: 10px 5px;
+}
+
+.action-container-disabled {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 10px;
+  padding: 0 10px;
+  border-radius: 5px;
+  background-color: lightgray;
+  color: rgb(114, 114, 114);
+
+  .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 10px;
+  }
+}
+
+.action-container p {
+  margin: 0;
+  display: flex;
+  align-items: center; /* Ensure the text is aligned with the icon vertically */
+}
+
+.title-box {
+  padding-bottom: 5px;
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+}
+
+.request-key-information-container {
+  cursor: pointer;
+}
+.request-key-information-container:hover {
+  background: #eee;
+}
+
+.key-information {
+  margin: 0.5rem;
+  display: flex;
+}
+
+.request-drop-down {
+  box-shadow: 0 0 8px 0 #0002;
+  margin: 10px 20px 14px;
+  border: 1px solid #0002;
+}
+
+.action-image-container {
+  padding: 0 5px 0 0;
+}
+.image-container {
+  display: flex;
+  padding-right: 5px;
+  align-self: center;
+}
+
+.missing-document-indicator {
+  background-color: red;
+  width: 10px;
+  opacity: 50%;
+}
+
+.available-document-indicator {
+  background-color: lightgreen;
+  width: 10px;
+  opacity: 50%;
+}
+
+.document-status {
+  display: inline-flex;
+  border-radius: 5px;
+  padding: 1px 6px;
+  align-items: center;
+  margin-left: 11px;
+
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.document-info {
+  margin-right: 1rem;
+  text-align: left !important;
+}
+
+.public-status {
+  background-color: rgb(70, 180, 70);
+}
+
+.anonymous {
+  background-color: rgb(108, 89, 107);
+}
+
+.private-status {
+  background-color: rgb(221, 66, 66);
+}
+
+.requested {
+  border-radius: 5px;
+  background-color: red;
+}
+
+.image-container-dropdown-arrow {
+  height: 25px;
+  margin-top: 1%;
+  margin-right: 10px;
+}
+
+.action-button {
+  width: 100%;
+  justify-content: left !important;
+  padding: 12px 17px !important;
+  margin-top: 11px !important;
+}
+
+.action-text {
+  padding-left: 6px;
+}
+
+.rq-download-btn {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.document-missing {
+  border-radius: 5px;
+  background-color: rgb(255, 203, 203);
+}
+
+.document-missing-text {
+  color: red;
+}
+
+.rq-modify-btn {
+  float: right;
+}
+
+.change-request-status-button {
+  border-bottom: 1px solid lightgray;
+  padding-top: 0.5%;
+  padding-bottom: 0.5%;
+  cursor: pointer;
+}
+
+.change-request-status-button:hover {
+  background-color: #e0e0e0;
+}

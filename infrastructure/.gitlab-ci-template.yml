@@ -1,0 +1,18 @@
+.terraform-security-check:
+  image: 
+    name: aquasec/trivy:latest
+    entrypoint: ["/bin/sh", "-c"]
+  stage: static-tf-analysis
+  script:
+    - trivy config --tf-vars ${TF_VAR_FILE_NAME}.tfvars . --exit-code 1
+
+.terraform-code-analysis:
+  image:
+    name: bridgecrew/checkov:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  stage: static-tf-analysis
+  script:
+    #s3 event notifications & bucket replication checks skipped
+    - checkov --var-file ${TF_VAR_FILE_NAME}.tfvars --directory . --skip-check CKV2_AWS_62,CKV_AWS_144

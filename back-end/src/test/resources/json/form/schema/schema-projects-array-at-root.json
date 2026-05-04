@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "gsid": { "type": "string" },
+          "title": { "type": "string" }
+        }
+      }
+    }
+  }
+}

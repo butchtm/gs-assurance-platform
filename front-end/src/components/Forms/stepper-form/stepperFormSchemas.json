@@ -1,0 +1,237 @@
+{
+  "steps": [
+    {
+      "title": "Personal Information",
+      "description": "Basic personal details",
+      "schema": {
+        "type": "object",
+        "required": ["firstName", "lastName", "email"],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "title": "First Name",
+            "description": "Enter your first name"
+          },
+          "lastName": {
+            "type": "string",
+            "title": "Last Name",
+            "description": "Enter your last name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email Address",
+            "description": "Enter a valid email address"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone Number",
+            "description": "Enter your phone number"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Date of Birth",
+            "description": "Select your birth date"
+          }
+        }
+      },
+      "uiSchema": {
+        "firstName": {
+          "ui:autocomplete": "given-name"
+        },
+        "lastName": {
+          "ui:autocomplete": "family-name"
+        },
+        "email": {
+          "ui:autocomplete": "email"
+        },
+        "phone": {
+          "ui:autocomplete": "tel"
+        },
+        "birthDate": {
+          "ui:widget": "date",
+          "ui:options": {
+            "yearsRange": [1920, 2010]
+          }
+        }
+      }
+    },
+    {
+      "title": "Professional Details",
+      "description": "Your work experience and skills",
+      "schema": {
+        "type": "object",
+        "required": ["jobTitle", "experience"],
+        "properties": {
+          "jobTitle": {
+            "type": "string",
+            "title": "Job Title",
+            "description": "Your current or desired job title"
+          },
+          "company": {
+            "type": "string",
+            "title": "Company",
+            "description": "Your current or previous company"
+          },
+          "experience": {
+            "type": "string",
+            "title": "Experience Level",
+            "enum": ["Entry Level", "Junior", "Mid-level", "Senior", "Lead", "Principal"],
+            "description": "Select your experience level"
+          },
+          "skills": {
+            "type": "array",
+            "title": "Technical Skills",
+            "items": {
+              "type": "string",
+              "enum": ["JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "C#", "Go"]
+            },
+            "uniqueItems": true,
+            "description": "Select your technical skills"
+          },
+          "salary": {
+            "type": "number",
+            "title": "Expected Salary",
+            "minimum": 0,
+            "description": "Enter your expected annual salary"
+          }
+        }
+      },
+      "uiSchema": {
+        "experience": {
+          "ui:widget": "radio"
+        },
+        "skills": {
+          "ui:widget": "ChipMultiSelectWidget"
+        },
+        "salary": {
+          "ui:options": {
+            "inputType": "number"
+          }
+        }
+      }
+    },
+    {
+      "title": "Preferences & Settings",
+      "description": "Your preferences and account settings",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "workLocation": {
+            "type": "string",
+            "title": "Preferred Work Location",
+            "enum": ["Remote", "On-site", "Hybrid", "No preference"],
+            "description": "Select your preferred work arrangement"
+          },
+          "availableStartDate": {
+            "type": "string",
+            "format": "date",
+            "title": "Available Start Date",
+            "description": "When can you start working?"
+          },
+          "willingToRelocate": {
+            "type": "boolean",
+            "title": "Willing to Relocate",
+            "default": false
+          },
+          "interests": {
+            "type": "array",
+            "title": "Professional Interests",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Frontend Development",
+                "Backend Development",
+                "Mobile Development",
+                "DevOps",
+                "Data Science",
+                "Machine Learning",
+                "UI/UX Design",
+                "Project Management"
+              ]
+            },
+            "uniqueItems": true,
+            "description": "Select areas of interest"
+          },
+          "bio": {
+            "type": "string",
+            "title": "Professional Bio",
+            "description": "Tell us about your professional background and goals"
+          },
+          "notifications": {
+            "type": "object",
+            "title": "Notification Preferences",
+            "properties": {
+              "emailNotifications": {
+                "type": "boolean",
+                "title": "Email Notifications",
+                "default": true
+              },
+              "smsNotifications": {
+                "type": "boolean",
+                "title": "SMS Notifications",
+                "default": false
+              },
+              "jobAlerts": {
+                "type": "boolean",
+                "title": "Job Alerts",
+                "default": true
+              }
+            }
+          }
+        }
+      },
+      "uiSchema": {
+        "workLocation": {
+          "ui:widget": "radio"
+        },
+        "availableStartDate": {
+          "ui:widget": "date"
+        },
+        "interests": {
+          "ui:widget": "ChipMultiSelectWidget"
+        },
+        "bio": {
+          "ui:widget": "textarea",
+          "ui:options": {
+            "rows": 4
+          }
+        },
+        "notifications": {
+          "ui:options": {
+            "label": true
+          }
+        }
+      }
+    }
+  ],
+  "initialFormData": {
+    "step0": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1-555-0123",
+      "birthDate": "1990-05-15"
+    },
+    "step1": {
+      "jobTitle": "Frontend Developer",
+      "company": "Tech Corp",
+      "experience": "Mid-level",
+      "skills": ["JavaScript", "TypeScript", "React"],
+      "salary": 75000
+    },
+    "step2": {
+      "workLocation": "Hybrid",
+      "availableStartDate": "2025-03-01",
+      "willingToRelocate": false,
+      "interests": ["Frontend Development", "UI/UX Design"],
+      "bio": "Passionate frontend developer with experience in modern web technologies.",
+      "notifications": {
+        "emailNotifications": true,
+        "smsNotifications": false,
+        "jobAlerts": true
+      }
+    }
+  }
+}

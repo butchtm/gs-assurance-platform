@@ -1,0 +1,17 @@
+{
+  "steps": [
+    {
+      "title": "Mock Step",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "mockQuestion1": {
+            "type": "string",
+            "title": "1. This is a mock question 1"
+          }
+        }
+      },
+      "uiSchema": {}
+    }
+  ]
+}

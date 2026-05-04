@@ -1,0 +1,16 @@
+.types-container {
+  width: 60%;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: left;
+}
+
+.list {
+  list-style-type: disc;
+  margin: 0;
+  padding: 0;
+}
+
+.list li {
+  margin-bottom: 10px;
+}

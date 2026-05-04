@@ -1,0 +1,49 @@
+{
+  "id": "1666",
+  "created_at": "2019-03-27T13:54:23Z",
+  "updated_at": "2026-01-02T05:02:11Z",
+  "name": "test project name",
+  "description": "test project description",
+  "status": "NEW_PROJECT",
+  "gsf_standards_version": "Gold Standard for the Global Goals",
+  "estimated_annual_credits": 987,
+  "crediting_period_start_date": "2024-01-01",
+  "crediting_period_end_date": "2028-01-01",
+  "methodology": "ACM0001 Flaring or use of landfill gas",
+  "type": "A/R",
+  "size": "Large Scale",
+  "sustaincert_id": 1234,
+  "sustaincert_url": "http://localhost:3001/projects/GS1234",
+  "project_developer": "test account name",
+  "country": "International",
+  "country_code": "XZ",
+  "latitude": null,
+  "longitude": null,
+  "state": null,
+  "carbon_stream": "GS_CER",
+  "programme_of_activities": "POA",
+  "crediting_periods": "[{\"id\":1,\"start_date\":\"2024-01-01\",\"end_date\":\"2025-12-31\",\"methodologies\":[{\"id\":1,\"description\":\"AMC1 - methodology 1\",\"version\":1.1},{\"id\":2,\"description\":\"AMC2 - methodology 2\",\"version\":2.1}]},{\"id\":2,\"start_date\":\"2026-01-01\",\"end_date\":\"2028-01-01\",\"methodologies\":[{\"id\":1,\"description\":\"AMC1 - methodology 1\",\"version\":1.1},{\"id\":2,\"description\":\"AMC2 - methodology 2\",\"version\":2.1}]}]",
+  "sustainable_development_goals": [
+    {
+      "name": "Goal 7: Affordable and Clean Energy",
+      "issuable_products": []
+    },
+    {
+      "name": "Goal 2: Zero Hunger",
+      "issuable_products": []
+    }
+  ],
+  "owner": {
+    "id": "99",
+    "created_at": "2019-03-27T11:23:52Z",
+    "updated_at": "2019-03-27T11:23:52Z",
+    "number": "1022286",
+    "is_chargeable": false,
+    "has_marketplace_listing": false,
+    "is_master_account": true,
+    "is_partner": false,
+    "can_access_marketplace_integration_kit": false,
+    "can_access_projects_api": false
+  },
+  "labels": []
+}

@@ -1,0 +1,35 @@
+stages:
+  - build
+
+variables:
+  DOCKER_VERSION: "24.0.6"
+
+build-back-end-pipeline-image:
+  stage: build
+  image: ${NEXUS_PREFIX}/docker-runner
+  services:
+    - name: ${NEXUS_PREFIX}/docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    PIPELINE_IMAGE: ${NEXUS_PREFIX}/gold_standard/back-end/pipeline:latest
+  script:
+    - docker build -f ./docker/back-end-pipeline.Dockerfile --build-arg DOCKER_VERSION=${DOCKER_VERSION} --build-arg NEXUS_PREFIX=${NEXUS_PREFIX} -t ${PIPELINE_IMAGE} .
+    - docker push ${PIPELINE_IMAGE}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BUILD_BACK_END_PIPELINE_IMAGE_JOB'
+
+build-back-end-base-image:
+  stage: build
+  image: ${NEXUS_PREFIX}/docker-runner
+  services:
+    - name: ${NEXUS_PREFIX}/docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    APP_BASE_IMAGE: ${NEXUS_PREFIX}/gold_standard/back-end/app-base:latest
+  script:
+    - docker build -f ./docker/back-end-base.Dockerfile --build-arg DOCKER_VERSION=${DOCKER_VERSION} -t ${APP_BASE_IMAGE} .
+    - docker push ${APP_BASE_IMAGE}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $BUILD_BACK_END_BASE_IMAGE_JOB'

@@ -1,0 +1,73 @@
+{
+  "body": {
+    "content": [
+      {
+        "id": 82846,
+        "recipientType": "ACCOUNT",
+        "recipientId": 706,
+        "addressees": [
+          "testuser@example.com"
+        ],
+        "subject": "Design Change | With VVB no. 1 received for GS31244",
+        "htmlBody": "<div style=\"font-family: Arial,sans-serif;\">\n    <p>Dear Reviewer,</p>\n    <p>\n    You have been assigned to review the following project’s request. Please log-in to your account to access project documents.\n    </p>\n    <p>\n    Please upload the findings documents on GSIQ platform.\n    </p>\n    <p>\n    Should you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\n    </p>\n    <p>\n    Best regards,\n    </p>\n    <p>\n    The Gold Standard Foundation\n    </p>\n    <hr style=\"border: 1px solid #cccccc;\"/>\n    <ul style={{ listStyle: 'none', padding: 0 }}>\n\t<table>\n\t\t<tr>\n\t\t\t<td><strong>Project:</strong></td>\n\t\t\t<td>automation test (POA) run:582 (L)</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>GSID:</strong></td>\n\t\t\t<td>GS31244</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>Request:</strong></td>\n\t\t\t<td>Design Change | With VVB no. 1</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>Project Type:</strong></td>\n\t\t\t<td>Agriculture</td>\n\t\t</tr>\n\t\t<tr>\n            <td><strong>Feedback Round:</strong></td>\n            <td>1</td>\n\t\t</tr>\n\t\t<tr>\n            <td><strong>Review Due Date:</strong></td>\n            <td>25/12/2025</td>\n\t\t</tr>\n    </table>\n</div>",
+        "textBody": "Dear Reviewer,\n\nYou have been assigned to review the following project’s request. Please log-in to your account to access project documents.\n\nPlease upload the findings documents on GSIQ platform.\n\nShould you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\n\nBest regards,\n\nThe Gold Standard Foundation\n\n\nProject: automation test (POA) run:582 (L)\n\nGSID: GS31244\n\nRequest: Design Change | With VVB no. 1\n\nProject Type: Agriculture\n\nFeedback Round: 1\n\nReview Due Date: 25/12/2025\n",
+        "createdTimestamp": "2025-11-27T09:04:14.755754Z",
+        "messagingReference": "0107019ac48e59bb-5f1b6d7c-317c-48b0-895d-31cf8c11f012-000000"
+      }
+    ],
+    "pageSize": 1,
+    "pageNumber": 1,
+    "totalPages": 15223,
+    "totalElements": 15223
+  },
+  "headers": {
+    "date": "Thu, 27 Nov 2025 09:04:15 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "0",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "pragma": "no-cache",
+    "expires": "0",
+    "x-frame-options": "DENY"
+  },
+  "status": 200,
+  "statusText": "OK",
+  "isOkStatusCode": true,
+  "requestHeaders": {
+    "Connection": "keep-alive",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+    "accept": "*/*",
+    "cookie": "refreshToken=REDACTED_REFRESH_TOKEN; accessToken=REDACTED_ACCESS_TOKEN; idToken=REDACTED_ID_TOKEN",
+    "accept-encoding": "gzip, deflate"
+  },
+  "duration": 51,
+  "allRequestResponses": [
+    {
+      "Request Body": null,
+      "Request Headers": {
+        "Connection": "keep-alive",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
+        "accept": "*/*",
+        "cookie": "refreshToken=REDACTED_REFRESH_TOKEN; accessToken=REDACTED_ACCESS_TOKEN; idToken=REDACTED_ID_TOKEN",
+        "accept-encoding": "gzip, deflate"
+      },
+      "Request URL": "https://dev.goldstandard-assurance.org/api/notifications/emails?size=1",
+      "Response Body": "{\"content\":[{\"id\":82846,\"recipientType\":\"ACCOUNT\",\"recipientId\":706,\"addressees\":[\"testuser@example.com\"],\"subject\":\"Design Change | With VVB no. 1 received for GS31244\",\"htmlBody\":\"<div style=\\\"font-family: Arial,sans-serif;\\\">\\n    <p>Dear Reviewer,</p>\\n    <p>\\n    You have been assigned to review the following project’s request. Please log-in to your account to access project documents.\\n    </p>\\n    <p>\\n    Please upload the findings documents on GSIQ platform.\\n    </p>\\n    <p>\\n    Should you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\\n    </p>\\n    <p>\\n    Best regards,\\n    </p>\\n    <p>\\n    The Gold Standard Foundation\\n    </p>\\n    <hr style=\\\"border: 1px solid #cccccc;\\\"/>\\n    <ul style={{ listStyle: 'none', padding: 0 }}>\\n\\t<table>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Project:</strong></td>\\n\\t\\t\\t<td>automation test (POA) run:582 (L)</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>GSID:</strong></td>\\n\\t\\t\\t<td>GS31244</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Request:</strong></td>\\n\\t\\t\\t<td>Design Change | With VVB no. 1</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Project Type:</strong></td>\\n\\t\\t\\t<td>Agriculture</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n            <td><strong>Feedback Round:</strong></td>\\n            <td>1</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n            <td><strong>Review Due Date:</strong></td>\\n            <td>25/12/2025</td>\\n\\t\\t</tr>\\n    </table>\\n</div>\",\"textBody\":\"Dear Reviewer,\\n\\nYou have been assigned to review the following project’s request. Please log-in to your account to access project documents.\\n\\nPlease upload the findings documents on GSIQ platform.\\n\\nShould you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\\n\\nBest regards,\\n\\nThe Gold Standard Foundation\\n\\n\\nProject: automation test (POA) run:582 (L)\\n\\nGSID: GS31244\\n\\nRequest: Design Change | With VVB no. 1\\n\\nProject Type: Agriculture\\n\\nFeedback Round: 1\\n\\nReview Due Date: 25/12/2025\\n\",\"createdTimestamp\":\"2025-11-27T09:04:14.755754Z\",\"messagingReference\":\"0107019ac48e59bb-5f1b6d7c-317c-48b0-895d-31cf8c11f012-000000\"}],\"pageSize\":1,\"pageNumber\":1,\"totalPages\":15223,\"totalElements\":15223}",
+      "Response Headers": {
+        "date": "Thu, 27 Nov 2025 09:04:15 GMT",
+        "content-type": "application/json",
+        "transfer-encoding": "chunked",
+        "connection": "keep-alive",
+        "x-content-type-options": "nosniff",
+        "x-xss-protection": "0",
+        "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+        "pragma": "no-cache",
+        "expires": "0",
+        "x-frame-options": "DENY"
+      },
+      "Response Status": 200
+    }
+  ]
+}

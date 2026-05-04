@@ -1,0 +1,615 @@
+{
+  "steps": [
+    {
+      "title": "Project(s) Information",
+      "schema": {
+        "type": "object",
+        "required": ["projects"],
+        "properties": {
+          "projects": {
+            "type": "array",
+            "minItems": 1,
+            "title": "If you are submitting an annual report for a project or number of VPAs, please include the details of all VPAs",
+            "items": {
+              "type": "object",
+              "title": "",
+              "required": ["title", "gsid", "registryLink"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "title": "1. Title of Project / VPA"
+                },
+                "gsid": {
+                  "type": "string",
+                  "title": "2. GS ID"
+                },
+                "registryLink": {
+                  "type": "string",
+                  "title": "3. GS Registry Project Link"
+                }
+              }
+            }
+          }
+        }
+      },
+      "uiSchema": {
+        "projects": {
+          "items": {
+            "ui:order": ["title", "gsid", "registryLink"]
+          }
+        }
+      }
+    },
+    {
+      "title": "Report Information",
+      "schema": {
+        "type": "object",
+        "required": ["reportCompletionDate", "monitoringPeriod", "verificationInProgress"],
+        "properties": {
+          "reportCompletionDate": {
+            "type": "string",
+            "format": "date",
+            "title": "4. Date of completion of the report"
+          },
+          "monitoringPeriod": {
+            "type": "object",
+            "title": "5. Which monitoring period is the annual report being submitted for?",
+            "required": ["startDate", "endDate"],
+            "properties": {
+              "startDate": {
+                "type": "string",
+                "format": "date",
+                "title": "Start Date"
+              },
+              "endDate": {
+                "type": "string",
+                "format": "date",
+                "title": "End Date"
+              }
+            }
+          },
+          "verificationInProgress": {
+            "type": "boolean",
+            "title": "6. Is a verification in progress for this monitoring period?",
+            "description": "Annual reports are still required by the end of the calendar year if a verification is in progress but not complete. Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.39 and 5.1.42",
+            "oneOf": [
+              {
+                "const": true,
+                "title": "Yes"
+              },
+              {
+                "const": false,
+                "title": "No"
+              }
+            ],
+            "default": false
+          }
+        }
+      },
+      "uiSchema": {
+        "ui:order": ["reportCompletionDate", "monitoringPeriod", "verificationInProgress"],
+        "monitoringPeriod": {
+          "ui:order": ["startDate", "endDate"]
+        },
+        "verificationInProgress": {
+          "ui:widget": "radio"
+        }
+      }
+    },
+    {
+      "title": "Annual Report",
+      "schema": {
+        "type": "object",
+        "required": ["projectActivity", "projectProgressSummary", "grievanceMechanismChanged"],
+        "properties": {
+          "projectActivity": {
+            "type": "object",
+            "title": "",
+            "description": "",
+            "required": ["projectActiveDuringPeriod"],
+            "properties": {
+              "projectActiveDuringPeriod": {
+                "type": "boolean",
+                "title": "7. Has the project been actively implemented/operated during the monitoring period (Q5) this report refers to?",
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ],
+                "default": true
+              }
+            },
+            "if": {
+              "properties": {
+                "projectActiveDuringPeriod": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "projectInactiveReason": {
+                  "title": "If answer is no to Q7, please explain the reason",
+                  "type": "string"
+                }
+              },
+              "required": ["projectInactiveReason"]
+            }
+          },
+          "projectProgressSummary": {
+            "type": "string",
+            "title": "8. Please list the recent activities, events and actions related to the project that summarize the project's progress during the monitoring period this report refers to",
+            "description": "This may include milestones in implementation, calibration of equipment, carrying out of surveys or monitoring activities, Host Country approvals, etc. Refer to: [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(a)"
+          },
+          "grievanceMechanismChanged": {
+            "type": "boolean",
+            "title": "9. Have there been any changes to the continuous input/grievance mechanism during the monitoring period this report refers to?",
+            "description": "If yes, please ensure that all stakeholders are informed of the new way to provide continuous inputs or file grievances.",
+            "oneOf": [
+              {
+                "const": true,
+                "title": "Yes"
+              },
+              {
+                "const": false,
+                "title": "No"
+              }
+            ]
+          }
+        }
+      },
+      "uiSchema": {
+        "ui:order": ["projectActivity", "projectProgressSummary", "grievanceMechanismChanged"],
+        "projectActivity": {
+          "projectActiveDuringPeriod": {
+            "ui:widget": "radio"
+          },
+          "projectInactiveReason": {
+            "ui:widget": "LargeTextWidget",
+            "ui:options": {
+              "rows": 4
+            }
+          }
+        },
+        "projectProgressSummary": {
+          "ui:widget": "LargeTextWidget",
+          "ui:options": {
+            "rows": 4
+          }
+        },
+        "grievanceMechanismChanged": {
+          "ui:widget": "radio"
+        }
+      }
+    },
+    {
+      "title": "Stakeholder Engagement Report",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "stakeholderEngagement": {
+            "type": "object",
+            "title": "",
+            "required": ["stakeholderFeedbackReceived"],
+            "properties": {
+              "stakeholderFeedbackReceived": {
+                "type": "boolean",
+                "title": "10. Has there been any input/feedback or grievance provided by stakeholders after the validation stage and during the monitoring period this report refers to?",
+                "description": "Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(c). If yes, please fill out the details below.",
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ],
+                "default": false
+              }
+            },
+            "if": {
+              "properties": {
+                "stakeholderFeedbackReceived": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "stakeholderFeedbackEntries": {
+                  "type": "array",
+                  "minItems": 1,
+                  "title": "Stakeholder Engagement Report",
+                  "items": {
+                    "type": "object",
+                    "title": "",
+                    "required": [
+                      "date",
+                      "comment",
+                      "expectedActions",
+                      "ownerResponse",
+                      "responsiblePerson",
+                      "issueResolved"
+                    ],
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "format": "date",
+                        "title": "Date"
+                      },
+                      "comment": {
+                        "type": "string",
+                        "title": "Comment"
+                      },
+                      "expectedActions": {
+                        "type": "string",
+                        "title": "Actions expected from Project Owner"
+                      },
+                      "ownerResponse": {
+                        "type": "string",
+                        "title": "Response by Project Owner"
+                      },
+                      "responsiblePerson": {
+                        "type": "string",
+                        "title": "Responsible person for the issue"
+                      },
+                      "issueResolved": {
+                        "type": "boolean",
+                        "title": "Issue Resolved?"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": ["stakeholderFeedbackEntries"]
+            }
+          }
+        }
+      },
+      "uiSchema": {
+        "stakeholderEngagement": {
+          "stakeholderFeedbackReceived": {
+            "ui:widget": "radio"
+          },
+          "stakeholderFeedbackEntries": {
+            "items": {
+              "ui:order": ["date", "comment", "expectedActions", "ownerResponse", "responsiblePerson", "issueResolved"],
+              "expectedActions": {
+                "ui:widget": "LargeTextWidget",
+                "ui:options": {
+                  "rows": 4
+                }
+              },
+              "ownerResponse": {
+                "ui:widget": "LargeTextWidget",
+                "ui:options": {
+                  "rows": 4
+                }
+              },
+              "issueResolved": {
+                "ui:widget": "radio"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Annual Report part 2",
+      "schema": {
+        "type": "object",
+        "required": ["incidentReport", "legalDisputes", "projectUpdates", "monitoringSummary"],
+        "properties": {
+          "incidentReport": {
+            "type": "object",
+            "title": "",
+            "description": "",
+            "required": ["incidentOccurred"],
+            "properties": {
+              "incidentOccurred": {
+                "type": "boolean",
+                "title": "11. Have there been any incidents or events that may impact the Outcomes/Impacts delivered to date (in terms of loss) or the ongoing Performance of the Project.",
+                "description": "Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(d)",
+                "default": false,
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ]
+              }
+            },
+            "if": {
+              "properties": {
+                "incidentOccurred": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "incidentDetails": {
+                  "title": "If answer is yes to Q11, please explain the reason",
+                  "type": "string"
+                }
+              },
+              "required": ["incidentDetails"]
+            }
+          },
+          "legalDisputes": {
+            "type": "object",
+            "title": "",
+            "description": "",
+            "required": ["legalDisputesOccurred"],
+            "properties": {
+              "legalDisputesOccurred": {
+                "type": "boolean",
+                "title": "12. Have any legal contests/disputes arisen related to the project?",
+                "description": "Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(e)",
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ],
+                "default": false
+              }
+            },
+            "if": {
+              "properties": {
+                "legalDisputesOccurred": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "legalDisputesDetails": {
+                  "title": "If answer is yes to Q12, please explain the reason",
+                  "type": "string"
+                }
+              },
+              "required": ["legalDisputesDetails"]
+            }
+          },
+          "projectUpdates": {
+            "type": "object",
+            "title": "",
+            "description": "",
+            "required": ["projectUpdatesOccurred"],
+            "properties": {
+              "projectUpdatesOccurred": {
+                "type": "boolean",
+                "title": "13. Have there been any updates to the Key Project Information, Project Design Document, Monitoring & Reporting Plan?",
+                "description": "Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(f)",
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ],
+                "default": false
+              }
+            },
+            "if": {
+              "properties": {
+                "projectUpdatesOccurred": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "projectUpdatesDetails": {
+                  "title": "If answer is yes to Q13, please explain the reason",
+                  "type": "string"
+                }
+              },
+              "required": ["projectUpdatesDetails"]
+            }
+          },
+          "monitoringSummary": {
+            "type": "string",
+            "title": "14. Please provide a summary of the monitoring information collected during the year. ",
+            "description": "Please only provide information on those indicators monitored during the reporting period. Indicators monitored once per monitoring period are not necessary to be included here. Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(g)"
+          },
+          "lufParticipantUpdates": {
+            "type": "string",
+            "title": "15. (For LUF projects) Have there been any updates to the 'Project Participants and Secured Titles'?",
+            "description": "Please ensure that at all times the project is in compliance with section 2 (b) of the Land Use and Forests Activity Requirements. Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(h)",
+            "oneOf": [
+              {
+                "const": "true",
+                "title": "Yes"
+              },
+              {
+                "const": "false",
+                "title": "No"
+              },
+              {
+                "const": "",
+                "title": "N/A"
+              }
+            ],
+            "default": ""
+          },
+          "extremeEvents": {
+            "type": "object",
+            "title": "",
+            "description": "",
+            "required": ["extremeEventsOccurred"],
+            "properties": {
+              "extremeEventsOccurred": {
+                "type": "boolean",
+                "title": "16. Have there been any extreme events that potentially resulted in reversal of sequestered emissions by the project activity?",
+                "oneOf": [
+                  {
+                    "const": true,
+                    "title": "Yes"
+                  },
+                  {
+                    "const": false,
+                    "title": "No"
+                  }
+                ],
+                "default": false
+              }
+            },
+            "if": {
+              "properties": {
+                "extremeEventsOccurred": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "extremeEventDetails": {
+                  "title": "If answer is yes to Q16, please explain the reason",
+                  "type": "string"
+                }
+              },
+              "required": ["extremeEventDetails"]
+            }
+          }
+        }
+      },
+      "uiSchema": {
+        "ui:order": [
+          "incidentReport",
+          "legalDisputes",
+          "projectUpdates",
+          "monitoringSummary",
+          "lufParticipantUpdates",
+          "extremeEvents"
+        ],
+        "incidentReport": {
+          "incidentOccurred": {
+            "ui:widget": "radio"
+          },
+          "incidentDetails": {
+            "ui:widget": "LargeTextWidget",
+            "ui:options": {
+              "rows": 4
+            }
+          }
+        },
+        "legalDisputes": {
+          "legalDisputesOccurred": {
+            "ui:widget": "radio"
+          },
+          "legalDisputesDetails": {
+            "ui:widget": "LargeTextWidget",
+            "ui:options": {
+              "rows": 4
+            }
+          }
+        },
+        "projectUpdates": {
+          "projectUpdatesOccurred": {
+            "ui:widget": "radio"
+          },
+          "projectUpdatesDetails": {
+            "ui:widget": "LargeTextWidget",
+            "ui:options": {
+              "rows": 4
+            }
+          }
+        },
+        "monitoringSummary": {
+          "ui:widget": "LargeTextWidget",
+          "ui:options": {
+            "rows": 4
+          }
+        },
+        "lufParticipantUpdates": {
+          "ui:widget": "radio"
+        },
+        "extremeEvents": {
+          "extremeEventsOccurred": {
+            "ui:widget": "radio"
+          },
+          "extremeEventDetails": {
+            "ui:widget": "LargeTextWidget",
+            "ui:options": {
+              "rows": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "Supporting Documentation / Evidence",
+      "schema": {
+        "type": "object",
+        "required": ["supportingDocumentsList"],
+        "properties": {
+          "supportingDocumentsList": {
+            "type": "string",
+            "title": "17. Please list any supporting documentation or evidence provided along with this annual report below. ",
+            "description": "Refer to [Principles and Requirements](https://globalgoals.goldstandard.org/101-par-principles-requirements/) 5.1.42.(f)"
+          }
+        }
+      },
+      "uiSchema": {
+        "supportingDocumentsList": {
+          "ui:widget": "LargeTextWidget",
+          "ui:options": {
+            "rows": 4
+          }
+        }
+      }
+    },
+    {
+      "title": "Declaration",
+      "schema": {
+        "type": "object",
+        "required": ["annualReportDeclarationAccepted"],
+        "properties": {
+          "annualReportDeclarationAccepted": {
+            "type": "boolean",
+            "title": "I hereby acknowledge and affirm that I understand the following with respect to annual reporting:",
+            "default": false,
+            "enum": [true]
+          }
+        }
+      },
+      "uiSchema": {
+        "annualReportDeclarationAccepted": {
+          "ui:widget": "DeclarationCheckboxWidget",
+          "ui:options": {
+            "points": [
+              "The information provided as part of annual reporting is primarily for information-sharing purposes.",
+              "Annual reporting serves as an opportunity to share progress, track key updates, and confirm to Gold Standard that the project remains active.",
+              "Formal review of conformity to requirements and any changes in approach shall be undertaken at performance certification only.",
+              "Notwithstanding the above, I understand and agree that failure to provide Annual Reports as required may result in the decertification of the Project.",
+              "I acknowledge that by submitting Annual Reports, I am not relieved of any obligations to comply with all applicable Gold Standard requirements throughout the project's duration.",
+              "I understand that Gold Standard reserves the right to request additional information or clarification based on the content of the Annual Reports.",
+              "I affirm that all information provided in the Annual Reports will be, to the best of my knowledge, true, accurate, and complete."
+            ],
+            "summary": "By agreeing to these terms, I confirm my understanding of and commitment to the annual reporting process as outlined above."
+          }
+        }
+      }
+    }
+  ]
+}
