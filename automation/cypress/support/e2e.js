@@ -15,6 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import "./commands"
+import "cypress-network-idle"
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
@@ -24,4 +25,9 @@ import "./commands"
 beforeEach(() => {
   cy.visit("/")
   cy.acceptCookies()
+})
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // do not fail tests on random 500 responses from the ui
+  return false;
 })

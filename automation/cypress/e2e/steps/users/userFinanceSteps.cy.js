@@ -26,7 +26,8 @@ When("I select update invoice status from request actions", () => {
 })
 
 And("I enter {string} as my invoice amount", (invoiceAmount) => {
-  openProjectOpenRequest.updateInvoiceModal.invoiceAmount().click().type(invoiceAmount)
+  openProjectOpenRequest.updateInvoiceModal.invoiceAmount().click().type('{selectall}').type(invoiceAmount, {delay: 100})
+  //openProjectOpenRequest.updateInvoiceModal.invoiceAmount()
 })
 
 And("I can save my invoice update", () => {

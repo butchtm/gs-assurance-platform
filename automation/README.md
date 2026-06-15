@@ -28,6 +28,20 @@ cd automation
 # Install dependencies (will install from package.json)
 npm install
 ```
+
+## Local Environment Configuration
+Users are synced from Cognito, however Platform Accounts need to be created manually locally.  These should be:
+
+PD
+ARM
+TAC
+VVB
+Finance
+Reviewer
+Support
+
+Each needs to be created in the UI and the relevent autotest-xxx user added as an Assigned User.  E.g. When creating the PD platform account the autotest-PD user must be added as an Assigned User.
+
 ## Dependencies
 This project relies on the following dependencies:
 
@@ -44,15 +58,15 @@ These dependencies are specified in the package.json file:
 ```
 # From package.json
 "dependencies": {
-  "cypress": "^13.15.0",
   "cypress-cucumber-preprocessor": "^4.3.1",
   "dotenv": "^16.4.5"
 },
 "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+      "cypress": "^15.14.2",
 }
 ```
-(The .prettierrc, file is available via contact to automation-contact@example.com)
+(The .prettierrc, file is available via contact to gjennings@caci.co.uk)
 
 
 .gitignore file:
@@ -64,7 +78,7 @@ node_modules
 cypress/screenshots #To avoid uploading many screenshots from cypress output
 .gitlab-ci copy.yml
 ```
-file is available via contact to automation-contact@example.com
+file is available via contact to gjennings@caci.co.uk
 
 ## User Configuration (Dotenv)
 Ensure you have a .env file in the root directory with the necessary environment variables:
@@ -77,7 +91,7 @@ ADMIN_PASSWORD=
 PD_USERNAME=
 PD_PASSWORD=
 ```
-We have generic users created in the name of automation for each user group, contact automation-contact@example.com for the env file to use on your local environment.
+We have generic users created in the name of automation for each user group, contact gjennings@caci.co.uk for the env file to use on your local environment.
 
 The same set of users are in use for the gitlab CI/CD pipeline. 
 
@@ -88,7 +102,11 @@ To run the tests, use the following commands:
 #### Open Cypress Test Runner
 ```
 # When writing tests use this mode as very helpful for debugging
-npx cypress open
+With a LOCAL front-end:
+npm run cypress:open -- --config-file cypress.config.local.js
+
+With the DEV environment front-nd:
+npm run cypress:open
 
 # Once gui is open, select E2E Testing
 # You can select any browser installed on your machine
@@ -98,10 +116,14 @@ npx cypress open
 #### Run Tests in Headless Mode
 - Provides output to console (with --spec and other commands can become a quick debugger)
 ```
-npx cypress run
+With a LOCAL front-end:
+npm run cypress:run -- --config-file cypress.config.local.js
+
+With a DEV environment front-end:
+npm run cypress:run
 
 #Example of a more specific command:
-npx cypress run --spec .\cypress\e2e\features\projectCreation.feature --env TAGS='@group0A'
+npm run cypress:run -- --spec .\cypress\e2e\features\projectCreation.feature --env TAGS='@group0A'
 
 #The above will run only in that file and only scenarios with that name
 ```
@@ -254,7 +276,7 @@ https://dev.goldstandard-assurance.org/api/automated-test-projects
 
 Note: a future refactor planned to have the end point called automatically in a clear up stage
 
-Note: automation-contact@example.com has a postman collection to do this and is available on request
+Note: gjennings@caci.co.uk has a postman collection to do this and is available on request
 
 ## Writing New Tests
 

@@ -8,6 +8,20 @@ module.exports = defineConfig({
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     specPattern: "**/*.feature",
     setupNodeEvents(on, config) {
+      on("task", {
+        log(message) {
+          console.log(message)
+          return null
+        }
+      })
+      on("before:browser:launch", (browser = {}, launchOptions) => {
+        if (browser.family === "chromium") {
+          launchOptions.args.push("--disable-gpu");
+          launchOptions.args.push("--disable-dev-shm-usage");
+          launchOptions.args.push("--disable-software-rasterizer");
+        }
+        return launchOptions;
+      });
       on("file:preprocessor", cucumber());
 
       config.env.ADMIN_USERNAME = process.env.ADMIN_USERNAME || config.env.ADMIN_USERNAME;

@@ -5,6 +5,7 @@ import { apiClient } from "../../APIClient/Client";
 
 export interface MethodologyReferenceType extends ReferenceType {
   inUse: boolean;
+  paa?: boolean;
 }
 
 interface MethodologyResponse {
@@ -15,13 +16,22 @@ interface MethodologyResponse {
 export interface EditableMethodologyValues {
   description: string;
   active: boolean;
+  paa: boolean;
   id?: number;
 }
 
-export const getMethodologies = (search: string, page: number, pageSize: number): Promise<MethodologyResponse> => {
+export const getMethodologies = (
+  search: string,
+  page: number,
+  pageSize: number,
+  filterByPAA?: boolean,
+): Promise<MethodologyResponse> => {
   const filterParams = new URLSearchParams({});
   if (search) {
     filterParams.append("description", search);
+  }
+  if (filterByPAA !== undefined) {
+    filterParams.append("paa", filterByPAA.toString());
   }
   return apiClient.makeRequest("/methodologies/pages", "GET", "{}", {
     page,

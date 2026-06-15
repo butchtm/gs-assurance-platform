@@ -1,12 +1,9 @@
-import { truncate } from "node:fs/promises";
-
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import MockDate from "mockdate";
-import { MemoryRouter } from "react-router-dom";
 
-import { mockActiveReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
-import { AuthContext, AuthContextType } from "../../../Auth/Login/AuthProvider";
-import { getAssignedRequests } from "../../Requests";
+import { renderWithProviders } from "@/test/test-utils";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { getAssignedRequests } from "@/components/requests/Requests";
 
 import RegistryReviewerMyRequests from "./RegistryReviewerMyRequests";
 
@@ -71,20 +68,11 @@ const mockRequestsResponse = {
   totalPages: 1,
 };
 
-const mockAuthProvider = {
-  isRegistryUser: jest.fn(),
-  isReviewerUser: jest.fn(),
-  isArmUser: jest.fn(),
-} as Record<string, jest.Mock>;
-
 describe("RegistryReviewerMyRequests", () => {
   beforeEach(() => {
     MockDate.set("2024-07-16");
     cleanup();
     (getAssignedRequests as jest.Mock).mockResolvedValue(mockRequestsResponse);
-    mockAuthProvider.isRegistryUser.mockReturnValue(false);
-    mockAuthProvider.isReviewerUser.mockReturnValue(false);
-    mockAuthProvider.isArmUser.mockReturnValue(false);
   });
 
   afterAll(() => {
@@ -92,13 +80,7 @@ describe("RegistryReviewerMyRequests", () => {
   });
 
   it("loads and displays requests", async () => {
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <MemoryRouter>
-          <RegistryReviewerMyRequests />
-        </MemoryRouter>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<RegistryReviewerMyRequests />);
 
     await waitFor(() => {
       expect(screen.getByText("GSID1")).toBeInTheDocument();
@@ -123,15 +105,13 @@ describe("RegistryReviewerMyRequests", () => {
 
   it('displays "No Assigned Requests found." when there are no requests', async () => {
     (getAssignedRequests as jest.Mock).mockResolvedValue({ content: [], totalPages: 0 });
-    mockAuthProvider.isRegistryUser.mockReturnValue(true);
-
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <MemoryRouter>
-          <RegistryReviewerMyRequests />
-        </MemoryRouter>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<RegistryReviewerMyRequests />, {
+      providerOverrides: {
+        auth: {
+          isRegistryUser: jest.fn().mockReturnValue(true),
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByText("No Assigned Requests found.")).toBeInTheDocument();
@@ -139,14 +119,13 @@ describe("RegistryReviewerMyRequests", () => {
   });
 
   it("should display invoice status for registry users", async () => {
-    mockAuthProvider.isRegistryUser.mockReturnValue(truncate);
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <MemoryRouter>
-          <RegistryReviewerMyRequests />
-        </MemoryRouter>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<RegistryReviewerMyRequests />, {
+      providerOverrides: {
+        auth: {
+          isRegistryUser: jest.fn().mockReturnValue(true),
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByText("GSID1")).toBeInTheDocument();
@@ -158,15 +137,13 @@ describe("RegistryReviewerMyRequests", () => {
   });
 
   it("should not display invoice status for non-registry users", async () => {
-    mockAuthProvider.isRegistryUser.mockReturnValue(false);
-
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <MemoryRouter>
-          <RegistryReviewerMyRequests />
-        </MemoryRouter>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<RegistryReviewerMyRequests />, {
+      providerOverrides: {
+        auth: {
+          isRegistryUser: jest.fn().mockReturnValue(false),
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByText("GSID1")).toBeInTheDocument();
@@ -178,14 +155,13 @@ describe("RegistryReviewerMyRequests", () => {
   });
 
   it("should display activity information for reviewer users", async () => {
-    mockAuthProvider.isReviewerUser.mockReturnValue(true);
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <MemoryRouter>
-          <RegistryReviewerMyRequests />
-        </MemoryRouter>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<RegistryReviewerMyRequests />, {
+      providerOverrides: {
+        auth: {
+          isReviewerUser: jest.fn().mockReturnValue(true),
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByText("GSID1")).toBeInTheDocument();

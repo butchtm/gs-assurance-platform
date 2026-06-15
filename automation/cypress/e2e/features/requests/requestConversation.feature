@@ -116,7 +116,6 @@ Feature: request conversations
         Given I login as "<username>"
         And "<username>" click "my requests" from the navbar successfully
         And I clear the my requests dashboard request status filter as "<username>"
-        And I select "Name or Exact GSID" from my requests dashboard page
         And I type "automation test (POA)" into "name or gsid (my requests)"
         Then "automation test (POA)" "project" is displayed in the list 
         And I locate "<messageCount>" new message label for my "<requestType>" row
@@ -131,7 +130,6 @@ Feature: request conversations
         Given I login as "<username>"
         And "<username>" click "my requests" from the navbar successfully
         And I clear the my requests dashboard request status filter as "<username>"
-        And I select "Name or Exact GSID" from my requests dashboard page
         And I type "automation test (POA)" into "name or gsid (my requests)"
         Then "automation test (POA)" "project" is displayed in the list
 
@@ -148,7 +146,6 @@ Feature: request conversations
         Given I login as "<username>"
         And "<username>" click "my requests" from the navbar successfully
         And I clear the my requests dashboard request status filter as "<username>"
-        And I select "Name or Exact GSID" from my requests dashboard page
         And I type "automation test (POA)" into "name or gsid (my requests)"
         Then "automation test (POA)" "project" is displayed in the list 
 
@@ -165,7 +162,6 @@ Feature: request conversations
         Given I login as "<username>"
         And "<username>" click "my requests" from the navbar successfully
         And I clear the my requests dashboard request status filter as "<username>"
-        And I select "Name or Exact GSID" from my requests dashboard page
         And I type "automation test (POA)" into "name or gsid (my requests)"
         Then "automation test (POA)" "project" is displayed in the list 
 
@@ -204,7 +200,6 @@ Feature: request conversations
         Given I login as "<username>"
         And "<username>" click "my requests" from the navbar successfully
         And I clear the my requests dashboard request status filter as "<username>"
-        And I select "Name or Exact GSID" from my requests dashboard page
         And I type "automation test (POA)" into "name or gsid (my requests)"
         Then "automation test (POA)" "project" is displayed in the list 
 

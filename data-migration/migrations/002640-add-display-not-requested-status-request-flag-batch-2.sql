@@ -1,0 +1,31 @@
+UPDATE gs.project
+SET display_not_requested_status_requests = true
+WHERE gsid IN (
+  'GS12797',
+  'GS12361',
+  'GS13100',
+  'GS12696',
+  'GS12682',
+  'GS13171',
+  'GS13170',
+  'GS12860',
+  'GS12959',
+  'GS12881',
+  'GS12587',
+  'GS13054',
+  'GS13053',
+  'GS13106',
+  'GS12466',
+  'GS12911',
+  'GS12447',
+  'GS12323',
+  'GS12938',
+  'GS12614',
+  'GS12203',
+  'GS11569',
+  'GS11550',
+  'GS11856',
+  'GS11798',
+  'GS12096',
+  'GS3660'
+);

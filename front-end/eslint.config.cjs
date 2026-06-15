@@ -16,16 +16,7 @@ const compat = new FlatCompat({
 
 module.exports = [
   {
-    ignores: [
-      "node_modules",
-      "build",
-      "dist",
-      "coverage",
-      "jest.config.ts", 
-      "vite.config.ts",
-      "jest/*",
-      "chunking.ts"
-    ],
+    ignores: ["node_modules", "build", "dist", "coverage", "jest.config.ts", "vite.config.ts", "jest/*", "chunking.ts"],
   },
 
   ...compat.extends(
@@ -39,7 +30,7 @@ module.exports = [
   ),
 
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
+    files: ["**/*.{ts,tsx}"],
 
     languageOptions: {
       parser: tsParser,
@@ -68,7 +59,7 @@ module.exports = [
 
     settings: {
       "import/resolver": {
-        typescript: {},
+        typescript: { project: "./tsconfig.json" },
         node: {
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },
@@ -92,14 +83,11 @@ module.exports = [
       "no-restricted-syntax": [
         "error",
         {
-          selector:
-            "MemberExpression[object.name='window'][property.name='location']",
-          message:
-            "Use useNavigation or useLocation from react-router-dom to query and change the browser URL",
+          selector: "MemberExpression[object.name='window'][property.name='location']",
+          message: "Use useNavigation or useLocation from react-router-dom to query and change the browser URL",
         },
         {
-          selector:
-            "MemberExpression[object.name='screen'][property.name='debug']",
+          selector: "MemberExpression[object.name='screen'][property.name='debug']",
           message: "Avoid leaving debugging code",
         },
       ],
@@ -111,17 +99,45 @@ module.exports = [
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
           caughtErrorsIgnorePattern: "^_",
-        }
+        },
       ],
     },
   },
   {
+    files: ["**/*.js"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        commonjs: true,
+        __dirname: "readonly",
+        __filename: "readonly",
+        require: "readonly",
+        module: "readonly",
+        console: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
+  {
     files: ["**/*.cjs"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: {
+        commonjs: true,
+        __dirname: "readonly",
+        __filename: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
   },
   {
     files: ["**/*.d.ts"],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
     },
-  }
+  },
 ];

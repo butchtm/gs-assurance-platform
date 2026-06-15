@@ -11,14 +11,14 @@ spring:
       enabled: ALWAYS
   datasource:
     driver-class-name: org.postgresql.Driver
-    password: ${DB_PASSWORD:changeme}
+    password: MySuperSafePostgresPassword
     url: jdbc:postgresql://localhost:5432/assurance_db
     username: postgres
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: https://cognito-idp.eu-central-1.amazonaws.com/REPLACE_WITH_COGNITO_POOL_ID
+          issuer-uri: https://cognito-idp.eu-central-1.amazonaws.com/eu-central-1_XIzobZSx7
 
 notification:
   contact-mapping:

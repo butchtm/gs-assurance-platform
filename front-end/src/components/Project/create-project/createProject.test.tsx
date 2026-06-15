@@ -1,19 +1,15 @@
 import { Box, Card, Container, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { Formik, useFormikContext } from "formik";
 
-import {
-  ReferenceDataIdsOrId,
-  ReferenceType,
-  ReferenceTypeContext,
-} from "../../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes } from "../../../common/data-types/DebugReferenceTypes";
-import { mockCreateProjectFormValues } from "../../../common/project/DebugProject";
-import { AuthContext, AuthContextType } from "../../Auth/Login/AuthProvider";
-import { FormikStep } from "../../Reusable/Formik/FormikStep";
-import { FormikStepper } from "../../Reusable/Formik/FormikStepper";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceDataIdsOrId, ReferenceType } from "@/common/data-types/DataReferenceTypes";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { mockCreateProjectFormValues } from "@/common/project/DebugProject";
+import { FormikStep } from "@/components/Reusable/Formik/FormikStep";
+import { FormikStepper } from "@/components/Reusable/Formik/FormikStepper";
 
 import { getWarningForProjectTypes, warningText } from "./CreateProject";
 import { ReviewStep } from "./steps/ReviewStep";
@@ -22,12 +18,6 @@ import { Step2 } from "./steps/Step2";
 import { Step3 } from "./steps/Step3";
 import { Step4 } from "./steps/Step4";
 import { Step5 } from "./steps/Step5";
-
-const mockAuthProvider = {
-  isProjectDeveloperUser: jest.fn(),
-  isAdminUser: jest.fn(),
-  isArmUser: jest.fn(),
-} as Record<keyof AuthContextType, jest.Mock>;
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -124,58 +114,53 @@ describe("CreateProject", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={mockCreateProjectFormValues} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Container maxWidth="md">
+            <Card className="wizard-card">
+              <Box>
+                <Typography variant="h4">New Project</Typography>
+                <br></br>
+              </Box>
+              <FormikStepper
+                initialValues={mockCreateProjectFormValues}
+                onSubmit={async (values) => {
+                  return await Promise.resolve(values);
+                }}
+                setToLastStep={true}
+              >
+                <FormikStep label="Start">
+                  <Step1 />
+                </FormikStep>
+                <FormikStep label="Details">
+                  <Step2 />
+                </FormikStep>
+                <FormikStep label="Methodologies">
+                  <Step3 />
+                </FormikStep>
+                <FormikStep label="Transitioning">
+                  <Step4 />
+                </FormikStep>
+                <FormikStep label="Goals">
+                  <Step5 />
+                </FormikStep>
+                <FormikStep label="Review">
+                  <ReviewStep />
+                </FormikStep>
+              </FormikStepper>
+            </Card>
+          </Container>
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
             activeReferenceTypes: mockActiveReferenceTypes,
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
             getCustomReferenceOptions: mockGetCustomReferenceOptions,
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={mockCreateProjectFormValues} onSubmit={jest.fn()}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Container maxWidth="md">
-                <Card className="wizard-card">
-                  <Box>
-                    <Typography variant="h4">New Project</Typography>
-                    <br></br>
-                  </Box>
-                  <FormikStepper
-                    initialValues={mockCreateProjectFormValues}
-                    onSubmit={async (values) => {
-                      return await Promise.resolve(values);
-                    }}
-                    setToLastStep={true}
-                  >
-                    <FormikStep label="Start">
-                      <Step1 />
-                    </FormikStep>
-                    <FormikStep label="Details">
-                      <Step2 />
-                    </FormikStep>
-                    <FormikStep label="Methodologies">
-                      <Step3 />
-                    </FormikStep>
-                    <FormikStep label="Transitioning">
-                      <Step4 />
-                    </FormikStep>
-                    <FormikStep label="Goals">
-                      <Step5 />
-                    </FormikStep>
-                    <FormikStep label="Review">
-                      <ReviewStep />
-                    </FormikStep>
-                  </FormikStepper>
-                </Card>
-              </Container>
-            </LocalizationProvider>
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     expect(screen.getByText("Review Your Information")).toBeInTheDocument();

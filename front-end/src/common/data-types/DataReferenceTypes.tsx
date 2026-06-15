@@ -1,25 +1,36 @@
-import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
 
-import { apiClient } from "../../components/APIClient/Client";
+import { apiClient } from "@/components/APIClient/Client";
 import {
   getAllMethodologies,
   MethodologyReferenceType,
-} from "../../components/Administration/reference-types/ReferenceTypes";
+} from "@/components/Administration/reference-types/ReferenceTypes";
 
 export interface ReferenceType {
   id: number;
   code: string;
   description: string;
   active?: boolean;
+  paa?: boolean;
 }
 
 export interface ReferenceTypes {
   [key: string]: ReferenceType[];
 }
 
+export type RequestType = {
+  id: number;
+  code: string;
+  description: string;
+  isActive: boolean;
+  supportsPAA: boolean;
+};
+
 export interface Options {
   value: number | string;
   label: string;
+  flag?: boolean; // to handle boolean values in select options, since the value needs to be a string for the Select component but we want to preserve the boolean type for form values
 }
 
 export const getReferenceValueIdsByCodes = (referenceCodes: string[], referenceType: ReferenceType[]) => {
@@ -76,8 +87,9 @@ export interface ReferenceTypeContextType {
   allReferenceTypes: ReferenceTypes;
   inactiveReferenceTypes: ReferenceTypes;
   referenceMethodologies: MethodologyReferenceType[];
+  activeRequestTypes: RequestType[];
   getCustomReferenceOptions: (reference: string, currentValue?: ReferenceDataIdsOrId) => Options[];
-  refreshReferenceData: () => Promise<void>;
+  refreshReferenceData: () => void;
 }
 
 export const ReferenceTypeContext = createContext<ReferenceTypeContextType>({
@@ -85,6 +97,7 @@ export const ReferenceTypeContext = createContext<ReferenceTypeContextType>({
   allReferenceTypes: {},
   inactiveReferenceTypes: {},
   referenceMethodologies: [],
+  activeRequestTypes: [],
   getCustomReferenceOptions: () => {
     throw Error("ReferenceTypeContext getCustomReferenceOptions called too early");
   },
@@ -92,105 +105,136 @@ export const ReferenceTypeContext = createContext<ReferenceTypeContextType>({
     throw Error("ReferenceTypeContext refreshReferenceData called too early");
   },
 });
+
 export const useReferenceTypes = () => useContext(ReferenceTypeContext);
 
-const filterActiveRefrenceTypes = (types: ReferenceTypes, active: boolean): ReferenceTypes => {
+const filterActiveReferenceTypes = (types: ReferenceTypes, active: boolean): ReferenceTypes => {
   return Object.keys(types).reduce((acc, key) => {
     acc[key] = types[key].filter((type: ReferenceType) => type.active === active);
+
     return acc;
   }, {} as ReferenceTypes);
 };
 
+const staleTimeFiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds, easier to read and maintain than a large number literal
+
 export const ReferenceTypeProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [allReferenceTypes, setAllReferenceTypes] = useState<ReferenceTypes>({});
-  const [inactiveReferenceTypes, setInactiveReferenceTypes] = useState<ReferenceTypes>({});
-  const [activeReferenceTypes, setActiveReferenceTypes] = useState<ReferenceTypes>({});
-  const [referenceMethodologies, setReferenceMethodologies] = useState<MethodologyReferenceType[]>([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const {
+    data: allReferenceTypes,
+    isSuccess: allReferenceTypesSuccess,
+    refetch: refetchAllReferenceTypes,
+  } = useQuery<ReferenceTypes>({
+    queryKey: ["reference-data-types"],
+    queryFn: () => apiClient.makeRequest("/reference-data-types", "GET"),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: staleTimeFiveMinutes,
+  });
 
-  const fetchReferenceTypes = async () => {
-    const types = await apiClient.makeRequest("/reference-data-types", "GET");
-    setAllReferenceTypes(types);
+  const {
+    data: referenceMethodologies,
+    isSuccess: referenceMethodologiesFetched,
+    refetch: refetchReferenceMethodologies,
+  } = useQuery<MethodologyReferenceType[]>({
+    queryKey: ["reference-methodologies"],
+    queryFn: getAllMethodologies,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: staleTimeFiveMinutes,
+  });
 
-    const activeTypes = filterActiveRefrenceTypes(types, true);
-    setActiveReferenceTypes(activeTypes);
+  const { data: activeRequestTypes, isSuccess: activeRequestTypesFetched } = useQuery<RequestType[]>({
+    queryKey: ["active-request-types"],
+    queryFn: () => apiClient.makeRequest("/request-types", "GET"),
+    select: (data) => data.filter((type: RequestType) => type.isActive),
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  });
+  const hasLoaded = allReferenceTypesSuccess && referenceMethodologiesFetched && activeRequestTypesFetched;
 
-    const inactiveTypes = filterActiveRefrenceTypes(types, false);
-    setInactiveReferenceTypes(inactiveTypes);
+  // Ensure we never pass undefined into the context value — use empty
+  // defaults until data is available.
+  const safeAllReferenceTypes: ReferenceTypes = allReferenceTypes ?? {};
+  const safeReferenceMethodologies: MethodologyReferenceType[] = referenceMethodologies ?? [];
+  const safeActiveRequestTypes: RequestType[] = activeRequestTypes ?? [];
+  const activeReferenceTypes = useMemo(() => {
+    return filterActiveReferenceTypes(safeAllReferenceTypes, true);
+  }, [safeAllReferenceTypes]);
 
-    setHasLoaded(true);
-  };
+  const inactiveReferenceTypes = useMemo(() => {
+    return filterActiveReferenceTypes(safeAllReferenceTypes, false);
+  }, [safeAllReferenceTypes]);
 
-  const fetchMethodologies = async () => {
-    const response = await getAllMethodologies();
-    setReferenceMethodologies(response);
-  };
+  const getCustomReferenceOptions = useCallback(
+    (reference: string, currentValue?: ReferenceDataIdsOrId): Options[] => {
+      const isLegacy = isLegacyValue(inactiveReferenceTypes, reference, currentValue);
 
-  const fetchData = async () => {
-    await Promise.all([fetchReferenceTypes(), fetchMethodologies()]);
-  };
+      const referenceTypeDataSource =
+        isLegacy || reference === "ProjectClassification" ? safeAllReferenceTypes : activeReferenceTypes;
 
-  useEffect(() => {
-    fetchData();
-    const FIVE_MINS_IN_MS = 300_000;
-    setInterval(fetchMethodologies, FIVE_MINS_IN_MS);
-  }, []);
+      const referenceTypeData =
+        reference == "Methodology" ? safeReferenceMethodologies : referenceTypeDataSource[reference];
+      if (!referenceTypeData) return [];
 
-  const isLegacyValue = (
-    inactiveReferenceTypes: ReferenceTypes,
-    reference: string,
-    value?: ReferenceDataIdsOrId,
-  ): boolean => {
-    if (value == null || value == undefined) return false;
+      return referenceTypeData
+        .filter((item) => reference !== "ProjectClassification" || item.active || item.code === "VPA_CPA")
+        .map((item) => {
+          return {
+            value: item.id,
+            label: item.description,
+          };
+        });
+    },
+    [activeReferenceTypes, safeAllReferenceTypes, inactiveReferenceTypes, safeReferenceMethodologies],
+  );
 
-    const referenceArray = inactiveReferenceTypes[reference];
-    if (!referenceArray) return false;
-
-    const checkSingleValue = (val: number | string) => referenceArray.some((ref) => ref.id === val);
-
-    if (Array.isArray(value)) {
-      return value.some((val) => checkSingleValue(val));
-    } else {
-      return checkSingleValue(value);
-    }
-  };
-
-  const getCustomReferenceOptions = (reference: string, currentValue?: ReferenceDataIdsOrId): Options[] => {
-    const isLegacy = isLegacyValue(inactiveReferenceTypes, reference, currentValue);
-
-    const referenceTypeDataSource =
-      isLegacy || reference === "ProjectClassification" ? allReferenceTypes : activeReferenceTypes;
-
-    const referenceTypeData = reference == "Methodology" ? referenceMethodologies : referenceTypeDataSource[reference];
-    if (!referenceTypeData) return [];
-
-    return referenceTypeData
-      .filter((item) => reference !== "ProjectClassification" || item.active || item.code === "VPA_CPA")
-      .map((item) => {
-        return {
-          value: item.id,
-          label: item.description,
-        };
-      });
-  };
-
-  const refreshReferenceData = async () => {
-    await fetchData();
+  const refreshReferenceData = () => {
+    refetchAllReferenceTypes();
+    refetchReferenceMethodologies();
   };
 
   const value = useMemo<ReferenceTypeContextType>(
     () => ({
       activeReferenceTypes,
-      allReferenceTypes,
+      allReferenceTypes: safeAllReferenceTypes,
       inactiveReferenceTypes,
-      referenceMethodologies,
+      referenceMethodologies: safeReferenceMethodologies,
+      activeRequestTypes: safeActiveRequestTypes,
       getCustomReferenceOptions,
       refreshReferenceData,
     }),
-    [activeReferenceTypes, allReferenceTypes, inactiveReferenceTypes, referenceMethodologies],
+    [
+      activeReferenceTypes,
+      safeAllReferenceTypes,
+      inactiveReferenceTypes,
+      safeReferenceMethodologies,
+      safeActiveRequestTypes,
+      getCustomReferenceOptions,
+      refreshReferenceData,
+    ],
   );
 
   return <ReferenceTypeContext.Provider value={value}>{hasLoaded && children}</ReferenceTypeContext.Provider>;
+};
+
+const isLegacyValue = (
+  inactiveReferenceTypes: ReferenceTypes,
+  reference: string,
+  value?: ReferenceDataIdsOrId,
+): boolean => {
+  if (value == null || value == undefined) return false;
+
+  const referenceArray = inactiveReferenceTypes[reference];
+  if (!referenceArray) return false;
+
+  const checkSingleValue = (val: number | string) => referenceArray.some((ref) => ref.id === val);
+
+  if (Array.isArray(value)) {
+    return value.some((val) => checkSingleValue(val));
+  } else {
+    return checkSingleValue(value);
+  }
 };

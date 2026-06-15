@@ -27,10 +27,10 @@ Feature: emails contain the correct content
         And I type "<emissionCheck>" into "emission reduction or removal"
         Then Field contains "<emissionCheck>" in "value field"
 
-        When I click "next" from project creation page 
-        Then I am taken to page "2"
+        When I click "next" from request creation page 
+        Then I am taken to request creation page "2"
 
-        When I click "finish" from project creation page 
+        When I click "finish" from request creation page 
         Then Success message appears
 
         When I select the "requests" nav button in my project
@@ -92,13 +92,13 @@ Feature: emails contain the correct content
         And I type "<emissionCheck>" into "emission reduction or removal"
         Then Field contains "<emissionCheck>" in "value field"
 
-        When I click "next" from project creation page 
-        Then I am taken to page "2"
+        When I click "next" from request creation page 
+        Then I am taken to request creation page "Methodologies"
 
-        When I click "next" from project creation page 
-        Then I am taken to page "3"
+        When I click "next" from request creation page 
+        Then I am taken to request creation page "3"
 
-        When I click "finish" from project creation page 
+        When I click "finish" from request creation page 
         Then Success message appears
 
         When I select the "requests" nav button in my project
@@ -232,28 +232,6 @@ Feature: emails contain the correct content
             | ADMIN       | Design Change \| With VVB    | Design Change \| With VVB no. 1 | 1,000         | No    | Listed        | Reviewer Assigned  | 1         | template 9 |
 
     
-    #template 9 - reviweer assigned 
-    Scenario Outline: template 9 (reviewer assigned)
-        Given I login as "<username>"
-        When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
-        And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
-        And I select the "requests" nav button in my project 
-        And I open my request "<requestTypeSubmission>" from the request view
-        Then I can see the correct "<requestTypeSubmission>" header
-
-        When I select view assignments button from request actions
-        And I can see "automation test (POA)" header in assignment modal
-        Then I assign the "Reviewer" to perform the review stage
-        And I can see assignments updated toast popup
-
-        And I can capture my last "<noOfNotif>" email notifications
-        And I check my email notifications "<templates>" for "<requestTypeSubmission>" to "<targetStatus>"
-
-    Examples:
-            | username    | requestTypeCreation          | requestTypeSubmission           | emissionCheck | batch | projectStatus | targetStatus       | noOfNotif | templates  |
-            | ADMIN       | Design Change \| With VVB    | Design Change \| With VVB no. 1 | 1,000         | No    | Listed        | Reviewer Assigned  | 1         | template 9 |
-
   #modify so that design change request is stakeholder consultation enabled
 #add template 10 ---------- does not seem to be working perhaps due to newer tac/ngo notifications 
 #add template 11 (make comments) --------------- some unknowns here around the GS ARM Team users getting emails twice and the need for that

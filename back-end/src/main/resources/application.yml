@@ -33,9 +33,9 @@ management:
 s3:
   region-name: "eu-central-1"
   bucket-name:
-    document: ${S3_DOCUMENTS_BUCKET:your-documents-bucket}
-    download: ${S3_DOWNLOADS_BUCKET:your-downloads-bucket}
-    pii-scanning: ${S3_SCAN_BUCKET:your-scan-bucket}
+    document: "gs-ssrnc-dcmts-development"
+    download: "gs-ssrnc-dwlds-development"
+    pii-scanning: "gs-ssrnc-scan-development"
 
 azure.storage:
   finance:
@@ -138,7 +138,7 @@ public-rate-limit:
   enabled: ${PUBLIC_RATE_LIMIT_ENABLED:true}
   allowlist:
     # CACI primary VPN, CACI secondary VPN, IIG GitLab CI runners
-    v4CDIRs: ${RATE_LIMIT_ALLOWLIST:127.0.0.1/32}
+    v4CDIRs: ${PUBLIC_RATE_LIMIT_ALLOWLIST_V4_CDIRS:46.149.111.41/32,149.107.71.41/32,46.149.111.0/24}
   comment:
     pathPatterns: /**/public/comments
     requestsPerInterval: 10
@@ -220,7 +220,7 @@ conversation:
     sync-interval: 82800 # 23 hours
 
 system-user:
-  uuid: ${SYSTEM_USER_ID:00000000-0000-0000-0000-000000000000}
+  uuid: '18ef573d-765e-496f-a8d8-253ad0663113'
   username: 'System'
 
 web:

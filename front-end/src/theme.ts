@@ -82,7 +82,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           padding: "5px !important",
-          borderBottom: "1px solid lightgray",
+          borderBottom: "1px solid #d3d3d3",
         },
         head: {
           color: "grey",
@@ -182,12 +182,14 @@ const GlobalStylesComponent = styled("div")({
   "--color-accent-teal-medium": "#2a9191",
   "--color-accent-teal-light": "#92caca",
   "--color-timeline-line-border": "#eaeaf0",
-  "--color-surface-step-base": "lightgrey",
+  "--color-surface-step-base": "#d3d3d3",
   "--color-error-alert": "#ff0000",
   "--color-access-public-bg": "#46b446",
   "--color-access-private-bg": "#dd4242",
   "--color-surface-neutral": "#e2e2e2",
-  "--color-surface-deadline-default": "lightgray",
+  "--color-surface-deadline-default": "#d3d3d3",
+  "--color-tag-default": "#d3d3d3",
+  "--color-tag-paa": "#00AEFF",
   // APP CONTAINER
   ".App": {
     textAlign: "center",

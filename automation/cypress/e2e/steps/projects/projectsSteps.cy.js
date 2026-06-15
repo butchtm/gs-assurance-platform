@@ -26,6 +26,7 @@ Then("My project {string} with {string} status can be seen", (projectName, proje
 })
 
 Then("I click {string} for my {string} with {string} status", (button, projectName, projectStatus) => {
+  cy.waitForNetworkIdle(1000)
   if (button == "View") {
     cy.findProjectRow(projectName, projectStatus, () => {
       cy.get("span").contains(projectName).click()
@@ -64,7 +65,6 @@ And("I search a {string} {string} GSID", (status, text) => {
 
     const gsid = gsids[status][text]
     cy.log("Located: " + gsid)
-    //projectsPage.feature.projectSearchBar().click({ force: true }).type(gsid+'{enter}')
   })
 })
 
@@ -89,13 +89,12 @@ And("I select {string} {string} GSID from results as {string}", (status, text, u
     cy.log("text: " + text)
     const gsid = gsids[status][text]
 
-    cy.intercept("GET", `**${gsid}**`).as("waitOnApi")
+  
     //Taken from the step above and added intercept to reduce flakey part of tests
     projectsPage.feature
       .projectSearchBar()
-      .click({ force: true })
-      .type(gsid + "{enter}")
-    cy.wait("@waitOnApi")
+      .type(gsid + "{enter}", {delay: 100})
+    cy.waitForNetworkIdle(1000)
     cy.get(`[aria-label="${gsid}"]`).click({ force: true })
   })
 })

@@ -39,6 +39,7 @@ public class RequestFactory {
             create.getMonitoringPeriod(),
             create.getRequestTypeId(),
             create.getEmissionReductionAmount(),
+            Optional.ofNullable(create.getPaa()).orElse(false),
             create.getMethodologies());
     request.setStartDate(create.getStartDate());
     return request;
@@ -52,6 +53,7 @@ public class RequestFactory {
         projectRequestInfo.getMonitoringPeriod(),
         create.getRequestTypeId(),
         projectRequestInfo.getEmissionReductionAmount(),
+        create.isPaa(),
         projectRequestInfo.getMethodologies());
   }
 
@@ -61,6 +63,7 @@ public class RequestFactory {
       MonitoringPeriodDTO monitoringPeriod,
       int requestTypeId,
       Integer annualEmissionReduction,
+      boolean paa,
       Collection<RequestMethodologyDTO> methodologies) {
     var project = projectFinder.forceGetProjectById(projectId);
     var requests = requestFinder.getByProjectId(projectId);
@@ -70,6 +73,7 @@ public class RequestFactory {
     request.setProject(project);
     request.setRequestName(nameCalculator.calculateName(requestTypeId, requestCountByType));
     request.setRequestType(new RequestType(requestTypeId));
+    request.setPaa(request.getRequestType().supportsPAA() && paa);
     request.setIndex(calculateNextIndex(requests));
     request.setSameRequestTypeCount(requestCountByType);
     request.setEmissionReductionAmount(annualEmissionReduction);

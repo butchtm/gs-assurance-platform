@@ -1,0 +1,1 @@
+GRANT DELETE ON gs.pii_metadata TO gs_assurance_db_writer;

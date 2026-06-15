@@ -2,6 +2,7 @@ package org.goldstandard.assurance.api.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,7 +14,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import org.goldstandard.assurance.api.dto.CreditingPeriodMethodologyDTO;
+import java.util.stream.Stream;
+import org.goldstandard.assurance.api.dto.BatchRequestCreateDTO;
 import org.goldstandard.assurance.api.dto.RequestCreateUpdateDTO;
 import org.goldstandard.assurance.api.entity.Project;
 import org.goldstandard.assurance.api.entity.Request;
@@ -25,6 +27,9 @@ import org.goldstandard.assurance.api.fixtures.RequestCreateUpdateDTOMother;
 import org.goldstandard.assurance.api.service.permission.AuthenticatedUserSupplier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -86,6 +91,31 @@ class RequestFactoryTest {
   }
 
   @Test
+  void shouldBuildRequestForBatch() {
+    var create =
+        BatchRequestCreateDTO.builder()
+            .requestTypeId(RequestType.PRELIMINARY_REVIEW_ID)
+            .paa(false)
+            .build();
+    var project = createProject();
+    var projectRequestInfo =
+        BatchRequestCreateDTO.ProjectRequestInfo.builder().projectId(project.getId()).build();
+
+    mockTimeNow();
+    when(projectFinder.forceGetProjectById(project.getId())).thenReturn(project);
+    when(requestFinder.getByProjectId(project.getId())).thenReturn(Collections.emptyList());
+    when(nameCalculator.calculateName(eq(create.getRequestTypeId()), anyInt()))
+        .thenReturn("Review no. 1");
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(12345);
+
+    var result = requestFactory.buildRequestForBatch(create, projectRequestInfo);
+
+    assertThat(result.getRequestType().getId()).isEqualTo(create.getRequestTypeId());
+    assertThat(result.getProject()).isEqualTo(project);
+    assertThat(result.isPaa()).isFalse();
+  }
+
+  @Test
   void shouldSetSameRequestTypeCountAndIndexCorrectly() {
     var create = buildRequestCreateUpdate();
     var existingRequests =
@@ -106,6 +136,66 @@ class RequestFactoryTest {
     assertThat(result.getSameRequestTypeCount()).isEqualTo(existingRequests.size());
   }
 
+  static Stream<Arguments> requestPaaHandlingTestCases() {
+    return Stream.of(
+        Arguments.of(
+            RequestType.PRELIMINARY_REVIEW_ID,
+            true,
+            true,
+            "PAA preserved when request type supports PAA"),
+        Arguments.of(
+            RequestType.PRELIMINARY_REVIEW_ID,
+            false,
+            false,
+            "PAA not forced when request type supports PAA"),
+        Arguments.of(
+            RequestType.GENERIC,
+            true,
+            false,
+            "PAA forced 'false' when request type does not support PAA"));
+  }
+
+  @ParameterizedTest(name = "{index}: {3} → expected={0}")
+  @MethodSource("requestPaaHandlingTestCases")
+  void handlesPaa(
+      Integer requestTypeId, boolean createPaa, boolean expectedPaa, String description) {
+    var create =
+        RequestCreateUpdateDTO.builder().requestTypeId(requestTypeId).paa(createPaa).build();
+    var project = createProject();
+
+    mockTimeNow();
+    when(projectFinder.forceGetProjectById(PROJECT_ID)).thenReturn(project);
+    when(requestFinder.getByProjectId(PROJECT_ID)).thenReturn(Collections.emptyList());
+    when(nameCalculator.calculateName(create.getRequestTypeId(), 0)).thenReturn("Review no. 1");
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(12345);
+
+    var result = requestFactory.buildRequest(PROJECT_ID, create);
+
+    assertThat(result.isPaa()).isEqualTo(expectedPaa);
+  }
+
+  @ParameterizedTest(name = "{index}: {3} → expected={0}")
+  @MethodSource("requestPaaHandlingTestCases")
+  void handlesPaaForBatchRequests(
+      Integer requestTypeId, boolean createPaa, boolean expectedPaa, String description) {
+    var create =
+        BatchRequestCreateDTO.builder().requestTypeId(requestTypeId).paa(createPaa).build();
+    var project = createProject();
+    var projectRequestInfo =
+        BatchRequestCreateDTO.ProjectRequestInfo.builder().projectId(project.getId()).build();
+
+    mockTimeNow();
+    when(projectFinder.forceGetProjectById(project.getId())).thenReturn(project);
+    when(requestFinder.getByProjectId(project.getId())).thenReturn(Collections.emptyList());
+    when(nameCalculator.calculateName(eq(create.getRequestTypeId()), anyInt()))
+        .thenReturn("Review no. 1");
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(12345);
+
+    var result = requestFactory.buildRequestForBatch(create, projectRequestInfo);
+
+    assertThat(result.isPaa()).isEqualTo(expectedPaa);
+  }
+
   private static Request createRequest(Integer index) {
     var request = new Request();
     request.setIndex(index);
@@ -120,14 +210,6 @@ class RequestFactoryTest {
 
   private static RequestCreateUpdateDTO buildRequestCreateUpdate() {
     return RequestCreateUpdateDTOMother.builder(1).requestTypeId(1000).build();
-  }
-
-  private static List<CreditingPeriodMethodologyDTO> buildMethodologyDTOs() {
-    return List.of(buildMethodologyDTO(1001, 1.0), buildMethodologyDTO(1002, 2.0));
-  }
-
-  private static CreditingPeriodMethodologyDTO buildMethodologyDTO(int id, double version) {
-    return CreditingPeriodMethodologyDTO.builder().id(id).version(version).build();
   }
 
   private void mockTimeNow() {

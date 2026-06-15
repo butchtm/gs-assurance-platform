@@ -5,7 +5,7 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-changeme}
+      - POSTGRES_PASSWORD=MySuperSafePostgresPassword
       - POSTGRES_DB=assurance_db
     command: ["postgres", "-c", "log_statement=all"]
     healthcheck:
@@ -15,10 +15,17 @@ services:
       retries: 6
 
   liquibase:
-    image: liquibase/liquibase
+    image: liquibase/liquibase:4.29.2
     volumes:
       - ../../data-migration/migrations:/liquibase/changelog
-    command: --url="jdbc:postgresql://db:5432/assurance_db" --changeLogFile=changelog.yaml --username=postgres --password=${DB_PASSWORD:-changeme} --searchPath=./changelog --contexts="local" update
+    environment:
+      LIQUIBASE_COMMAND_URL: "jdbc:postgresql://db:5432/assurance_db"
+      LIQUIBASE_COMMAND_USERNAME: postgres
+      LIQUIBASE_COMMAND_PASSWORD: MySuperSafePostgresPassword
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog.yaml
+      LIQUIBASE_SEARCH_PATH: ./changelog
+      LIQUIBASE_COMMAND_CONTEXT_FILTER: local
+    command: update
     depends_on:
       db:
         condition: service_healthy

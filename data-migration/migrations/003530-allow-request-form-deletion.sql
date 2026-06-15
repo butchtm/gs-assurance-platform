@@ -1,0 +1,1 @@
+GRANT DELETE ON gs.request_form TO gs_assurance_db_writer;

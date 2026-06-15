@@ -47,6 +47,7 @@ function useSubmitRequest() {
       newMonitoringPeriodStartDate,
       newMonitoringPeriodEndDate,
       feeSchedule,
+      paa,
     } = formValues;
     const project = location.state.project;
     const requestTypeId = requestType ? parseInt(requestType) : 1;
@@ -59,6 +60,7 @@ function useSubmitRequest() {
       emissionReductionAmount,
       manuallyAdded: true,
       startDate: dayjs.utc().toISOString(),
+      paa,
     };
 
     const request: Partial<CreateUpdateRequestPayload> = {
@@ -94,6 +96,7 @@ function useSubmitRequest() {
     const payload: CreateBatchRequestPayload = {
       requestTypeId: Number(formValues.requestType),
       batchTypeId: formValues.batchRequestTypeId,
+      paa: formValues.paa,
       projectRequestInfos: formValues.batchProjectIds.map((batchProjectId) => {
         if (!formValues.batchStepProjectValues) throw Error("Invalid batchStepProjectValues");
 
@@ -163,6 +166,7 @@ function CreateRequestWizard() {
     newMonitoringPeriodStartDate: null,
     newMonitoringPeriodEndDate: null,
     feeSchedule: null,
+    paa: false,
   };
   const { activeReferenceTypes } = useReferenceTypes();
   const location: Location<LocationState> = useLocation();

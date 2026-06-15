@@ -1,7 +1,9 @@
 import { waitFor } from "@testing-library/react";
 import { useLocation } from "react-router-dom";
 
-import { GSRequest } from "../../../common/request/GSRequest";
+import { BASE_REQUEST_TYPE } from "@/common/request/DebugRequests";
+import { GSRequest } from "@/common/request/GSRequest";
+
 import { ParentRequestWithBatchedRequests } from "../create-request/Wizard/Request";
 import { BatchedProjectRequests, updateRequest } from "../Requests";
 
@@ -21,11 +23,8 @@ const parentRequest: GSRequest = {
   startDate: "2025-08-05T14:42:00.000Z",
   endDate: "2025-10-05T14:42:00.000Z",
   bookingDate: "",
-  requestType: {
-    id: 1,
-    code: "TYPE1",
-    description: "Type1",
-  },
+  paa: false,
+  requestType: BASE_REQUEST_TYPE("TYPE1", 1),
   index: 1,
   reviewName: "Request 1",
   sameReviewTypeCount: 1,
@@ -194,6 +193,7 @@ describe("UpdateRequestHelpers", () => {
     newMonitoringPeriodStartDate: null,
     newMonitoringPeriodEndDate: null,
     feeSchedule: 0,
+    paa: false,
   };
 
   it("submits multiple updated request payloads for batched requests", async () => {
@@ -229,6 +229,7 @@ describe("UpdateRequestHelpers", () => {
             endDate: null,
             feeSchedule: 0,
           },
+          paa: false,
         },
         1,
       );
@@ -254,6 +255,7 @@ describe("UpdateRequestHelpers", () => {
             endDate: null,
             feeSchedule: 0,
           },
+          paa: false,
         },
         2,
       );
@@ -274,6 +276,7 @@ describe("UpdateRequestHelpers", () => {
     newMonitoringPeriodStartDate: null,
     newMonitoringPeriodEndDate: null,
     feeSchedule: null,
+    paa: false,
   };
   it("submits the updated request payload for standalone request", async () => {
     (useLocation as jest.Mock).mockReturnValue({
@@ -301,6 +304,7 @@ describe("UpdateRequestHelpers", () => {
             endDate: null,
             feeSchedule: null,
           },
+          paa: false,
         },
         1,
       );

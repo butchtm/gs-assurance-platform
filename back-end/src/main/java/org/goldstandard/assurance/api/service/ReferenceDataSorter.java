@@ -38,7 +38,9 @@ public class ReferenceDataSorter {
 
   private static Map<String, Comparator<ReferenceDataType>> buildSpecificComparators() {
     return Map.of(
-        "CarbonStream", new CodeOrderedComparator(List.of("GS_VER", "GS_CER", "REPORTING_ONLY")),
+        "CarbonStream",
+            new CodeOrderedComparator(
+                List.of("GS_VER", "GS_CER", "REPORTING_ONLY", "GS_TVER_IT", "GS_TVER_PT")),
         "ProjectSize",
             new CodeOrderedComparator(List.of("MICROSCALE", "SMALL_SCALE", "LARGE_SCALE")),
         "ProjectType", new OrderedLastCodesComparator(List.of("OTHER")),

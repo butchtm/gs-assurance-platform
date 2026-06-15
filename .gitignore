@@ -1,0 +1,50 @@
+# Local-only configuration
+.env
+.env.*
+!.env.example
+!.env.template
+!.env.*.example
+!.env.*.template
+
+# Local archives and downloaded source snapshots
+archive/
+*-s3-export-*/
+*.zip
+
+# Local database dumps and oversized load-test fixtures
+data-migration/dump_prod_db/
+load-test/src/resources/very_large_document.txt
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java build output
+target/
+build/
+
+# Node build output and dependencies
+node_modules/
+coverage/
+dist/
+
+# Test and report output
+playwright-report/
+test-results/
+cypress/screenshots/
+cypress/videos/
+
+# Terraform local state
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan

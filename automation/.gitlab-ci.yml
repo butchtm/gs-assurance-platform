@@ -26,7 +26,6 @@ stages:          # List of stages for jobs, and their order of execution
   - dashboards stage
   - reporting stage
 
-
 # Define common variables and scripts
 .default_variables: &default_variables
   variables:
@@ -51,12 +50,21 @@ stages:          # List of stages for jobs, and their order of execution
     - mkdir -p reporting/${CI_JOB_NAME}
     - node -v
     - npm cache clean --force
-    - npx cypress cache clear
     - npm ci
+    - npm install cypress --save-dev
+
+
+cache:
+  key: cypress
+  policy: pull-push
+  paths:
+    - node_modules/
+    - /root/.cache/Cypress
+
 
 .default_script: &default_script
   script:
-    - npx cypress --version
+    - npm run cypress:version
 
 .default_artifacts: &default_artifacts
   artifacts:
@@ -64,8 +72,8 @@ stages:          # List of stages for jobs, and their order of execution
     paths:
       - cypress/screenshots
       - cypress/videos
-      - cypress/fixtures/platformInfo.json
       - cypress/fixtures/a11y/
+      - cypress/fixtures/*.json
       - reporting/all-results/
       - reporting/job_summary.txt
     reports: 
@@ -82,7 +90,7 @@ cypress_tests_projectSetup:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@groupDS' --spec ./cypress/e2e/features/dataSetup/dataSetup.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@groupDS' --spec ./cypress/e2e/features/dataSetup/dataSetup.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -91,7 +99,7 @@ cypress_tests_group6:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group6' --spec ./cypress/e2e/features/dashboards/platformAccounts.feature --browser chrome  
+    - npm run cypress:run -- --env TAGS='@group6' --spec ./cypress/e2e/features/dashboards/platformAccounts.feature --browser chrome  
   <<: *default_artifacts
   <<: *default_variables
 
@@ -100,7 +108,7 @@ cypress_tests_group10:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group10' --spec ./cypress/e2e/features/functional/admin.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group10' --spec ./cypress/e2e/features/functional/admin.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -109,7 +117,7 @@ cypress_tests_group11:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group11' --spec ./cypress/e2e/features/functional/footerBar.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group11' --spec ./cypress/e2e/features/functional/footerBar.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -118,7 +126,7 @@ cypress_tests_group7:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group7' --spec ./cypress/e2e/features/dashboards/usersDashboard.feature --browser chrome     
+    - npm run cypress:run -- --env TAGS='@group7' --spec ./cypress/e2e/features/dashboards/usersDashboard.feature --browser chrome     
   <<: *default_artifacts
   <<: *default_variables
 
@@ -130,7 +138,7 @@ emailContent:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@emailTestSuite' --spec ./cypress/e2e/features/emails/emailTest.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@emailTestSuite' --spec ./cypress/e2e/features/emails/emailTest.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -141,7 +149,7 @@ projectRisk:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group18' --spec ./cypress/e2e/features/projects/projectRisk.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group18' --spec ./cypress/e2e/features/projects/projectRisk.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -152,7 +160,7 @@ cypress_tests_group3Part1:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group3' --spec ./cypress/e2e/features/requests/requestCreation.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group3' --spec ./cypress/e2e/features/requests/requestCreation.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
   
@@ -164,7 +172,7 @@ requestConversation:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group19' --spec ./cypress/e2e/features/requests/requestConversation.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group19' --spec ./cypress/e2e/features/requests/requestConversation.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -175,7 +183,7 @@ cypress_tests_group4D:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group4D' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group4D' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -187,7 +195,7 @@ cypress_tests_group3Part2:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group3' --spec ./cypress/e2e/features/requests/requestCreationMonitoringPeriods.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group3' --spec ./cypress/e2e/features/requests/requestCreationMonitoringPeriods.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -199,9 +207,23 @@ cypress_tests_group16:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group16' --spec ./cypress/e2e/features/requests/viewAssignments.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group16' --spec ./cypress/e2e/features/requests/viewAssignments.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
+
+requestViewEdit:
+  stage: request setup stage
+  needs:
+    - cypress_tests_projectSetup 
+    - cypress_tests_group3Part1
+    - cypress_tests_group3Part2
+  <<: *default_before_script
+  <<: *default_script
+  script:
+    - npm run cypress:run -- --env TAGS='@viewEditRequests' --spec ./cypress/e2e/features/requests/viewEditRequests.feature --browser chrome
+  <<: *default_artifacts
+  <<: *default_variables
+
 
 cypress_tests_group17:
   stage: request setup stage
@@ -212,7 +234,7 @@ cypress_tests_group17:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group17' --spec ./cypress/e2e/features/users/userFinance.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group17' --spec ./cypress/e2e/features/users/userFinance.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -225,7 +247,7 @@ cypress_tests_group2A:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group2A' --spec ./cypress/e2e/features/projects/projects.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group2A' --spec ./cypress/e2e/features/projects/projects.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -238,7 +260,7 @@ cypress_tests_group1A:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group1A' --spec ./cypress/e2e/features/projects/editProject.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group1A' --spec ./cypress/e2e/features/projects/editProject.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -252,7 +274,7 @@ cypress_tests_group1BPart1:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group1B' --spec ./cypress/e2e/features/projects/projectCreation.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group1B' --spec ./cypress/e2e/features/projects/projectCreation.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -267,7 +289,7 @@ cypress_tests_group1BPart2:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group1B' --spec ./cypress/e2e/features/functional/login.feature --browser chrome
+    - npm run cypress:run -- --env TAGS='@group1B' --spec ./cypress/e2e/features/functional/login.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
@@ -281,7 +303,7 @@ cypress_tests_group2B:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group2B' --spec ./cypress/e2e/features/projects/projects.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group2B' --spec ./cypress/e2e/features/projects/projects.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -292,7 +314,7 @@ cypress_tests_group4A:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group4A' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group4A' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -304,7 +326,7 @@ cypress_tests_group4B:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group4B' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group4B' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -317,7 +339,7 @@ cypress_tests_group4C:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group4C' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group4C' --spec ./cypress/e2e/features/projects/selectedProject.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -329,7 +351,7 @@ cypress_tests_group5:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group5' --spec ./cypress/e2e/features/functional/navigationBars.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group5' --spec ./cypress/e2e/features/functional/navigationBars.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -343,7 +365,7 @@ cypress_tests_group8:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group8' --spec ./cypress/e2e/features/dashboards/allRequestDashboard.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group8' --spec ./cypress/e2e/features/dashboards/allRequestDashboard.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -357,7 +379,7 @@ cypress_tests_group9:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group9' --spec ./cypress/e2e/features/functional/consultations.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group9' --spec ./cypress/e2e/features/functional/consultations.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -377,10 +399,21 @@ requestSubmissionsTests:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --headed --env TAGS='@groupRS' --spec ./cypress/e2e/features/requests/submitRequest.feature --browser chrome
+    - npm run cypress:run -- --headed --env TAGS='@groupRS' --spec ./cypress/e2e/features/requests/submitRequest.feature --browser chrome
   <<: *default_artifacts
   <<: *default_variables
 
+completedRequestTests:
+  stage: request submission stage
+  needs:
+    - requestSubmissionsTests
+    - cypress_tests_projectSetup
+  <<: *default_before_script
+  <<: *default_script
+  script:
+    - npm run cypress:run -- --env TAGS='@completedRequests' --spec ./cypress/e2e/features/requests/completedRequests.feature --browser chrome
+  <<: *default_artifacts
+  <<: *default_variables
 
 
 creditingPeriodPageTests:
@@ -391,7 +424,7 @@ creditingPeriodPageTests:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --headed --env TAGS='@group12' --spec ./cypress/e2e/features/projects/projectInfoCreditingPeriod.feature --browser chrome 
+    - npm run cypress:run -- --headed --env TAGS='@group12' --spec ./cypress/e2e/features/projects/projectInfoCreditingPeriod.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -404,7 +437,7 @@ userTacSpecificTests:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --headed --env TAGS='@group13' --spec ./cypress/e2e/features/users/userTac.feature --browser chrome 
+    - npm run cypress:run -- --headed --env TAGS='@group13' --spec ./cypress/e2e/features/users/userTac.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -416,7 +449,7 @@ myRequestDashboardTests:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --env TAGS='@group15' --spec ./cypress/e2e/features/dashboards/myRequestDashboard.feature --browser chrome 
+    - npm run cypress:run -- --env TAGS='@group15' --spec ./cypress/e2e/features/dashboards/myRequestDashboard.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 
@@ -429,7 +462,7 @@ commonDashboardTests:
   <<: *default_before_script
   <<: *default_script
   script:
-    - npx cypress run --headed --env TAGS='@group14' --spec ./cypress/e2e/features/dashboards/reportDashboard.feature --browser chrome 
+    - npm run cypress:run -- --headed --env TAGS='@group14' --spec ./cypress/e2e/features/dashboards/reportDashboard.feature --browser chrome 
   <<: *default_artifacts
   <<: *default_variables
 

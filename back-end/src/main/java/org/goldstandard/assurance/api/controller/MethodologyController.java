@@ -39,12 +39,13 @@ public class MethodologyController {
   @GetMapping("/pages")
   public PagedResource<MethodologyManagementDTO> getAllMethodologies(
       @RequestParam(value = "description", required = false, defaultValue = "") String description,
+      @RequestParam(value = "paa", required = false) Boolean paa,
       @PageableDefault(
               sort = {"id"},
               direction = Sort.Direction.ASC,
               size = DEFAULT_PAGE_SIZE)
           Pageable pageable) {
-    var allMethodologies = service.getAll(pageable, description);
+    var allMethodologies = service.getAll(pageable, description, paa);
     return new PagedResource<>(allMethodologies.map(converter::toManagementDTO));
   }
 

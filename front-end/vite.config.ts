@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/ui/, ""),
         },
         "/api": {
-          target: env.VITE_PROXY_TARGET || "https://dev.goldstandard-assurance.org",
+          target: env.VITE_PROXY_TARGET || "http://localhost:8080",
           changeOrigin: true,
         },
       },

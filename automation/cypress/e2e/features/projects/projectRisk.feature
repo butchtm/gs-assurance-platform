@@ -4,7 +4,6 @@ Feature: tests relating to the project risk feature
     Scenario Outline: <username> can open risk update modal
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -21,7 +20,6 @@ Feature: tests relating to the project risk feature
     Scenario Outline: <username> updates the risk summary
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -40,7 +38,6 @@ Feature: tests relating to the project risk feature
     Scenario Outline: <username> checks the history table for recent update
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -48,14 +45,13 @@ Feature: tests relating to the project risk feature
         Then I can see my details "<risk>" "<user>" "<description>" in the risk table
 
     Examples:
-            | username    | risk      | user            | description               | projectStatus   | 
-            | ADMIN       | No Risk   | George Jennings | this project is high risk | Listed          |
-            | ARM TEAM    | No Risk   | George Jennings | this project is high risk | New             |
+            | username    | risk      | user      | description               | projectStatus   | 
+            | ADMIN       | No Risk   | auto test | this project is high risk | Listed          |
+            | ARM TEAM    | No Risk   | auto test | this project is high risk | New             |
 
     Scenario Outline: <username> turns on the risk flag
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -68,14 +64,13 @@ Feature: tests relating to the project risk feature
         And I can see high risk flag at top of page
 
     Examples:
-            | username    | risk      | user            | description               | projectStatus   | 
-            | ADMIN       | High Risk | George Jennings | this project is high risk | Listed          |
-            | ARM TEAM    | High Risk | George Jennings | this project is high risk | New             |
+            | username    | risk      | user      | description               | projectStatus   | 
+            | ADMIN       | High Risk | auto test | this project is high risk | Listed          |
+            | ARM TEAM    | High Risk | auto test | this project is high risk | New             |
 
     Scenario Outline: <username> selects risk warning from top of page to read content
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -86,14 +81,13 @@ Feature: tests relating to the project risk feature
 
 
     Examples:
-            | username    | risk      | user            | description               | projectStatus   | 
-            | ADMIN       | High Risk | George Jennings | this project is high risk | Listed          |
-            | ARM TEAM    | High Risk | George Jennings | this project is high risk | New             |
+            | username    | risk      | user      | description               | projectStatus   | 
+            | ADMIN       | High Risk | auto test | this project is high risk | Listed          |
+            | ARM TEAM    | High Risk | auto test | this project is high risk | New             |
 
     Scenario Outline: <username> selects risk warning from top of page to update risk content
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -110,14 +104,13 @@ Feature: tests relating to the project risk feature
 
 
     Examples:
-            | username    | risk      | user            | description               | projectStatus   | updatedDescription         |
-            | ADMIN       | High Risk | George Jennings | this project is high risk | Listed          | project is still high risk |
-            | ARM TEAM    | High Risk | George Jennings | this project is high risk | New             | project is still high risk |
+            | username    | risk      | user      | description               | projectStatus   | updatedDescription         |
+            | ADMIN       | High Risk | auto test | this project is high risk | Listed          | project is still high risk |
+            | ARM TEAM    | High Risk | auto test | this project is high risk | New             | project is still high risk |
     
     Scenario Outline: <username> selects risk warning from top of request creation
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -128,14 +121,13 @@ Feature: tests relating to the project risk feature
         Then I can see my risk summary "<updatedDescription>" in the risk banner
 
     Examples:
-            | username    | risk      | user            | description               | projectStatus   | updatedDescription         |
-            | ADMIN       | High Risk | George Jennings | this project is high risk | Listed          | project is still high risk |
-            | ARM TEAM    | High Risk | George Jennings | this project is high risk | New             | project is still high risk |
+            | username    | risk      | user      | description               | projectStatus   | updatedDescription         |
+            | ADMIN       | High Risk | auto test | this project is high risk | Listed          | project is still high risk |
+            | ARM TEAM    | High Risk | auto test | this project is high risk | New             | project is still high risk |
 
     Scenario Outline: <username> turns off the risk flag
         Given I login as "<username>"
         When I click "projects" from the navbar
-        And I search a "<projectStatus>" "automation test (POA)" GSID
         And I select "<projectStatus>" "automation test (POA)" GSID from results as "<username>"
         Then project information can be seen 
 
@@ -147,6 +139,6 @@ Feature: tests relating to the project risk feature
         And I can see my details "<risk>" "<user>" "<description>" in the risk table
 
     Examples:
-            | username    | risk    | user            | description               | projectStatus   | 
-            | ADMIN       | No Risk | George Jennings | this project is high risk | Listed          |
-            | ARM TEAM    | No Risk | George Jennings | this project is high risk | New             |
+            | username    | risk    | user      | description               | projectStatus   | 
+            | ADMIN       | No Risk | auto test | this project is high risk | Listed          |
+            | ARM TEAM    | No Risk | auto test | this project is high risk | New             |

@@ -47,7 +47,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldUpdateAllFieldsForNonBatchedRequest() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     var update = RequestCreateUpdateDTOMother.build(originalRequest.getId());
     int userId = 456;
     when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
@@ -73,7 +73,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldNotUpdateLastSubmittedByUserIdIfStatusIsNotChanged() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     var update =
         RequestCreateUpdateDTOMother.builder(originalRequest.getId())
             .requestStatusId(originalRequest.getCurrentRequestStatus().getId())
@@ -89,8 +89,8 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldUpdateAllFieldsForBatchParentRequest() {
-    var originalRequest = buildRequest(1);
-    originalRequest.setBatch(buildBatchWithParent(buildRequest(1)));
+    var originalRequest = buildRequest(1).build();
+    originalRequest.setBatch(buildBatchWithParent(buildRequest(1).build()));
     var update = RequestCreateUpdateDTOMother.build(originalRequest.getId());
     int userId = 321;
     when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
@@ -115,11 +115,71 @@ class RequestUpdateApplierTest {
   }
 
   @Test
+  void shouldAllowPaaOnUpdateWhenRequestTypeSupportsPaa() {
+    var originalRequest = buildRequest().build();
+    originalRequest.setRequestType(new RequestType(RequestType.PRELIMINARY_REVIEW_ID));
+    var update =
+        RequestCreateUpdateDTO.builder()
+            .id(originalRequest.getId())
+            .requestStatusId(3)
+            .paa(true)
+            .build();
+    int userId = 111;
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
+    givenActivityEnderReturnsUpdatedRequest(originalRequest);
+
+    var updatedRequest = applier.applyUpdates(originalRequest, update);
+
+    assertThat(updatedRequest.isPaa()).isTrue();
+  }
+
+  @Test
+  void shouldForcePaaFalseOnUpdateWhenRequestTypeDoesNotSupportPaa() {
+    var originalRequest = buildRequest().build();
+    originalRequest.setRequestType(new RequestType(RequestType.GENERIC));
+    var update =
+        RequestCreateUpdateDTO.builder()
+            .id(originalRequest.getId())
+            .requestStatusId(3)
+            .paa(true)
+            .build();
+    int userId = 111;
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
+    givenActivityEnderReturnsUpdatedRequest(originalRequest);
+
+    var updatedRequest = applier.applyUpdates(originalRequest, update);
+
+    assertThat(updatedRequest.isPaa()).isFalse();
+  }
+
+  @Test
+  void shouldPreservePaaOnUpdateWhenPaaUpdateIsNull() {
+    var originalRequest = buildRequest().build();
+    originalRequest.setRequestType(new RequestType(RequestType.PRELIMINARY_REVIEW_ID));
+    originalRequest.setPaa(true);
+    var update =
+        RequestCreateUpdateDTO.builder()
+            .id(originalRequest.getId())
+            .requestStatusId(3)
+            .paa(null)
+            .build();
+    int userId = 111;
+    when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
+    givenActivityEnderReturnsUpdatedRequest(originalRequest);
+
+    var updatedRequest = applier.applyUpdates(originalRequest, update);
+
+    assertThat(updatedRequest.isPaa()).isTrue();
+  }
+
+  @Test
   void shouldOnlyUpdateChildRequestFieldsForBatchChildRequest() {
-    var request = buildRequest(1);
+    var request =
+        buildRequest(1).requestType(new RequestType(RequestType.DESIGN_CHANGE_WITH_VVB)).build();
     var original = request.toBuilder().build();
-    request.setBatch(buildBatchWithParent(buildRequest(2)));
-    var update = RequestCreateUpdateDTOMother.build(request.getId());
+    request.setBatch(buildBatchWithParent(buildRequest(2).build()));
+    var update =
+        RequestCreateUpdateDTOMother.builder(request.getId()).requestTypeId(0).paa(true).build();
     int userId = 654;
     when(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId()).thenReturn(userId);
 
@@ -130,7 +190,9 @@ class RequestUpdateApplierTest {
         .isEqualTo(update.getCreditingPeriod().getPeriodId());
     assertThat(updatedRequest.getEmissionReductionAmount())
         .isEqualTo(update.getEmissionReductionAmount());
+    assertThat(updatedRequest.isPaa()).isTrue();
 
+    assertThat(updatedRequest.getRequestType()).isEqualTo(original.getRequestType());
     assertThat(updatedRequest.getCurrentRequestStatus().getId())
         .isEqualTo(original.getCurrentRequestStatus().getId());
     assertThat(updatedRequest.getStartDate()).isEqualTo(original.getStartDate());
@@ -144,7 +206,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldUpdateEndDateIfRequestIsInactiveAndEndDateNotAlreadySet() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     originalRequest.setEndDate(null);
     var update =
         RequestCreateUpdateDTOMother.builder(originalRequest.getId())
@@ -160,7 +222,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldNotUpdateEndDateIfRequestIsInactiveAndEndDateIsAlreadySet() {
-    var originalRequest = buildRequest(); // End date is set in this build method
+    var originalRequest = buildRequest().build(); // End date is set in this build method
     var originalEndDate = originalRequest.getEndDate();
     var update =
         RequestCreateUpdateDTOMother.builder(originalRequest.getId())
@@ -176,7 +238,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldNotUpdateEndDateIfRequestIsActive() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     originalRequest.setEndDate(null);
     var update =
         RequestCreateUpdateDTOMother.builder(originalRequest.getId())
@@ -191,7 +253,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldRemoveDraftCreditingPeriodIfExistingCreditingPeriodIdSpecified() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     originalRequest.setDraftCreditingPeriod(new RequestCreditingPeriod());
     var creditingPeriodIndex = 1;
     var creditingPeriodDto = new CreditingPeriodDTO(creditingPeriodIndex);
@@ -210,7 +272,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldRemoveExistingCreditingPeriodIdIfNewCreditingPeriodSpecified() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     originalRequest.setCreditingPeriod(1);
     var creditingStartDate = ZonedDateTime.now();
     var creditingPeriodDto =
@@ -246,7 +308,7 @@ class RequestUpdateApplierTest {
 
   @Test
   void shouldCloseRequestWithReason() {
-    var originalRequest = buildRequest();
+    var originalRequest = buildRequest().build();
     var update =
         RequestCreateUpdateDTOMother.build(
             originalRequest.getId(), 8, "Other reason for cancellation");
@@ -275,24 +337,26 @@ class RequestUpdateApplierTest {
     return Batch.builder().parentRequest(parentRequest).build();
   }
 
-  private static Request buildRequest() {
+  private static Request.RequestBuilder buildRequest() {
     return buildRequest(1);
   }
 
-  private static Request buildRequest(Integer id) {
-    var request = new Request();
-    ZonedDateTime start = ZonedDateTime.now();
-    request.setId(id);
-    request.setCurrentRequestStatus(new RequestStatus(2));
-    request.setStartDate(start);
-    request.setEndDate(start.plusDays(2));
-    request.setBookingDate(start.plusMinutes(100));
-    request.setCreditingPeriod(456);
-    request.setEmissionReductionAmount(789);
-    request.setManuallyAdded(true);
-    request.setRequestType(new RequestType(0));
-    request.setCurrentActivity(buildRequestActivity());
-    return request;
+  private static Request.RequestBuilder buildRequest(Integer id) {
+    var start = ZonedDateTime.now();
+    var builder =
+        Request.builder()
+            .id(id)
+            .currentRequestStatus(new RequestStatus(2))
+            .startDate(start)
+            .endDate(start.plusDays(2))
+            .bookingDate(start.plusMinutes(100))
+            .requestType(new RequestType(0))
+            .creditingPeriod(456)
+            .emissionReductionAmount(789)
+            .manuallyAdded(true)
+            .currentActivity(buildRequestActivity())
+            .paa(false);
+    return builder;
   }
 
   private static RequestActivity buildRequestActivity() {
@@ -300,7 +364,7 @@ class RequestUpdateApplierTest {
   }
 
   private static Activity buildActivity() {
-    return new Activity();
+    return Activity.builder().build();
   }
 
   private void mockTimeNow() {

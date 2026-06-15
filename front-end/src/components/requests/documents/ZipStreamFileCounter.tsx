@@ -2,18 +2,18 @@ import { LocalFileHeader } from "./zip-streaming/structures/LocalFileHeader";
 import { ZipDataUtils } from "./zip-streaming/ZipDataUtils";
 
 export class ZipStreamFileCounter {
-  private recentDataBuffer = new Uint8Array();
+  // Explicitly set the generic type argument to ArrayBuffer
+  private recentDataBuffer: Uint8Array<ArrayBuffer> = new Uint8Array();
 
   constructor(private readonly onFileNameObserved: (fileName: string) => void) {
     this.onFileNameObserved = onFileNameObserved;
   }
-
   public scanForPotentialFileHeaders(additionalBytes: Uint8Array) {
     this.recentDataBuffer = this.concatenateBuffers(this.recentDataBuffer, additionalBytes);
     this.scanRecentDataBufferForFileHeaders();
   }
 
-  private concatenateBuffers(buffer1: Uint8Array, buffer2: Uint8Array): Uint8Array {
+  private concatenateBuffers(buffer1: Uint8Array<ArrayBuffer>, buffer2: Uint8Array): Uint8Array<ArrayBuffer> {
     const concatenated = new Uint8Array(buffer1.length + buffer2.length);
     concatenated.set(buffer1);
     concatenated.set(buffer2, buffer1.length);

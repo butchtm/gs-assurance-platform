@@ -6,6 +6,7 @@ import { ReferenceType, useReferenceTypes } from "../../../../common/data-types/
 import { Project } from "../../../../common/project/Project";
 import { AuthContext } from "../../../Auth/Login/AuthProvider";
 import { helperTexts } from "../../../Project/create-project/HelperText";
+import { CustomFormSelect } from "../../../Reusable/FormFields/CustomFormSelect";
 import CustomHelperText, { CustomTooltip } from "../../../Reusable/FormFields/CustomTooltipText";
 import { getBatchedRequestTypeMappings, getRequiredDocumentsForRequest } from "../../Requests";
 
@@ -29,8 +30,9 @@ export const Step1: React.FC<Step1Props> = ({
   setRequestTypeId,
   requestEditId,
 }) => {
-  const { values, setFieldValue, touched, errors } = useFormikContext<CreateRequestForm>();
-  const { activeReferenceTypes } = useReferenceTypes();
+  const { values, setFieldValue, touched, errors, resetForm } = useFormikContext<CreateRequestForm>();
+  const { activeRequestTypes } = useReferenceTypes();
+
   const [requestType, setRequestType] = useState<number | null>(null);
   const [batchRequestTypes, setBatchRequestTypes] = useState<ReferenceType[]>([]);
 
@@ -99,39 +101,24 @@ export const Step1: React.FC<Step1Props> = ({
 
   const onRequestTypeUpdate = (selectedRequestType: ReferenceType | null) => {
     if (values.requestType !== null) {
-      resetFieldValues();
+      resetForm();
     }
     setRequestType(selectedRequestType ? selectedRequestType.id : null);
     setFieldValue("requestType", selectedRequestType ? selectedRequestType.id.toString() : "");
-  };
-
-  const resetFieldValues = () => {
-    setFieldValue("createBatchRequest", "no");
-    setFieldValue("batchRequestTypeId", null);
-    setFieldValue("batchProjectIds", null);
-    setFieldValue("creditingPeriodId", null);
-    setFieldValue("startDate", null);
-    setFieldValue("endDate", null);
-    setFieldValue("batchStepProjectValues", null);
-    setFieldValue("isMonitoringPeriodEnabled", null);
-    setFieldValue("canCreateNewCreditingPeriod", null);
-    setFieldValue("emissionReductionAmount", null);
-    setFieldValue("useNewCreditingPeriod", null);
-    setFieldValue("newCreditingPeriodStartDate", null);
-    setFieldValue("newCreditingPeriodEndDate", null);
-    setFieldValue("methodologies", null);
-    setFieldValue("requiredDocuments", null);
-    setFieldValue("feeSchedule", null);
   };
 
   const authContext = useContext(AuthContext);
   const isDeveloper = authContext.isProjectDeveloperUser();
 
   const filteredRequestTypes = isDeveloper
-    ? activeReferenceTypes?.RequestType.filter((type) => type.code !== "ISSUANCE")
-    : activeReferenceTypes?.RequestType;
+    ? activeRequestTypes.filter((type) => type.code !== "ISSUANCE")
+    : activeRequestTypes;
 
   const gridItemProps = requestEditId ? { xs: 11 } : { xs: 12 };
+
+  const autocompleteValue = activeRequestTypes.find(
+    (requestTypeOption) => requestTypeOption.id == Number(values.requestType),
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "0 10%", p: 2 }}>
@@ -145,9 +132,7 @@ export const Step1: React.FC<Step1Props> = ({
                     <Autocomplete
                       options={filteredRequestTypes}
                       getOptionLabel={(option) => option.description}
-                      value={activeReferenceTypes?.RequestType.find(
-                        (requestTypeOption) => requestTypeOption.id == Number(values.requestType),
-                      )}
+                      value={autocompleteValue}
                       onChange={(_, selectedRequestType) => {
                         onRequestTypeUpdate(selectedRequestType);
                       }}
@@ -178,6 +163,19 @@ export const Step1: React.FC<Step1Props> = ({
                 </Grid>
               </FormControl>
             </Grid>
+            {autocompleteValue?.supportsPAA && (
+              <Grid item xs={12}>
+                <CustomFormSelect
+                  name="paa"
+                  label="Is a PAA request?"
+                  options={[
+                    { value: "true", label: "Yes", flag: true },
+                    { value: "false", label: "No", flag: false },
+                  ]}
+                  required
+                />
+              </Grid>
+            )}
             <Grid item xs={12}>
               {(!requestEditId || values.createBatchRequest == "yes") && (
                 <Step1BatchChoice batchRequestTypes={batchRequestTypes} update={!!requestEditId}></Step1BatchChoice>

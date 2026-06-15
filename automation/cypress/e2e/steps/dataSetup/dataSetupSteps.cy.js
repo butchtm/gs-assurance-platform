@@ -166,10 +166,15 @@ Then("I add {string} {string} projects", (number, type) => {
   }
 })
 
-Given("I perform this test of API delete test data", () => {
+
+Given("I delete all existing projects", () => {
   cy.loginApi().then(() => {
     cy.deleteTestDataApi()
   })
+})
+
+Then("There are no projects shown on the projects page", () => {
+  cy.contains('automation test').should("not.exist")
 })
 
 Then("an email should have subject {string} and body containing {string}", (expectedSubject, expectedBodyText) => {

@@ -1,0 +1,5 @@
+ALTER TABLE gs.request_type_document_type
+DROP CONSTRAINT request_type_document_type_document_display_category_id_fkey;
+
+ALTER TABLE gs.request_type_document_type
+ADD FOREIGN KEY (document_display_category_id) REFERENCES gs.document_display_category ON DELETE RESTRICT;

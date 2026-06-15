@@ -1,5 +1,4 @@
 import "@testing-library/jest-dom";
-import { TextDecoder, TextEncoder } from "util";
 
 import { extend } from "dayjs";
 import businessDays from "dayjs-business-days2";
@@ -24,20 +23,3 @@ failOnConsole({
     return /React Router Future Flag Warning/.test(message);
   },
 });
-
-// Polyfill for TextEncoder
-if (typeof global.TextEncoder === "undefined") {
-  global.TextEncoder = TextEncoder;
-}
-if (typeof window.TextEncoder === "undefined") {
-  window.TextEncoder = global.TextEncoder;
-}
-
-// Polyfill for TextDecoder
-if (typeof global.TextDecoder === "undefined") {
-  // @ts-expect-error Fix TextDecoder Polyfill for Jest
-  global.TextDecoder = TextDecoder;
-}
-if (typeof window.TextDecoder === "undefined") {
-  window.TextDecoder = global.TextDecoder;
-}

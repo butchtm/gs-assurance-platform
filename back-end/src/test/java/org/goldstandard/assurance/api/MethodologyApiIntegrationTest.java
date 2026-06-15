@@ -61,6 +61,72 @@ class MethodologyApiIntegrationTest extends AbstractApiTest {
     }
   }
 
+  @Test
+  void shouldReturnAllMethodologiesPagedMatchingPaaFilter() {
+    var paaDomain =
+        MethodologyManagementDTO.builder()
+            .description("paa methodology")
+            .active(true)
+            .paa(true)
+            .build();
+    var nonPaaDto =
+        MethodologyManagementDTO.builder()
+            .description("non paa methodology")
+            .active(true)
+            .paa(false)
+            .build();
+    List<Integer> idsToDelete = new ArrayList<>();
+    try {
+      var paaResult = client.createMethodologyAsAdmin(paaDomain);
+      var nonPaaResult = client.createMethodologyAsAdmin(nonPaaDto);
+      assertThat(paaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(nonPaaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+      // Filter by paa=true
+      var pageResult = client.getAllMethodologiesPagedAsAdmin("", true);
+      assertThat(pageResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(pageResult.getBody()).isNotNull();
+      assertThat(pageResult.getBody().getContent()).allMatch(m -> m.isPaa());
+
+      idsToDelete.addAll(List.of(paaResult.getBody().getId(), nonPaaResult.getBody().getId()));
+    } finally {
+      cleanUpMethodologies(idsToDelete);
+    }
+  }
+
+  @Test
+  void shouldReturnAllMethodologiesPagedMatchingNonPaaFilter() {
+    var paaDomain =
+        MethodologyManagementDTO.builder()
+            .description("paa methodology")
+            .active(true)
+            .paa(true)
+            .build();
+    var nonPaaDto =
+        MethodologyManagementDTO.builder()
+            .description("non paa methodology")
+            .active(true)
+            .paa(false)
+            .build();
+    List<Integer> idsToDelete = new ArrayList<>();
+    try {
+      var paaResult = client.createMethodologyAsAdmin(paaDomain);
+      var nonPaaResult = client.createMethodologyAsAdmin(nonPaaDto);
+      assertThat(paaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(nonPaaResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+      // Filter by paa=false
+      var pageResult = client.getAllMethodologiesPagedAsAdmin("", false);
+      assertThat(pageResult.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(pageResult.getBody()).isNotNull();
+      assertThat(pageResult.getBody().getContent()).allMatch(m -> !m.isPaa());
+
+      idsToDelete.addAll(List.of(paaResult.getBody().getId(), nonPaaResult.getBody().getId()));
+    } finally {
+      cleanUpMethodologies(idsToDelete);
+    }
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {
@@ -111,7 +177,7 @@ class MethodologyApiIntegrationTest extends AbstractApiTest {
       assertThat(createResult.getStatusCode()).isEqualTo(HttpStatus.OK);
 
       var updateDTO =
-          MethodologyManagementDTO.builder().description("update").active(false).build();
+          MethodologyManagementDTO.builder().description("update").active(false).paa(true).build();
       var result = client.updateMethodologyAsAdmin(updateDTO, createResult.getBody().getId());
       assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -148,5 +214,6 @@ class MethodologyApiIntegrationTest extends AbstractApiTest {
     assertThat(actual.getDescription()).isEqualTo(dto.getDescription());
     assertThat(actual.getActive()).isEqualTo(dto.getActive());
     assertThat(actual.getCode()).isEqualTo(dto.getDescription().toUpperCase());
+    assertThat(actual.isPaa()).isEqualTo(dto.isPaa());
   }
 }

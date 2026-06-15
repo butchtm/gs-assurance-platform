@@ -75,10 +75,13 @@ const mockRequest: GSRequest = {
   startDate: "",
   endDate: "",
   bookingDate: "",
+  paa: false,
   requestType: {
     id: 1005,
     code: "PERFORMANCE_CERTIFICATION_|_PROJECT",
     description: "",
+    supportsPAA: false,
+    isActive: true,
   },
   index: 0,
   reviewName: "",

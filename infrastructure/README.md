@@ -4,6 +4,46 @@ Terraform infrastructure for the Gold Standard Assurance Platform.
 
 An architecture diagram is available - [architecture.drawio](./docs/architecture.drawio). It can be viewed using the free online tool [DrawIO](https://app.diagrams.net/).
 
+## Quickstart
+
+1. Install [Terraform](https://developer.hashicorp.com/terraform/install)
+   (or manage your installations with
+   [`tfenv`](https://github.com/tfutils/tfenv)).
+1. Define your environment.
+   During development, only use the `development` environment.
+   1. Define the `GS_ENV_NAME` environment variable.
+      For example you could run `export GS_ENV_NAME=development` in your terminal,
+      or create a script with that set that you then `source`.
+      There is [an example template script](./local.sh.template)
+      you can use as a starting point if this is your preference.
+      From the root of this repository, you can run:
+
+      ```sh
+      cp ./local.sh.template ./local.sh
+      . ./local.sh
+      ```
+   1. Run `set_tf_env.sh`.
+      This will delete any existing Terraform configuration,
+      and generate a new copy of `providers.tf`
+      from [the template](./providers.tf.template).
+1. Prepare your AWS credentials.
+   As for the environment, you could export your `AWS_ACCESS_KEY_ID`,
+   `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN` in your terminal,
+   or you could create a script with these set that you then `source`.
+   Bear in mind that your credentials
+   will require regular rotation to keep up to date.
+1. Run `terraform init -reconfigure`.
+   This will install the necessary Terraform providers,
+   and initialise the Terraform modules.
+1. Run `terraform validate` to check the scripts can be parsed successfully.
+1. Run `terraform plan "-var-file=${GS_ENV_NAME}.tfvars"`.
+   (If prompted to provide unspecified variables, for now,
+   hit enter to proceed without values.)
+   This will run a Terraform plan to compare the defined state
+   against the current actual state of the infrastructure.
+   Any proposed changes will be shown in the output,
+   but nothing will be actioned from a `plan` operation.
+
 ## Modules
 ### Cognito
 Contains all the application user management. Users are controlled by a Cognito User Pool.

@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, DELETE, UPDATE ON gs.comment TO gs_assurance_db_writer;

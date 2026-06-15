@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class RequestCreateUpdateDTO {
   private final List<@Valid RequestMethodologyDTO> methodologies;
   private final Integer cancellationReasonId;
   private final String otherCancellationReason;
+  private final Boolean paa;
 
   public boolean shouldStartConsultation() {
     return Boolean.TRUE.equals(startStakeholderConsultation);
@@ -56,10 +58,10 @@ public class RequestCreateUpdateDTO {
   }
 
   public boolean containsUpdatesToMonitoringPeriod(Request request) {
-    if (Optional.ofNullable(monitoringPeriod).isPresent()) {
-      return monitoringPeriod.isUpdatedMonitoringPeriod(request);
+    if (Objects.isNull(monitoringPeriod)) {
+      return false;
     }
-    return false;
+    return monitoringPeriod.isUpdatedMonitoringPeriod(request);
   }
 
   public boolean hasMethodologies() {

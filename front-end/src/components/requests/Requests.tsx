@@ -33,6 +33,7 @@ export interface FormValues {
   newMonitoringPeriodStartDate: Dayjs | null;
   newMonitoringPeriodEndDate: Dayjs | null;
   feeSchedule: number | null;
+  paa: boolean;
 }
 
 export interface BatchedProjectRequests {

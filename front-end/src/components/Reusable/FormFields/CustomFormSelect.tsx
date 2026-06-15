@@ -1,5 +1,14 @@
-import { Box, FormControl, FormHelperText, InputBaseComponentProps, InputLabel, MenuItem, Select } from "@mui/material";
-import { useField, useFormikContext } from "formik";
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  InputBaseComponentProps,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
+import { useField } from "formik";
 import React from "react";
 
 import { Options } from "../../../common/data-types/DataReferenceTypes";
@@ -27,12 +36,18 @@ export const CustomFormSelect: React.FC<FormSelectProps> = ({
   required,
   inputProps,
 }) => {
-  const { setFieldValue } = useFormikContext();
   const [field, meta, helpers] = useField(name);
 
   if (!options) {
     return <></>;
   }
+
+  const selectValue = field?.value ?? "";
+
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const selected = options.find((o) => o.value == e.target.value);
+    helpers.setValue(selected?.flag ?? selected?.value);
+  };
 
   return (
     <Box display="flex" alignItems="center">
@@ -50,10 +65,8 @@ export const CustomFormSelect: React.FC<FormSelectProps> = ({
         <Select
           labelId={`${name}-label`}
           label={label}
-          value={field.value ?? ""}
-          onChange={(e) => {
-            setFieldValue(name, e.target.value);
-          }}
+          value={selectValue}
+          onChange={handleSelectChange}
           onBlur={() => helpers.setTouched(true)}
           inputProps={{
             ...inputProps,
@@ -64,7 +77,11 @@ export const CustomFormSelect: React.FC<FormSelectProps> = ({
           }}
         >
           {options.map((option) => (
-            <MenuItem key={option.value} value={option.value} data-testid={`${name}-option-${option.value}`}>
+            <MenuItem
+              key={String(option.value)}
+              value={String(option.value)}
+              data-testid={`${name}-option-${option.value}`}
+            >
               {option.label}
             </MenuItem>
           ))}

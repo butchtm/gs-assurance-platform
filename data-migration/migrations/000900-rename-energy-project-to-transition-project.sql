@@ -1,0 +1,17 @@
+ALTER TABLE gs.energy_project
+RENAME TO transition_project;
+
+ALTER TABLE gs.transition_project
+RENAME CONSTRAINT energy_project_pkey TO transition_project_pkey;
+
+ALTER TABLE gs.transition_project
+RENAME CONSTRAINT energy_project_project_id_fkey TO transition_project_project_id_fkey;
+
+ALTER TABLE gs.transition_project
+RENAME CONSTRAINT energy_project_transition_approval_procedure_fkey TO transition_project_transition_approval_procedure_fkey;
+
+ALTER TABLE gs.transition_project
+RENAME CONSTRAINT energy_project_transition_from_other_scheme_fkey TO transition_project_transition_from_other_scheme_fkey;
+
+ALTER TABLE gs.transition_project
+RENAME CONSTRAINT energy_project_transition_pathway_fkey TO transition_project_transition_pathway_fkey;

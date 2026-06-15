@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Mocha Tests" time="1.035" tests="1" failures="0" skipped="1">
-  <testsuite name="Root Suite" timestamp="2026-01-13T14:30:09" tests="0" file="cypress\e2e\features\requests\viewAssignments.feature" time="0.000" failures="0">
-  </testsuite>
-  <testsuite name="wizard to perform assignments" timestamp="2026-01-13T14:30:09" tests="1" time="0.969" failures="0">
-  </testsuite>
-</testsuites>

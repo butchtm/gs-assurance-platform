@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "ES6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
@@ -9,22 +9,37 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
     "plugins": [
       {
         "name": "ts-plugin-sort-import-suggestions",
         "moveUpPatterns": ["react-router-dom"],
         "moveDownPatterns": ["formik-mui"]
       }
-    ]
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
   },
   "ts-node": {
     "esm": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "scripts/*.ts", "eslint/custom-rules/**/*.cjs"]
+  "include": [
+    "src",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "scripts/*.ts",
+    "eslint/custom-rules/**/*.cjs",
+    "jest/wrappers/**/*.ts",
+    "vite-env.d.ts"
+  ]
 }

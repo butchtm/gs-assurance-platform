@@ -4,6 +4,7 @@ import { mockAssignmentsHasAudit, mockAssignmentsNoAudit } from "../../../../com
 import { mockActiveReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
 import { updateProjectPiiToNotFound } from "../../../../common/piiAnalysis/PiiAction";
 import {
+  BASE_REQUEST_TYPE,
   debugInRoundCompletionRequests,
   debugRequestTransitionResponse,
 } from "../../../../common/request/DebugRequests";
@@ -231,11 +232,7 @@ describe("InRoundCompletionStatusForm Component", () => {
   it("doesn't show PII questions if PII not present", async () => {
     const mockPreliminaryReview = {
       ...debugInRoundCompletionRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
       project: {
         gsid: "GS1",
         id: 1,
@@ -274,11 +271,7 @@ describe("InRoundCompletionStatusForm Component", () => {
   it("shows PII not found and acceptance questions if PII present", async () => {
     const mockPreliminaryReview = {
       ...debugInRoundCompletionRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
       project: {
         gsid: "GS1",
         id: 1,
@@ -318,11 +311,7 @@ describe("InRoundCompletionStatusForm Component", () => {
   it("submits any fields where the user has selected PII not found", async () => {
     const mockPreliminaryReview = {
       ...debugInRoundCompletionRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
       project: {
         gsid: "GS1",
         id: 1,

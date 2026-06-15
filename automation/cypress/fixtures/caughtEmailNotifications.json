@@ -1,36 +1,23 @@
 {
   "body": {
-    "content": [
-      {
-        "id": 82846,
-        "recipientType": "ACCOUNT",
-        "recipientId": 706,
-        "addressees": [
-          "testuser@example.com"
-        ],
-        "subject": "Design Change | With VVB no. 1 received for GS31244",
-        "htmlBody": "<div style=\"font-family: Arial,sans-serif;\">\n    <p>Dear Reviewer,</p>\n    <p>\n    You have been assigned to review the following project’s request. Please log-in to your account to access project documents.\n    </p>\n    <p>\n    Please upload the findings documents on GSIQ platform.\n    </p>\n    <p>\n    Should you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\n    </p>\n    <p>\n    Best regards,\n    </p>\n    <p>\n    The Gold Standard Foundation\n    </p>\n    <hr style=\"border: 1px solid #cccccc;\"/>\n    <ul style={{ listStyle: 'none', padding: 0 }}>\n\t<table>\n\t\t<tr>\n\t\t\t<td><strong>Project:</strong></td>\n\t\t\t<td>automation test (POA) run:582 (L)</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>GSID:</strong></td>\n\t\t\t<td>GS31244</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>Request:</strong></td>\n\t\t\t<td>Design Change | With VVB no. 1</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td><strong>Project Type:</strong></td>\n\t\t\t<td>Agriculture</td>\n\t\t</tr>\n\t\t<tr>\n            <td><strong>Feedback Round:</strong></td>\n            <td>1</td>\n\t\t</tr>\n\t\t<tr>\n            <td><strong>Review Due Date:</strong></td>\n            <td>25/12/2025</td>\n\t\t</tr>\n    </table>\n</div>",
-        "textBody": "Dear Reviewer,\n\nYou have been assigned to review the following project’s request. Please log-in to your account to access project documents.\n\nPlease upload the findings documents on GSIQ platform.\n\nShould you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\n\nBest regards,\n\nThe Gold Standard Foundation\n\n\nProject: automation test (POA) run:582 (L)\n\nGSID: GS31244\n\nRequest: Design Change | With VVB no. 1\n\nProject Type: Agriculture\n\nFeedback Round: 1\n\nReview Due Date: 25/12/2025\n",
-        "createdTimestamp": "2025-11-27T09:04:14.755754Z",
-        "messagingReference": "0107019ac48e59bb-5f1b6d7c-317c-48b0-895d-31cf8c11f012-000000"
-      }
-    ],
+    "content": [],
     "pageSize": 1,
     "pageNumber": 1,
-    "totalPages": 15223,
-    "totalElements": 15223
+    "totalPages": 0,
+    "totalElements": 0
   },
   "headers": {
-    "date": "Thu, 27 Nov 2025 09:04:15 GMT",
-    "content-type": "application/json",
-    "transfer-encoding": "chunked",
-    "connection": "keep-alive",
+    "vary": "Origin",
     "x-content-type-options": "nosniff",
     "x-xss-protection": "0",
     "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
     "pragma": "no-cache",
     "expires": "0",
-    "x-frame-options": "DENY"
+    "x-frame-options": "DENY",
+    "content-type": "application/json",
+    "date": "Mon, 11 May 2026 08:18:08 GMT",
+    "connection": "close",
+    "transfer-encoding": "chunked"
   },
   "status": 200,
   "statusText": "OK",
@@ -39,10 +26,10 @@
     "Connection": "keep-alive",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
     "accept": "*/*",
-    "cookie": "refreshToken=REDACTED_REFRESH_TOKEN; accessToken=REDACTED_ACCESS_TOKEN; idToken=REDACTED_ID_TOKEN",
+    "cookie": "refreshToken=eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.h78QNuX6VsNx87vxz0MBBTj5xsQefEsm9vbyBkML0niCbBwBYz7Yxl_4pI-CNuiPfjA3XMjVtl1MwPPRj6p1QxTiRJIINX3g46DKIe_ONY-r1M3yfgXcCgedP-m3eO3rmN4OHkLGJAFUe6vxSm-dEMXoQEu07qbAnHctKLGqs_Mqgaa6S1uOKlsRtx4FweJ6MBbvoIDnxA32pEIlMSBvMOfMfY_az1pQH3tQZBe-EDf9wb5cAydMZzMUoRbNy7nrckpxVohKPktU61CnWhHbcxoyYqjYQUcSglDPIHu8vdSdMo3Gczk5yANOSTwM3WtxFYCiovvRiRLla_NALVBu4g.AAuW0fMLKm0SgVbk.KgMtQlIDE6bVHShCR6FZtp2khMIkNszKZ2E6RMF7WIDbCmGCiukvyLXAW0670KgKR_A8zUChlWzhU56FIM-u27D0wJ86-7VqpTqsMPX9JRm4Ra7PqJ5BgDo2IcjW8g_RjkMvyj3AuWE8tR3HwpZRXZ9sYJC1mwzIGkHdZv-UZRWBJHkuYisdMzR-wlXySdrFsaeNa6cLPVAlgAoZxJwd1-GSwADAYQxJKoF7rpRDDfRbOHzFLf1jPVWoC8dmAw7iBFtUF6rUZgFYfCMAWqfTisOashYmD8TExnfa5y_DtC12pjGULxVF5sEQlPabcVHIyjJkwXtjgfXG4VHC6vMvflM0TRtg-DLugeITT_9u4bJ72EviHhonkoG0-5N6aOnVotGyNNv-nvpXJNRfRsjCyANPSN-bqpQJeCrG7zazBn-nagpLMJLk_mIGgDVPA8VKf59cdjTDCF1mRzUJK-OWszAxgydlZEWPyA4EzmL_bbbdqxM-stjrWDob5nvqulz6VCKaC1ZQV1NS7Au06Hd6teN9JxerLU9WXiz_nG5gderBLkVVIw9tpLsDRuSG2Y3KDdLrDAK9FxWM5x_p4IPpSVJnneuKGE63ubpp-OwqV7GBTVvhRJt8TEUx0giM4yGG0WhKN8o3lI_7JM-LEWUjuSe_xb0SmAZrZopGPt8PSbfuMpS2ylTnTPTMV18_DPlAIJ-WNO2eGG5m-9MoXsRG6K1gVSNAaBmixnA4VKUVk6MvS5ftluF82izo9R4034R6ooeqdXNxPQup8b61oWGoW-nJ6R6J2f294K7pR4vGVuFXadQte2-PvvCgGM7rWksq7VOUAtjhofQFpEOipt9JMT69TrZdoJvQcjNzaYwuvgTPQ98EBJX6w0dlHIot7skimhOd1EXgCKAmutibosuP6GgUwvCT3H47ei0k_PMnnbXbjR4RA_wM6PApxVLLzxpLlQTfsq_lmlxuLH3jSRGJ3LF8zZ0N3HLYf9jnz_IDAny1Q9LgUbEAEJiE92a1kAichSY7mwjDeSdhleJo0GfS8VS2o_2BYpGiqTy3SWJ4olQ7I1KlPTEwxWnilwldf0kDS9fYMBYlO961xheViIMGMBBe9w5Hcbkexm6SiPYHOv7uoDCfj7vG5qbXfj_vtCg8vT-njESggYEJAJZiLfQSj0gJdqZ2OAq4BgyyzA_yswgUlk062aZL-Al4zJtUnl5TPIbNUokiV6subB9ZVii-RcqvsQ9D6Xg_ZuvdIcY4Ugd89YUxmp_-mv69rjrzXbJ6XH3em0fEUgNcw2RpjJLBgmlmII8ldg.rz0DRUR2vdYbwOCSqJbClw; accessToken=eyJraWQiOiJsZ2lLOTR5bVJyM0x1NWdYTU1QNUFFdHgyTldVbWxybHYzdWNnNWlVa0xvPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkOGE0MTdkNC04YjNkLTRmYWItYTBjOC02OWYyYzE2YmU5MWUiLCJjb2duaXRvOmdyb3VwcyI6WyJHUy1BZG1pbiJdLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9YSXpvYlpTeDciLCJjbGllbnRfaWQiOiI1dm0zMGRkbTdnazI0YmY0aHBjaW43cDljcSIsIm9yaWdpbl9qdGkiOiIzODI3ZjQ3Yy0wYjE2LTQ2MTYtYjQzMS04YmVhOWI0NmMyNjAiLCJldmVudF9pZCI6IjY5OWMwYjAxLTZhZTctNGMzMC04YTVjLTg5YmVmYjM5ZmVmMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3Nzg0ODc0NzIsImV4cCI6MTc3ODQ5MTA3MiwiaWF0IjoxNzc4NDg3NDcyLCJqdGkiOiI4MjM4ZDYxNy0wZTkzLTQ0NDMtYTJiNS1lYmY2YWJmM2IxNjMiLCJ1c2VybmFtZSI6ImF1dG90ZXN0LWFkbWluIn0.FfpqG7FxrfEcV-bK2NOZEwq-jK029AbOfoRbTloBNsPSAhVF0GpuN-nLAbT4YuJIqOrPMOXk7HkCC7xjbn0efCeU2gisq8DnaeXtdKeDev3xuLZa9T6YXolASDBCJgx167PSZAmv25rOQTP-KLSRZBEa7kLDMNv69r4Zma393BRCz0t4n5ST3ql_lneYKoVcytnjcOV2IvrMfUIIkMGJAtby6P4KFto_9TPjfnOduGZZnZ_VRwu3nwaIOCplv_UezLvUHRywPwG-cz5DxcUrHPJ366uExFu8QegcfkzpbuHgDzgUMgpw7IOvT7bGrDWBTBOhAfgTV84adnDC87OGgw; idToken=eyJraWQiOiJLMmZWTHNrblEreE1NRWhRVzMxbzhYanY1UUhBS3U1NVZLY3dzVnRCUDAwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkOGE0MTdkNC04YjNkLTRmYWItYTBjOC02OWYyYzE2YmU5MWUiLCJjb2duaXRvOmdyb3VwcyI6WyJHUy1BZG1pbiJdLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9YSXpvYlpTeDciLCJjb2duaXRvOnVzZXJuYW1lIjoiYXV0b3Rlc3QtYWRtaW4iLCJnaXZlbl9uYW1lIjoiR2VvcmdlIiwib3JpZ2luX2p0aSI6IjM4MjdmNDdjLTBiMTYtNDYxNi1iNDMxLThiZWE5YjQ2YzI2MCIsImF1ZCI6IjV2bTMwZGRtN2drMjRiZjRocGNpbjdwOWNxIiwiZXZlbnRfaWQiOiI2OTljMGIwMS02YWU3LTRjMzAtOGE1Yy04OWJlZmIzOWZlZjIiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc3ODQ4NzQ3MiwiZXhwIjoxNzc4NDkxMDcyLCJpYXQiOjE3Nzg0ODc0NzIsImZhbWlseV9uYW1lIjoiSmVubmluZ3MiLCJqdGkiOiI4MmEzNDgzOC03NzE1LTRhMTgtOGZiNC1jMjgyNTRlZjZlNDUiLCJlbWFpbCI6ImdqZW5uaW5nc0BjYWNpLmNvLnVrIn0.kOFKF7lyteFzRqx0qnqtWwZAW1wLK4RQex49Osz4OiPyzy3GzXALf-glLcZq6tkQrt-T_DLf_oY7bRTmYBq1x8PdWc-0rCzDJOmGtf8VZFEP8s3_5AKPXn8m-X3BXY-0oQLw5iCBwam3CoULpZJ-t6V-x6aggs0yMphwDd9-Iso_m-Alm7zcOFTABUVT9h7xUONemJqdfER6M6HpR4xhyRBqNstfrW3dMKwfZ_2gAlopRJg1mACkDI5BwxboRqZuKDVCV4ySmDbufr8j7HO3Xry-J_eezPxeGKPmeFtAtHvDAkvKKmyZaV15jrczYX8lhtLehpm7k_J2BhQRaRf52g",
     "accept-encoding": "gzip, deflate"
   },
-  "duration": 51,
+  "duration": 9,
   "allRequestResponses": [
     {
       "Request Body": null,
@@ -50,22 +37,23 @@
         "Connection": "keep-alive",
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36",
         "accept": "*/*",
-        "cookie": "refreshToken=REDACTED_REFRESH_TOKEN; accessToken=REDACTED_ACCESS_TOKEN; idToken=REDACTED_ID_TOKEN",
+        "cookie": "refreshToken=eyJjdHkiOiJKV1QiLCJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAifQ.h78QNuX6VsNx87vxz0MBBTj5xsQefEsm9vbyBkML0niCbBwBYz7Yxl_4pI-CNuiPfjA3XMjVtl1MwPPRj6p1QxTiRJIINX3g46DKIe_ONY-r1M3yfgXcCgedP-m3eO3rmN4OHkLGJAFUe6vxSm-dEMXoQEu07qbAnHctKLGqs_Mqgaa6S1uOKlsRtx4FweJ6MBbvoIDnxA32pEIlMSBvMOfMfY_az1pQH3tQZBe-EDf9wb5cAydMZzMUoRbNy7nrckpxVohKPktU61CnWhHbcxoyYqjYQUcSglDPIHu8vdSdMo3Gczk5yANOSTwM3WtxFYCiovvRiRLla_NALVBu4g.AAuW0fMLKm0SgVbk.KgMtQlIDE6bVHShCR6FZtp2khMIkNszKZ2E6RMF7WIDbCmGCiukvyLXAW0670KgKR_A8zUChlWzhU56FIM-u27D0wJ86-7VqpTqsMPX9JRm4Ra7PqJ5BgDo2IcjW8g_RjkMvyj3AuWE8tR3HwpZRXZ9sYJC1mwzIGkHdZv-UZRWBJHkuYisdMzR-wlXySdrFsaeNa6cLPVAlgAoZxJwd1-GSwADAYQxJKoF7rpRDDfRbOHzFLf1jPVWoC8dmAw7iBFtUF6rUZgFYfCMAWqfTisOashYmD8TExnfa5y_DtC12pjGULxVF5sEQlPabcVHIyjJkwXtjgfXG4VHC6vMvflM0TRtg-DLugeITT_9u4bJ72EviHhonkoG0-5N6aOnVotGyNNv-nvpXJNRfRsjCyANPSN-bqpQJeCrG7zazBn-nagpLMJLk_mIGgDVPA8VKf59cdjTDCF1mRzUJK-OWszAxgydlZEWPyA4EzmL_bbbdqxM-stjrWDob5nvqulz6VCKaC1ZQV1NS7Au06Hd6teN9JxerLU9WXiz_nG5gderBLkVVIw9tpLsDRuSG2Y3KDdLrDAK9FxWM5x_p4IPpSVJnneuKGE63ubpp-OwqV7GBTVvhRJt8TEUx0giM4yGG0WhKN8o3lI_7JM-LEWUjuSe_xb0SmAZrZopGPt8PSbfuMpS2ylTnTPTMV18_DPlAIJ-WNO2eGG5m-9MoXsRG6K1gVSNAaBmixnA4VKUVk6MvS5ftluF82izo9R4034R6ooeqdXNxPQup8b61oWGoW-nJ6R6J2f294K7pR4vGVuFXadQte2-PvvCgGM7rWksq7VOUAtjhofQFpEOipt9JMT69TrZdoJvQcjNzaYwuvgTPQ98EBJX6w0dlHIot7skimhOd1EXgCKAmutibosuP6GgUwvCT3H47ei0k_PMnnbXbjR4RA_wM6PApxVLLzxpLlQTfsq_lmlxuLH3jSRGJ3LF8zZ0N3HLYf9jnz_IDAny1Q9LgUbEAEJiE92a1kAichSY7mwjDeSdhleJo0GfS8VS2o_2BYpGiqTy3SWJ4olQ7I1KlPTEwxWnilwldf0kDS9fYMBYlO961xheViIMGMBBe9w5Hcbkexm6SiPYHOv7uoDCfj7vG5qbXfj_vtCg8vT-njESggYEJAJZiLfQSj0gJdqZ2OAq4BgyyzA_yswgUlk062aZL-Al4zJtUnl5TPIbNUokiV6subB9ZVii-RcqvsQ9D6Xg_ZuvdIcY4Ugd89YUxmp_-mv69rjrzXbJ6XH3em0fEUgNcw2RpjJLBgmlmII8ldg.rz0DRUR2vdYbwOCSqJbClw; accessToken=eyJraWQiOiJsZ2lLOTR5bVJyM0x1NWdYTU1QNUFFdHgyTldVbWxybHYzdWNnNWlVa0xvPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkOGE0MTdkNC04YjNkLTRmYWItYTBjOC02OWYyYzE2YmU5MWUiLCJjb2duaXRvOmdyb3VwcyI6WyJHUy1BZG1pbiJdLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9YSXpvYlpTeDciLCJjbGllbnRfaWQiOiI1dm0zMGRkbTdnazI0YmY0aHBjaW43cDljcSIsIm9yaWdpbl9qdGkiOiIzODI3ZjQ3Yy0wYjE2LTQ2MTYtYjQzMS04YmVhOWI0NmMyNjAiLCJldmVudF9pZCI6IjY5OWMwYjAxLTZhZTctNGMzMC04YTVjLTg5YmVmYjM5ZmVmMiIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE3Nzg0ODc0NzIsImV4cCI6MTc3ODQ5MTA3MiwiaWF0IjoxNzc4NDg3NDcyLCJqdGkiOiI4MjM4ZDYxNy0wZTkzLTQ0NDMtYTJiNS1lYmY2YWJmM2IxNjMiLCJ1c2VybmFtZSI6ImF1dG90ZXN0LWFkbWluIn0.FfpqG7FxrfEcV-bK2NOZEwq-jK029AbOfoRbTloBNsPSAhVF0GpuN-nLAbT4YuJIqOrPMOXk7HkCC7xjbn0efCeU2gisq8DnaeXtdKeDev3xuLZa9T6YXolASDBCJgx167PSZAmv25rOQTP-KLSRZBEa7kLDMNv69r4Zma393BRCz0t4n5ST3ql_lneYKoVcytnjcOV2IvrMfUIIkMGJAtby6P4KFto_9TPjfnOduGZZnZ_VRwu3nwaIOCplv_UezLvUHRywPwG-cz5DxcUrHPJ366uExFu8QegcfkzpbuHgDzgUMgpw7IOvT7bGrDWBTBOhAfgTV84adnDC87OGgw; idToken=eyJraWQiOiJLMmZWTHNrblEreE1NRWhRVzMxbzhYanY1UUhBS3U1NVZLY3dzVnRCUDAwPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJkOGE0MTdkNC04YjNkLTRmYWItYTBjOC02OWYyYzE2YmU5MWUiLCJjb2duaXRvOmdyb3VwcyI6WyJHUy1BZG1pbiJdLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9YSXpvYlpTeDciLCJjb2duaXRvOnVzZXJuYW1lIjoiYXV0b3Rlc3QtYWRtaW4iLCJnaXZlbl9uYW1lIjoiR2VvcmdlIiwib3JpZ2luX2p0aSI6IjM4MjdmNDdjLTBiMTYtNDYxNi1iNDMxLThiZWE5YjQ2YzI2MCIsImF1ZCI6IjV2bTMwZGRtN2drMjRiZjRocGNpbjdwOWNxIiwiZXZlbnRfaWQiOiI2OTljMGIwMS02YWU3LTRjMzAtOGE1Yy04OWJlZmIzOWZlZjIiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTc3ODQ4NzQ3MiwiZXhwIjoxNzc4NDkxMDcyLCJpYXQiOjE3Nzg0ODc0NzIsImZhbWlseV9uYW1lIjoiSmVubmluZ3MiLCJqdGkiOiI4MmEzNDgzOC03NzE1LTRhMTgtOGZiNC1jMjgyNTRlZjZlNDUiLCJlbWFpbCI6ImdqZW5uaW5nc0BjYWNpLmNvLnVrIn0.kOFKF7lyteFzRqx0qnqtWwZAW1wLK4RQex49Osz4OiPyzy3GzXALf-glLcZq6tkQrt-T_DLf_oY7bRTmYBq1x8PdWc-0rCzDJOmGtf8VZFEP8s3_5AKPXn8m-X3BXY-0oQLw5iCBwam3CoULpZJ-t6V-x6aggs0yMphwDd9-Iso_m-Alm7zcOFTABUVT9h7xUONemJqdfER6M6HpR4xhyRBqNstfrW3dMKwfZ_2gAlopRJg1mACkDI5BwxboRqZuKDVCV4ySmDbufr8j7HO3Xry-J_eezPxeGKPmeFtAtHvDAkvKKmyZaV15jrczYX8lhtLehpm7k_J2BhQRaRf52g",
         "accept-encoding": "gzip, deflate"
       },
-      "Request URL": "https://dev.goldstandard-assurance.org/api/notifications/emails?size=1",
-      "Response Body": "{\"content\":[{\"id\":82846,\"recipientType\":\"ACCOUNT\",\"recipientId\":706,\"addressees\":[\"testuser@example.com\"],\"subject\":\"Design Change | With VVB no. 1 received for GS31244\",\"htmlBody\":\"<div style=\\\"font-family: Arial,sans-serif;\\\">\\n    <p>Dear Reviewer,</p>\\n    <p>\\n    You have been assigned to review the following project’s request. Please log-in to your account to access project documents.\\n    </p>\\n    <p>\\n    Please upload the findings documents on GSIQ platform.\\n    </p>\\n    <p>\\n    Should you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\\n    </p>\\n    <p>\\n    Best regards,\\n    </p>\\n    <p>\\n    The Gold Standard Foundation\\n    </p>\\n    <hr style=\\\"border: 1px solid #cccccc;\\\"/>\\n    <ul style={{ listStyle: 'none', padding: 0 }}>\\n\\t<table>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Project:</strong></td>\\n\\t\\t\\t<td>automation test (POA) run:582 (L)</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>GSID:</strong></td>\\n\\t\\t\\t<td>GS31244</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Request:</strong></td>\\n\\t\\t\\t<td>Design Change | With VVB no. 1</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n\\t\\t\\t<td><strong>Project Type:</strong></td>\\n\\t\\t\\t<td>Agriculture</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n            <td><strong>Feedback Round:</strong></td>\\n            <td>1</td>\\n\\t\\t</tr>\\n\\t\\t<tr>\\n            <td><strong>Review Due Date:</strong></td>\\n            <td>25/12/2025</td>\\n\\t\\t</tr>\\n    </table>\\n</div>\",\"textBody\":\"Dear Reviewer,\\n\\nYou have been assigned to review the following project’s request. Please log-in to your account to access project documents.\\n\\nPlease upload the findings documents on GSIQ platform.\\n\\nShould you have any questions on the process, please contact help@goldstandard.org with reference to the project GSID.\\n\\nBest regards,\\n\\nThe Gold Standard Foundation\\n\\n\\nProject: automation test (POA) run:582 (L)\\n\\nGSID: GS31244\\n\\nRequest: Design Change | With VVB no. 1\\n\\nProject Type: Agriculture\\n\\nFeedback Round: 1\\n\\nReview Due Date: 25/12/2025\\n\",\"createdTimestamp\":\"2025-11-27T09:04:14.755754Z\",\"messagingReference\":\"0107019ac48e59bb-5f1b6d7c-317c-48b0-895d-31cf8c11f012-000000\"}],\"pageSize\":1,\"pageNumber\":1,\"totalPages\":15223,\"totalElements\":15223}",
+      "Request URL": "http://localhost:3000/api/notifications/emails?size=1",
+      "Response Body": "{\"content\":[],\"pageSize\":1,\"pageNumber\":1,\"totalPages\":0,\"totalElements\":0}",
       "Response Headers": {
-        "date": "Thu, 27 Nov 2025 09:04:15 GMT",
-        "content-type": "application/json",
-        "transfer-encoding": "chunked",
-        "connection": "keep-alive",
+        "vary": "Origin",
         "x-content-type-options": "nosniff",
         "x-xss-protection": "0",
         "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
         "pragma": "no-cache",
         "expires": "0",
-        "x-frame-options": "DENY"
+        "x-frame-options": "DENY",
+        "content-type": "application/json",
+        "date": "Mon, 11 May 2026 08:18:08 GMT",
+        "connection": "close",
+        "transfer-encoding": "chunked"
       },
       "Response Status": 200
     }

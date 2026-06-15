@@ -1,0 +1,1 @@
+UPDATE gs.request_type SET code = 'DESIGN_CERTIFICATION_REAL_CASE_VPA' WHERE id = 1003;

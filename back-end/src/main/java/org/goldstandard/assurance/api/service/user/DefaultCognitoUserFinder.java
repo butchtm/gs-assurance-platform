@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.goldstandard.assurance.api.dto.cognito.CognitoUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
@@ -29,7 +28,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRe
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserType;
 
 @Service
-@Profile("!local")
 @Builder
 public class DefaultCognitoUserFinder implements CognitoUserFinder {
 

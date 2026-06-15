@@ -6,6 +6,7 @@ Feature: /update-project
         When "<username>" click "projects" from the navbar successfully
         And I click "projects search bar" from projects page
         And I type "automation test (standalone project)" into "projects search bar"
+        And My project "automation test (standalone project)" with "<projectStatus>" status can be seen
         And I click "Edit" for my "automation test (standalone project)" with "<projectStatus>" status
         Then "Update Project" can be seen
 

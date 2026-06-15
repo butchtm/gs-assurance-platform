@@ -104,6 +104,9 @@ public class RequestUpdateApplier {
     if (update.getEmissionReductionAmount() != null) {
       builder.emissionReductionAmount(update.getEmissionReductionAmount());
     }
+    if (update.getPaa() != null) {
+      builder.paa(request.getRequestType().supportsPAA() && update.getPaa());
+    }
     if (update.getMethodologies() != null) {
       builder.requestMethodologies(
           methodologyFactory.toMethodologies(update.getMethodologies(), request));

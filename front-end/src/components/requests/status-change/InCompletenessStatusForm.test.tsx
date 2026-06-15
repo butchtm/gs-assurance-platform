@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { act } from "react";
 
-import { mockAssignmentsHasAudit, mockAssignmentsNoAudit } from "../../../common/assignments/DebugAssignments";
-import { mockActiveReferenceTypes } from "../../../common/data-types/DebugReferenceTypes";
-import { debugInCompletenessRequests } from "../../../common/request/DebugRequests";
+import { BASE_REQUEST_TYPE, debugInCompletenessRequests } from "@/common/request/DebugRequests";
+import { mockAssignmentsHasAudit, mockAssignmentsNoAudit } from "@/common/assignments/DebugAssignments";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+
 import { getRequestAssignments } from "../assignment/Assignment";
 import { updateRequest } from "../Requests";
 
@@ -152,11 +153,7 @@ describe("InCompletenessForm Component", () => {
   it("can make the request not fast tracked", async () => {
     const mockPreliminaryReview = {
       ...debugInCompletenessRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
     };
 
     const mockOnSubmit = jest.fn();
@@ -194,11 +191,7 @@ describe("InCompletenessForm Component", () => {
   it("request is fast tracked by default if necessary", async () => {
     const mockPreliminaryReview = {
       ...debugInCompletenessRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
     };
 
     const mockOnSubmit = jest.fn();
@@ -231,11 +224,7 @@ describe("InCompletenessForm Component", () => {
   ])("can set the request to internal/external for generic request", async (label, internal) => {
     const mockGenericReview = {
       ...debugInCompletenessRequests[0],
-      requestType: {
-        id: 1000,
-        code: "GENERIC",
-        description: "Generic",
-      },
+      requestType: BASE_REQUEST_TYPE("GENERIC", 1000),
     };
 
     const mockOnSubmit = jest.fn();
@@ -273,11 +262,7 @@ describe("InCompletenessForm Component", () => {
   it("doesn't show PII questions if PII not present", async () => {
     const mockPreliminaryReview = {
       ...debugInCompletenessRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
       project: {
         gsid: "GS1",
         id: 1,
@@ -310,11 +295,7 @@ describe("InCompletenessForm Component", () => {
   it("shows PII not found and acceptance questions if PII present", async () => {
     const mockPreliminaryReview = {
       ...debugInCompletenessRequests[0],
-      requestType: {
-        id: 1000,
-        code: "PRELIMINARY_REVIEW",
-        description: "Preliminary Review",
-      },
+      requestType: BASE_REQUEST_TYPE("PRELIMINARY_REVIEW", 1000),
       project: {
         gsid: "GS1",
         id: 1,

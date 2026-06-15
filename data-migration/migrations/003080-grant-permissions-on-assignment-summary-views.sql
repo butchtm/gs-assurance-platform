@@ -1,0 +1,2 @@
+GRANT SELECT ON gs.v_request_assignments_summary TO gs_assurance_db_writer;
+GRANT SELECT ON gs.v_request_assignments_summary_totals TO gs_assurance_db_writer;

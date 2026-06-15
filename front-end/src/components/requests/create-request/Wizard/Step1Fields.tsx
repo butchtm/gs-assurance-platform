@@ -14,7 +14,6 @@ import {
 } from "../../../../common/request/GSRequest";
 import { CustomFormSelect } from "../../../Reusable/FormFields/CustomFormSelect";
 import { EmissionsReductionInput } from "../../../Reusable/FormFields/EmissionsReductionInput";
-import { requestsHelperText } from "../RequestHelpers";
 
 import { CreateRequestForm } from "./Request";
 import { Step1NewCreditingFields } from "./crediting-periods/Step1NewCreditingFields";
@@ -141,8 +140,8 @@ export const Step1Fields: React.FC<Step1FieldsProps> = ({ project }) => {
       )}
       <Grid item xs={12}>
         <EmissionsReductionInput
+          requestType={values.requestType}
           fieldValue={values.emissionReductionAmount}
-          helpText={requestsHelperText.emissionsReduction()}
           onChange={handleEmissionReductionChange}
           required={isEmissionRequired}
         />

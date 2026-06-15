@@ -5,6 +5,7 @@ import static org.goldstandard.assurance.api.service.ToPageConverter.toPage;
 import jakarta.transaction.Transactional;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
@@ -142,6 +143,10 @@ public class RequestFinder {
   public <T> Page<T> findAndMapPage(
       Specification<Request> spec, Pageable pageable, Function<Request, T> conversion) {
     return requestRepository.findAll(spec, pageable).map(conversion);
+  }
+
+  public Optional<Integer> findCurrentRequestId(Integer projectId) {
+    return requestRepository.findCurrentRequestIdByProjectId(projectId);
   }
 
   private Collection<Request> getAllSortedRequestsInConsultationFilteredByCompetency(

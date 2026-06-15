@@ -1,0 +1,2 @@
+GRANT SELECT ON gs.project_crediting_monitoring_period TO gs_assurance_db_writer;
+GRANT SELECT ON gs.request_monitoring_period TO gs_assurance_db_writer;

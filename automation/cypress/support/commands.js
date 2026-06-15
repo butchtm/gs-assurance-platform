@@ -63,10 +63,11 @@ Cypress.Commands.add("loginAsUser", (user) => {
 })
 
 Cypress.Commands.add("login", (username, password) => {
-  cy.visit("/")
   loginPage.usernameField().type(username) // Enter the username
   loginPage.passwordField().type(password) // Enter the password
-  loginPage.loginButton().click() // Click the login button
+  loginPage.loginButton().click() // Click the login button 
+  cy.waitForNetworkIdle(2000)
+  cy.contains('Projects').should('be.visible')
 })
 
 //find project row on projects page
@@ -230,12 +231,14 @@ Cypress.Commands.add("injectAxeAndLogViolation", () => {
 Cypress.Commands.add("loginApi", () => {
   cy.request("POST", "/api/public/login", {
     username: "Admin",
-    password: Cypress.env('ADMIN_PASSWORD')
+    password: "YzQ4XP6B.7p5"
   })
 })
 
 Cypress.Commands.add("deleteTestDataApi", () => {
-  cy.request("DELETE", "/api/automated-test-projects")
+  cy.request("DELETE", "/api/automated-test-projects").then((response) => {
+    expect(response.status).to.eq(204)
+  })
 })
 
 Cypress.Commands.add("getEmailNotificationsApi", (howManyEmails) => {
@@ -245,8 +248,110 @@ Cypress.Commands.add("getEmailNotificationsApi", (howManyEmails) => {
   })
 })
 
+Cypress.Commands.add("createMethodologyApi", (methodologyName, activeStatus, paa) => {
+  const methodologyJson = `{
+    description: ${methodologyName},
+    active: ${activeStatus},
+    paa: ${paa}
+  }`
+  cy.request("POST", "/api/methodologies", methodologyJson).then((response) => {
+    expect(response.status).to.eq(200)
+  })
+
+})
+
+Cypress.Commands.add("deleteMethodologyByName", (methodologyName) => {
+  cy.request("GET", "/api/methodologies").then((response) => {
+    expect(response.status).to.eq(200)
+
+    const targetMethodologys = response.body.filter(item => item.description === methodologyName);
+
+    if (targetMethodologys.length ===  0) {
+      cy.log(`Methodology ${methodologyName} not found, skipping`)
+    }
+    else {
+      targetMethodologys.forEach((targetMethodology) => {
+        cy.request('DELETE', `/api/methodologies/${targetMethodology.id}`).then((deleteResponse) => {
+          expect(deleteResponse.status).to.eq(204)
+        })
+      })
+    }
+  })
+  
+})
+
+Cypress.Commands.add("deletePlatformAccountByName", (platformAccountName) => {
+
+  cy.request({method: "GET", url: "/api/accounts",qs: {page: 0,size: 5000,name: `${platformAccountName}`}}).then((response) => {
+    expect(response.status).to.eq(200)
+    const targetAccounts = response.body.content.filter(item => item.name === platformAccountName);
+
+    if (targetAccounts.length ===  0) {
+      cy.log(`Platform account ${platformAccountName} not found, skipping`)
+    }
+    else {
+      cy.log(`Platform account ${platformAccountName}: ${targetAccounts.length} instances found`)
+      targetAccounts.forEach((targetAccount) => {
+        if (targetAccount.users.length > 0) {
+          cy.log(`Platform account ${platformAccountName} has users, skipping`)
+        }
+        else {
+          cy.request('DELETE', `/api/accounts/${targetAccount.id}`).then((deleteResponse) => {
+            expect(deleteResponse.status).to.eq(204)
+          })
+        }
+      })
+      
+    }
+  })
+})
+
+Cypress.Commands.add("deleteTestMethodologiesApi", () => {
+  cy.fixture("testMethodologies").then((testMethodologyList) => {
+    
+    testMethodologyList.forEach((testMethodology) => {
+      cy.deleteMethodologyByName(testMethodology.description)
+    })
+    
+  })
+})
+
+
+Cypress.Commands.add("deleteTestPlatformAccountsApi", () => {
+
+  cy.fixture("testPlatformAccounts").then((testPlatformAccountList) => {
+    testPlatformAccountList.forEach((testPlatformAccount) => {
+      cy.deletePlatformAccountByName(testPlatformAccount.name)
+    })
+  })
+
+})
+
 Cypress.Commands.add("getRunNumber", () => {
   cy.readFile("cypress/fixtures/platformInfo.json").then((file) => {
     return file["Run Number"]
+  })
+})
+
+Cypress.Commands.add("getRequestApi", (projectGsid, requestType, requestStatus, paaStatus) => {
+  cy.loginApi()
+  cy.getProjectIdByGsid(projectGsid).then((projectId) => {
+
+    return cy.request({method: "GET", url: "/api/requests", qs: {projectId: `${projectId}`}}).then((response) => {
+      expect(response.status).to.eq(200)
+      const convertedPaa = (paaStatus === 'true' || paaStatus === true)
+      console.log(`requests returned: ${JSON.stringify(response.body)}`)
+      const targetRequest = response.body.content.find(item => item.requestType.description === requestType && item.paa === convertedPaa && item.requestStatus.description === requestStatus);
+      expect(targetRequest).to.not.be.undefined
+      console.log(`Request identified: ${JSON.stringify(targetRequest)}`)
+      return cy.wrap(targetRequest)
+    })
+  })
+})
+
+Cypress.Commands.add("getProjectIdByGsid", (projectGsid) => {
+  return cy.request({method: "GET", url: "/api/projects", qs: {gsid: `${projectGsid}`}}).then((response) => {
+    const targetProject = response.body.content[0];
+    return cy.wrap(targetProject.id)
   })
 })

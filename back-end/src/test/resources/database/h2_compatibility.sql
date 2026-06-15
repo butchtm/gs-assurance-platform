@@ -892,4 +892,6 @@ CREATE VIEW gs.v_categorised_request_form
       ON rf.request_id = r.id
   LEFT JOIN gs.request_type_document_type rtdt
       ON r.request_type_id = rtdt.request_type_id
-      AND fd.type_id = rtdt.form_type_id
+      AND fd.type_id = rtdt.form_type_id;
+
+ALTER TABLE gs.methodology ALTER COLUMN paa SET DEFAULT true;

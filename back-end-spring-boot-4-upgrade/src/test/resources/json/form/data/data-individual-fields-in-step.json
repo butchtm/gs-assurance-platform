@@ -1,7 +1,0 @@
-[
-  {
-    "projectRegistryLinks": "http://localhost:3002/projects/details/1, http://localhost:3002/projects/details/2",
-    "projectTitles": "GS1, GS2",
-    "projectGsids": "Test Project 1, Test Project 2"
-  }
-]

@@ -22,11 +22,11 @@ VALUES
     (1,'SHARE_OF_PROCEEDS','Share of proceeds');
 
 INSERT INTO gs.methodology
-	(id, code, description)
+	(id, code, description, paa)
 VALUES
-    (0,'ACM0001_FLARING_OR_USE_OF_LANDFILL_GAS','ACM0001 Flaring or use of landfill gas'),
-    (1,'ACM0002_GRID_CONNECTED_ELECTRICITY_GENERATION_FROM_RENEWABLE_SOURCES','ACM0002 Grid-connected electricity generation from renewable sources'),
-    (2,'ACM0003_PARTIAL_SUBSTITUTION_OF_FOSSIL_FUELS_WITH_ALTERNATIVE_FUELS_OR_LESS_CARBON_INTENSIVE_FUELS_IN_CEMENT_MANUFACTURE','ACM0003 Partial substitution of fossil fuels with alternative fuels or less carbon intensive fuels in cement manufacture');
+    (0,'ACM0001_FLARING_OR_USE_OF_LANDFILL_GAS','ACM0001 Flaring or use of landfill gas', false),
+    (1,'ACM0002_GRID_CONNECTED_ELECTRICITY_GENERATION_FROM_RENEWABLE_SOURCES','ACM0002 Grid-connected electricity generation from renewable sources', false),
+    (2,'ACM0003_PARTIAL_SUBSTITUTION_OF_FOSSIL_FUELS_WITH_ALTERNATIVE_FUELS_OR_LESS_CARBON_INTENSIVE_FUELS_IN_CEMENT_MANUFACTURE','ACM0003 Partial substitution of fossil fuels with alternative fuels or less carbon intensive fuels in cement manufacture', false);
 
 INSERT INTO gs.project_classification
 	(id, code, description)

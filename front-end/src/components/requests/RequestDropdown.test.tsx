@@ -131,43 +131,23 @@ describe("RequestDropdown", () => {
     });
   });
 
-  it("shows the stakeholder consultation tag for requests in stakeholder consultation", async () => {
-    render(<RequestDropdown request={debugRequests[0]} opened={false} projectId={1} dashboardFormat={false} />);
+  it.each([
+    { request: { inStakeholderConsultation: true }, expectedTag: "In Stakeholder Consultation" },
+    { request: { fastTracked: true }, expectedTag: "Fast Track" },
+    { request: { internal: true }, expectedTag: "Internal" },
+    { request: { internal: false }, expectedTag: "External" },
+    { request: { paa: true }, expectedTag: "PAA" },
+  ])("shows the $expectedTag tag for the corresponding request", async ({ request, expectedTag }) => {
+    render(
+      <RequestDropdown
+        request={{ ...debugRequests[0], ...request }}
+        opened={false}
+        projectId={1}
+        dashboardFormat={false}
+      />,
+    );
     await waitFor(() => {
-      expect(screen.getByText("In Stakeholder Consultation")).toBeInTheDocument();
-    });
-  });
-
-  it("shows the fast track tag for fast tracked requests", async () => {
-    const fastTrackRequest = {
-      ...debugRequests[0],
-      fastTracked: true,
-    };
-    render(<RequestDropdown request={fastTrackRequest} opened={false} projectId={1} dashboardFormat={false} />);
-    await waitFor(() => {
-      expect(screen.getByText("Fast Track")).toBeInTheDocument();
-    });
-  });
-
-  it("shows the internal tag for internal requests", async () => {
-    const fastTrackRequest = {
-      ...debugRequests[0],
-      internal: true,
-    };
-    render(<RequestDropdown request={fastTrackRequest} opened={false} projectId={1} dashboardFormat={false} />);
-    await waitFor(() => {
-      expect(screen.getByText("Internal")).toBeInTheDocument();
-    });
-  });
-
-  it("shows the external tag for external requests", async () => {
-    const fastTrackRequest = {
-      ...debugRequests[0],
-      internal: false,
-    };
-    render(<RequestDropdown request={fastTrackRequest} opened={false} projectId={1} dashboardFormat={false} />);
-    await waitFor(() => {
-      expect(screen.getByText("External")).toBeInTheDocument();
+      expect(screen.getByText(expectedTag)).toBeInTheDocument();
     });
   });
 });

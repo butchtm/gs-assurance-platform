@@ -1,0 +1,1821 @@
+databaseChangeLog:
+  - changeSet:
+      author: "sladem"
+      id: "000005-foreign-tables"
+      sqlFile:
+        path: 000005-foreign-tables.sql
+      contextFilter: good-tds-fdw
+  - changeSet:
+      author: "sladem"
+      id: "000010-build-and-populate-staging"
+      sqlFile:
+        path: 000010-build-and-populate-staging.sql
+      contextFilter: good-tds-fdw
+  - changeSet:
+      author: "sladem"
+      id: "000020-sanitise-staging"
+      sqlFile:
+        path: 000020-sanitise-staging.sql
+      contextFilter: "good-tds-fdw AND ! (production OR staging)"
+  - changeSet:
+      author: "sladem"
+      id: "000025-drop-foreign-tables-schema"
+      sqlFile:
+        path: 000025-drop-foreign-tables-schema.sql
+      contextFilter: "good-tds-fdw AND ! (production OR staging)"
+  - changeSet:
+      author: "sladem"
+      id: "000028-tag-staged-data"
+      changes:
+        - tagDatabase:
+            tag: staged-data
+  - changeSet:
+      author: "sladem"
+      id: "000030-create-schemas"
+      sqlFile:
+        path: 000030-create-assurance-schemas.sql
+  - changeSet:
+      author: "sladem"
+      id: "000040-reference-data"
+      sqlFile:
+        path: 000040-reference-data.sql
+  - changeSet:
+      author: "sladem"
+      id: "000050-project-tables"
+      sqlFile:
+        path: 000050-project-tables.sql
+  - changeSet:
+      author: "sladem"
+      id: "000060-load-project-data"
+      sqlFile:
+        path: 000060-load-project-data.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000065-autoid-for-project-table"
+      sqlFile:
+        path: 000065-autoid-for-project-table.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "mruocco"
+      id: "000066-autoid-for-project-table-local"
+      sqlFile:
+        path: 000066-autoid-for-project-table-local.sql
+      contextFilter: "local"
+  - changeSet:
+      author: "sladem"
+      id: "000070-document-tables"
+      sqlFile:
+        path: 000070-document-tables.sql
+  - changeSet:
+      author: "sladem"
+      id: "000080-load-document-data"
+      sqlFile:
+        path: 000080-load-document-data.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000090-invoice-table"
+      sqlFile:
+        path: 000090-invoice-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000100-load-invoice-data"
+      sqlFile:
+        path: 000100-load-invoice-data.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000110-project-status-history-table"
+      sqlFile:
+        path: 000110-project-status-history-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000120-load-project-status-history-data"
+      sqlFile:
+        path: 000120-load-project-status-history-data.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000130-bundle-table"
+      sqlFile:
+        path: 000130-bundle-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000140-load-bundle-data-and-enable-bundle-fk"
+      sqlFile:
+        path: 000140-load-bundle-data-and-enable-bundle-fk.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000150-request-tables"
+      sqlFile:
+        path: 000150-request-tables.sql
+  - changeSet:
+      author: "sladem"
+      id: "000160-load-request-data"
+      sqlFile:
+        path: 000160-load-request-data.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "sladem"
+      id: "000170-reference-data-view"
+      sqlFile:
+        path: 000170-reference-data-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000180-project-gsid-auto-increment"
+      sqlFile:
+        path: 000180-project-gsid-auto-increment.sql
+      contextFilter: "! local"
+  - changeSet:
+      author: "mruocco"
+      id: "000181-project-gsid-auto-increment-local"
+      sqlFile:
+        path: 000181-project-gsid-auto-increment-local.sql
+      contextFilter: "local"
+  - changeSet:
+      author: "mruocco"
+      id: "000190-create-account-types"
+      sqlFile:
+        path: 000190-create-account-types.sql
+  - changeSet:
+      author: "sladem"
+      id: "000200-platform-account-tables"
+      sqlFile:
+        path: 000200-platform-account-tables.sql
+  - changeSet:
+      author: "mruocco"
+      id: "000205-create-gold-standard-accounts"
+      sqlFile:
+        path: 000205-create-gold-standard-accounts.sql
+  - changeSet:
+      author: "sladem"
+      id: "000210-add-account-type-to-reference-data-view"
+      sqlFile:
+        path: 000210-add-account-type-to-reference-data-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000220-load-account-data"
+      sqlFile:
+        path: 000220-load-account-data.sql
+  - changeSet:
+      author: "sladem"
+      id: "000240-map-project-project-developers-to-accounts-data"
+      sqlFile:
+        path: 000240-map-project-project-developers-to-accounts-data.sql
+  - changeSet:
+      author: "sladem"
+      id: "000260-assignments-table"
+      sqlFile:
+        path: 000260-assignments-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000270-add-assignment-type-and-assignment-status-to-reference-data-view"
+      sqlFile:
+        path: 000270-add-assignment-type-and-assignment-status-to-reference-data-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000290-add-cognito-user-id"
+      sqlFile:
+        path: 000290-add-cognito-user-id.sql
+  - changeSet:
+      author: "sladem"
+      id: "000310-document-request-type-mapping"
+      sqlFile:
+        path: 000310-document-request-type-mapping.sql
+  - changeSet:
+      author: "sladem"
+      id: "000320-add-document-category-to-reference-data-view"
+      sqlFile:
+        path: 000320-add-document-category-to-reference-data-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000340-wire-in-user-id-sequence"
+      sqlFile:
+        path: 000340-wire-in-user-id-sequence.sql
+  - changeSet:
+      author: "sladem"
+      id: "000360-add-new-gs-document-and-request-types"
+      sqlFile:
+        path: 000360-add-new-gs-document-and-request-types.sql
+  - changeSet:
+      author: "sladem"
+      id: "000370-add-document-display-category"
+      sqlFile:
+        path: 000370-add-document-display-category.sql
+  - changeSet:
+      author: "sladem"
+      id: "000380-request-document-categorisation"
+      sqlFile:
+        path: 000380-request-document-categorisation.sql
+  - changeSet:
+      author: "sladem"
+      id: "000390-legacy-request-document-categorisation"
+      sqlFile:
+        path: 000390-legacy-request-document-categorisation.sql
+  - changeSet:
+      author: "sladem"
+      id: "000400-add-request-document-categorisation-view"
+      sqlFile:
+        path: 000400-add-request-document-categorisation-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000420-add-basic-audit-table"
+      sqlFile:
+        path: 000420-add-basic-audit-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000440-add-process-table"
+      sqlFile:
+        path: 000440-add-process-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000460-correct-request-document-categorisation-view"
+      sqlFile:
+        path: 000460-correct-request-document-categorisation-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000470-correct-request-document-categorisation-foreign-key"
+      sqlFile:
+        path: 000470-correct-request-document-categorisation-foreign-key.sql
+  - changeSet:
+      author: "sladem"
+      id: "000490-change-process-status-to-varchar"
+      sqlFile:
+        path: 000490-change-process-status-to-varchar.sql
+  - changeSet:
+      author: "sladem"
+      id: "000500-user-email-not-unique"
+      sqlFile:
+        path: 000500-user-email-not-unique.sql
+  - changeSet:
+      author: "sladem"
+      id: "000520-add-user-given-and-family-name"
+      sqlFile:
+        path: 000520-add-user-given-and-family-name.sql
+  - changeSet:
+      author: "sladem"
+      id: "000540-cognito-email-address-can-be-null"
+      sqlFile:
+        path: 000540-cognito-email-address-can-be-null.sql
+  - changeSet:
+      author: "sladem"
+      id: "000560-energy-project-enums"
+      sqlFile:
+        path: 000560-energy-project-enums.sql
+  - changeSet:
+      author: "sladem"
+      id: "000600-relax-user-username-constraint"
+      sqlFile:
+        path: 000600-relax-user-username-constraint.sql
+  - changeSet:
+      author: "sladem"
+      id: "000620-default_account_is_active_to_true"
+      sqlFile:
+        path: 000620-default_account_is_active_to_true.sql
+  - changeSet:
+      author: "sladem"
+      id: "000640-roles-and-permissions"
+      sqlFile:
+        path: 000640-roles-and-permissions.sql
+  - changeSet:
+      author: "sladem"
+      id: "000660-autoid-for-request-table"
+      sqlFile:
+        path: 000660-autoid-for-request-table.sql
+      contextFilter: "!local"
+  - changeSet:
+      author: "mruocco"
+      id: "000661-autoid-for-request-table-local"
+      sqlFile:
+        path: 000661-autoid-for-request-table-local.sql
+      contextFilter: "local"
+  - changeSet:
+      author: "sladem"
+      id: "000680-permissions-for-request-sequence"
+      sqlFile:
+        path: 000680-permissions-for-request-sequence.sql
+  - changeSet:
+      author: "sladem"
+      id: "000700-rename-energy-project-fk-columns"
+      sqlFile:
+        path: 000700-rename-energy-project-fk-columns.sql
+  - changeSet:
+      author: "sladem"
+      id: "000720-correct-project-sequence"
+      sqlFile:
+        path: 000720-correct-project-sequence.sql
+      contextFilter: "!local"
+  - changeSet:
+      author: "sladem"
+      id: "000730-add-surrogate-id-to-assignment-table"
+      sqlFile:
+        path: 000730-add-surrogate-id-to-assignment-table.sql
+  - changeSet:
+      author: "sladem"
+      id: "000740-consistent-sequence-naming"
+      sqlFile:
+        path: 000740-consistent-sequence-naming.sql
+  - changeSet:
+      author: "sladem"
+      id: "000750-change-assignment-unique-key"
+      sqlFile:
+        path: 000750-change-assignment-unique-key.sql
+  - changeSet:
+      author: "sladem"
+      id: "000760-create-public-documents-view"
+      sqlFile:
+        path: 000760-create-public-documents-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000770-update-public-documents-view"
+      sqlFile:
+        path: 000770-update-public-documents-view.sql
+  - changeSet:
+      author: "sladem"
+      id: "000780-account-type-assignment-type-mappings"
+      sqlFile:
+        path: 000780-account-type-assignment-type-mappings.sql
+  - changeSet:
+      author: "sladem"
+      id: "000785-account-type-assignment-type-permissions"
+      sqlFile:
+        path: 000785-account-type-assignment-type-permissions.sql
+  - changeSet:
+      author: "sladem"
+      id: "000790-request-type-assignment-type-mapping"
+      sqlFile:
+        path: 000790-request-type-assignment-type-mapping.sql
+  - changeSet:
+      author: "sladem"
+      id: "000800-permitted-request-status-transitions"
+      sqlFile:
+        path: 000800-permitted-request-status-transitions.sql
+  - changeSet:
+      author: "sladem"
+      id: "000810-request-status_active_account_types"
+      sqlFile:
+        path: 000810-request-status_active_account_types.sql
+  - changeSet:
+      author: "sladem"
+      id: "000820-add-progressor-to-request-status-active-account-types"
+      sqlFile:
+        path: 000820-add-progressor-to-request-status-active-account-types.sql
+  - changeSet:
+      author: "ichadwick"
+      id: "000900-rename-energy-project-to-transition-project"
+      sqlFile:
+        path: 000900-rename-energy-project-to-transition-project.sql
+  - changeSet:
+      author: "ichadwick"
+      id: "000910-migrate-luf-project-columns-to-project-table"
+      sqlFile:
+        path: 000910-migrate-luf-project-columns-to-project-table.sql
+  - changeSet:
+      author: "ichadwick"
+      id: "000920-relax-project-column-contraints"
+      sqlFile:
+        path: 000920-relax-project-column-constraints.sql
+  - changeSet:
+      author: "sladem"
+      id: "000930-relax-invoice-constraints"
+      sqlFile:
+        path: 000930-relax-invoice-constraints.sql
+  - changeSet:
+      author: "sladem"
+      id: "000940-autoid-for-invoice-table"
+      sqlFile:
+        path: 000940-autoid-for-invoice-table.sql
+      contextFilter: "!local"
+  - changeSet:
+      author: "mruoc"
+      id: "000941-autoid-for-invoice-table-local"
+      sqlFile:
+        path: 000941-autoid-for-invoice-table-local.sql
+      contextFilter: "local"
+  - changeSet:
+      author: "sladem"
+      id: "000950-request-invoice-constraints"
+      sqlFile:
+        path: 000950-request-invoice-constraints.sql
+  - changeSet:
+      author: sladem
+      id: 000960-correct-taiwan-project-location
+      sqlFile:
+        path: 000960-correct-taiwan-project-location.sql
+  - changeSet:
+      author: "sladem"
+      id: "000970-notification-entities"
+      sqlFile:
+        path: 000970-notification-entities.sql
+  - changeSet:
+      author: "sladem"
+      id: "000980-transition-from-other-scheme-updates"
+      sqlFile:
+        path: 000980-transition-from-other-scheme-updates.sql
+  - changeSet:
+      author: "sladem"
+      id: "000990-deprecated-transition-pathways"
+      sqlFile:
+        path: 000990-deprecated-transition-pathways.sql
+  - changeSet:
+      author: "sladem"
+      id: "001000-notification-templates"
+      sqlFile:
+        path: 001000-notification-templates.sql
+  - changeSet:
+      author: "sladem"
+      id: "001010-project-classification-revisions"
+      sqlFile:
+        path: 001010-project-classification-revisions.sql
+  - changeSet:
+      author: "sladem"
+      id: "001020-transition-approval-procedure-revisions"
+      sqlFile:
+        path: 001020-transition-approval-procedure-revisions.sql
+  - changeSet:
+      author: "sladem"
+      id: "001030-add-cognito-attributes"
+      sqlFile:
+        path: 001030-add-cognito-attributes.sql
+  - changeSet:
+      author: "sladem"
+      id: "001040-numeric-gsid"
+      sqlFile:
+        path: 001040-numeric-gsid.sql
+  - changeSet:
+      author: "sladem"
+      id: "001050-add-round-of-review"
+      sqlFile:
+        path: 001050-add-round-of-review.sql
+  - changeSet:
+      author: "sladem"
+      id: "001060-add-request-status-notification-map"
+      sqlFile:
+        path: 001060-add-request-status-notification-map.sql
+  - changeSet:
+      author: "sladem"
+      id: "001070-update-notification-titles"
+      sqlFile:
+        path: 001070-update-notification-titles.sql
+  - changeSet:
+      author: "sladem"
+      id: "001080-request-status-history-trigger"
+      sqlFile:
+        path: 001080-request-status-history-trigger.sql
+  - changeSet:
+      author: "sladem"
+      id: "001090-additional-request-assignment-maps"
+      sqlFile:
+        path: 001090-additional-request-assignment-maps.sql
+  - changeSet:
+      author: "sladem"
+      id: "001100-deprecate-legacy-current-standard-versions"
+      sqlFile:
+        path: 001100-deprecate-legacy-current-standard-versions.sql
+  - changeSet:
+      author: "sladem"
+      id: "001110-new-template-formatting"
+      sqlFile:
+        path: 001110-new-template-formatting.sql
+  - changeSet:
+      author: "sladem"
+      id: "001120-multi-template-per-request-status-notification"
+      sqlFile:
+        path: 001120-multi-template-per-request-status-notification.sql
+  - changeSet:
+      author: "sladem"
+      id: "001130-notification-entity-missing-permissions"
+      sqlFile:
+        path: 001130-notification-entity-missing-permissions.sql
+  - changeSet:
+      author: "sladem"
+      id: "001140-project-changelog-history"
+      sqlFile:
+        path: 001140-project-changelog-history.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001150-assignment-to-notification-template-mapping"
+      sqlFile:
+        path: 001150-assignment-to-notification-template-mapping.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001160-grant-permission-on-assignment-notification-table"
+      sqlFile:
+        path: 001160-grant-permission-on-assignment-notification-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001170-update-account-type-table"
+      sqlFile:
+        path: 001170-update-account-type-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001180-update-account-type-view"
+      sqlFile:
+        path: 001180-update-account-type-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001200-add-stakeholder-consultation-types"
+      sqlFile:
+        path: 001200-add-stakeholder-consultation-types.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001210-add-stakeholder-consultation-table"
+      sqlFile:
+        path: 001210-add-stakeholder-consultation-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001220-update-request_status_transition-table"
+      sqlFile:
+        path: 001220-update-request_status_transition-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001230-auto-increment-stakeholder-consultation"
+      sqlFile:
+        path: 001230-auto-increment-stakeholder-consultation.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001240-add-stakeholder-consultation-request-type-relationship-table"
+      sqlFile:
+        path: 001240-add-stakeholder-consultation-request-type-relationship-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001250-grant-permission-on-stakeholder-consultation-tables"
+      sqlFile:
+        path: 001250-grant-permission-on-stakeholder-consultation-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001260-grant-permission-on-auto-increment-table"
+      sqlFile:
+        path: 001260-grant-permission-on-auto-increment-table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001270-create-public-stakeholder-view"
+      sqlFile:
+        path: 001270-create-public-stakeholder-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001280-create-public-request-views"
+      sqlFile:
+        path: 001280-create-public-request-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001290-create-public-views"
+      sqlFile:
+        path: 001290-create-public-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001300-create-comments_table"
+      sqlFile:
+        path: 001300-create-comments_table.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001310-update-comments_table_permissions"
+      sqlFile:
+        path: 001310-update-comments_table_permissions.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001320-update-public-stakeholder-view"
+      sqlFile:
+        path: 001320-update-public-stakeholder-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001330-update-tac_account_type"
+      sqlFile:
+        path: 001330-update-tac_account_type.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001340-create-public-comment-view"
+      sqlFile:
+        path: 001340-create-public-comment-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001350-add-comment-delete-suppress"
+      sqlFile:
+        path: 001350-add-comment-delete-suppress.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001360-add-deletion-suppression-reference-data-view"
+      sqlFile:
+        path: 001360-add-deletion-suppression-reference-data-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001370-new-comment-and-consultation-template"
+      sqlFile:
+        path: 001370-new-comment-and-consultation-template.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001380-update-audit-table-for-null-userids"
+      sqlFile:
+        path: 001380-update-audit-table-for-null-userids.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001390-update-consultation-template"
+      sqlFile:
+        path: 001390-update-consultation-template.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001400-create-batch-tables"
+      sqlFile:
+        path: 001400-create-batch-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001410-add-batch-mappings"
+      sqlFile:
+        path: 001410-add-batch-mappings.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001420-add-batch-types-to-reference-data-view"
+      sqlFile:
+        path: 001420-add-batch-types-to-reference-data-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001430-update_request_for_batch"
+      sqlFile:
+        path: 001430-update_request_for_batch.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001440-request-transition-missing"
+      sqlFile:
+        path: 001440-request-transition-missing.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001450-grant-update-permission-on-stakeholder-consultation-tables"
+      sqlFile:
+        path: 001450-grant-update-permission-on-stakeholder-consultation-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001460-notification-update"
+      sqlFile:
+        path: 001460-notification-update.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001470-update_batch_tables"
+      sqlFile:
+        path: 001470-update_batch_tables.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001480-add-assignment-due-date"
+      sqlFile:
+        path: 001480-add-assignment-due-date.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001490-add-arm-assigned-requests-view"
+      sqlFile:
+        path: 001490-add-arm-assigned-requests-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001500-add-poa-transition-batch-mapping"
+      sqlFile:
+        path: 001500-add-poa-transition-batch-mapping.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001510-update-public-stakeholder-views"
+      sqlFile:
+        path: 001510-update-public-stakeholder-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001520-add-permissions-public-stakeholder-views"
+      sqlFile:
+        path: 001520-add-permissions-public-stakeholder-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001530-add-permissions-public-comment-view"
+      sqlFile:
+        path: 001530-add-permissions-public-comment-view.sql
+  - changeSet:
+      author: "fchessell"
+      id: "001540-add-batch-id-to-requests-in-consultation-view"
+      sqlFile:
+        path: 001540-add-batch-id-to-requests-in-consultation-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001550-create-competencies-table"
+      sqlFile:
+        path: 001550-create-competencies-table.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001560-add-missing-related-documents"
+      sqlFile:
+        path: 001560-add-missing-related-documents.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001570-update-assigned-status-name"
+      sqlFile:
+        path: 001570-update-assigned-status-name.sql
+  - changeSet:
+      author: "fchessell"
+      id: "001580-add-certification-revoked-project-status"
+      sqlFile:
+        path: 001580-add-certification-revoked-project-status.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001590-add-assigned-requests-view"
+      sqlFile:
+        path: 001590-add-assigned-requests-view.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001600-remove-arm-assigned-requests-view"
+      sqlFile:
+        path: 001600-remove-arm-assigned-requests-view.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001610-update-project-status-descriptions"
+      sqlFile:
+        path: 001610-update-project-status-descriptions.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001620-update-assigned-requests-view"
+      sqlFile:
+        path: 001620-update-assigned-requests-view.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001630-update-oda-document-category"
+      sqlFile:
+        path: 001630-update-oda-document-category.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001640-remove-round-constraint"
+      sqlFile:
+        path: 001640-remove-round-constraint.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001650-update-public-views"
+      sqlFile:
+        path: 001650-update-public-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001660-create-public-stakeholder-batch-children"
+      sqlFile:
+        path: 001660-create-public-stakeholder-batch-children.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001670-add-project-status-sequence"
+      sqlFile:
+        path: 001670-add-project-status-sequence.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001680-add-project-status-transition-mappings"
+      sqlFile:
+        path: 001680-add-project-status-transition-mappings.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001690-add-select-permissions-to-project-status-transition-mappings"
+      sqlFile:
+        path: 001690-add-select-permissions-to-project-status-transition-mappings.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001700-add-batch-parent-id-view"
+      sqlFile:
+        path: 001700-add-batch-parent-id-view.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001710-update-desc-capitalisation"
+      sqlFile:
+        path: 001710-update-desc-capitalisation.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001720-tag-release-1.0.0"
+      changes:
+        - tagDatabase:
+            tag: 1.0.0
+  - changeSet:
+      author: "sbarker"
+      id: "001730-registry-update-table"
+      sqlFile:
+        path: 001730-registry-update-table.sql
+  - changeSet:
+      author: "wkewell"
+      id: "001740-rename-carbonstream-ver-to-gs-ver"
+      sqlFile:
+        path: 001740-rename-carbonstream-ver-to-gs-ver.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001750-update-project-classification-description"
+      sqlFile:
+        path: 001750-update-project-classification-description.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001760-update-request-type-descriptions"
+      sqlFile:
+        path: 001760-update-request-type-descriptions.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001770-update-required-document-types-for-legacy-request-types"
+      sqlFile:
+        path: 001770-update-required-document-types-for-legacy-request-types.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001780-add-batch-request-mappings"
+      sqlFile:
+        path: 001780-add-batch-request-mappings.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001790-add-all-requests-view.sql"
+      sqlFile:
+        path: 001790-add-all-requests-view.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001800-add-all-requests-view-filtered.sql"
+      sqlFile:
+        path: 001800-add-all-requests-view-filtered.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001810-retire-transition-approval-procedure"
+      sqlFile:
+        path: 001810-retire-transition-approval-procedure.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001820-add-gs-registry-account-type-mapping"
+      sqlFile:
+        path: 001820-add-gs-registry-account-type-mapping.sql
+  - changeSet:
+      author: "sbarker"
+      id: "001830-user-batch-table"
+      sqlFile:
+        path: 001830-user-batch-table.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001840-legacy-vpa-cpa-batch-type"
+      sqlFile:
+        path: 001840-legacy-vpa-cpa-batch-type.sql
+  - changeSet:
+      author: "scronk"
+      id: "001850-update-request-transition"
+      sqlFile:
+        path: 001850-update-request-transition.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001860-tag-release-1.0.1"
+      changes:
+        - tagDatabase:
+            tag: 1.0.1
+  - changeSet:
+      author: "dbutler"
+      id: "001870-add-crediting-methodologies"
+      sqlFile:
+        path: 001870-add-crediting-methodologies.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001880-add-more-legacy-vpa-cpa-batch-request-mappings"
+      sqlFile:
+        path: 001880-add-more-legacy-vpa-cpa-batch-request-mappings.sql
+  - changeSet:
+      author: "scronk"
+      id: "001890-update-public-stakeholder-view"
+      sqlFile:
+        path: 001890-update-public-stakeholder-view.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001900-remove-vpa-cpa-batch-request-mappings"
+      sqlFile:
+        path: 001900-remove-vpa-cpa-batch-request-mappings.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001910-scale-capitalisation"
+      sqlFile:
+        path: 001910-scale-capitalisation.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001920-tag-release-1.1.0"
+      changes:
+        - tagDatabase:
+            tag: 1.1.0
+  - changeSet:
+      author: "dbutler"
+      id: "001930-deadline-notification-updates"
+      sqlFile:
+        path: 001930-deadline-notification-updates.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001940-add-fast-track-column"
+      sqlFile:
+        path: 001940-add-fast-track-column.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001950-update-assigned-requests-view"
+      sqlFile:
+        path: 001950-update-assigned-requests-view.sql
+  - changeSet:
+      author: "mruocco"
+      id: "001960-tag-release-1.2.0"
+      changes:
+        - tagDatabase:
+            tag: 1.2.0
+  - changeSet:
+      author: "dbutler"
+      id: "001961-update-request-invoice-fk-constraint"
+      sqlFile:
+        path: 001961-update-request-invoice-fk-constraint.sql
+  - changeSet:
+      author: "dbutler"
+      id: "001962-tag-release-1.4.0"
+      changes:
+        - tagDatabase:
+            tag: 1.4.0
+  - changeSet:
+      author: "wkewell"
+      id: "001970-add-internal-column"
+      sqlFile:
+        path: 001970-add-internal-column.sql
+  - changeSet:
+      author: "fchessell"
+      id: "001980-create-activities-tables"
+      sqlFile:
+        path: 001980-create-activities-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "001990-add-activities-data"
+      sqlFile:
+        path: 001990-add-activities-data.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002000-autoid-for-request-activity-table"
+      sqlFile:
+        path: 002000-autoid-for-request-activity-table.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002010-add-activity-display-names"
+      sqlFile:
+        path: 002010-add-activity-display-names.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002020-update-consultation-notifications"
+      sqlFile:
+        path: 002020-update-consultation-notifications.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002030-include-activity-in-all-requests-view"
+      sqlFile:
+        path: 002030-include-activity-in-all-requests-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002040-include-activity-in-assigned-requests-view"
+      sqlFile:
+        path: 002040-include-activity-in-assigned-requests-view.sql
+  - changeSet:
+      author: "fchessell"
+      id: "002050-email-notification-updates"
+      sqlFile:
+        path: 002050-email-notification-updates.sql
+  - changeSet:
+      author: "fchessell"
+      id: "002055-email-notification-updates-versions"
+      sqlFile:
+        path: 002055-email-notification-updates-versions.sql
+  - changeSet:
+      author: "scronk"
+      id: "002060-request-views-get-activity-by-start-date"
+      sqlFile:
+        path: 002060-request-views-get-activity-by-start-date.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002070-consultation-started-notification-template-update"
+      sqlFile:
+        path: 002070-consultation-started-notification-template-update.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002080-add-submitted-by-user-to-request"
+      sqlFile:
+        path: 002080-add-submitted-by-user-to-request.sql
+  - changeSet:
+      author: "fchessell"
+      id: "002090-update-email-templates"
+      sqlFile:
+        path: 002090-update-email-templates.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002100-request-views-add-submitted-by-user"
+      sqlFile:
+        path: 002100-request-views-add-submitted-by-user.sql
+  - changeSet:
+      author: "scronk"
+      id: "002110-assigned-all-requests-only-incomplete-activities"
+      sqlFile:
+        path: 002110-assigned-all-requests-only-incomplete-activities.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002120-enable-automation-test-project-data-deletion"
+      sqlFile:
+        path: 002120-enable-automation-test-project-data-deletion.sql
+  - changeSet:
+      author: "fchessell"
+      id: "002130-email-notification-updates-versions"
+      sqlFile:
+        path: 002130-email-notification-updates-versions.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002140-update-project-fk-constraints"
+      sqlFile:
+        path: 002140-update-project-fk-constraints.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002141-update-request-fk-constraints"
+      sqlFile:
+        path: 002141-update-request-fk-constraints.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002142-update-notification-round-trigger"
+      sqlFile:
+        path: 002142-update-notification-round-trigger.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002150-tag-release-1.5.0"
+      changes:
+        - tagDatabase:
+            tag: 1.5.0
+  - changeSet:
+      author: "fchessell"
+      id: "002160-finance-your-turn-email-notification"
+      sqlFile:
+        path: 002160-finance-your-turn-email-notification.sql
+  - changeSet:
+      author: "fchessell"
+      id: "002170-arm-team-requests-view-assignments"
+      sqlFile:
+        path: 002170-arm-team-requests-view-assignments.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002180-add-methodologies-to-project-crediting-periods"
+      sqlFile:
+        path: 002180-add-methodologies-to-project-crediting-periods.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002190-add-searchable-projects-view"
+      sqlFile:
+        path: 002190-add-searchable-projects-view.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002200-update-crediting-methodologies-version-type"
+      sqlFile:
+        path: 002200-update-crediting-methodologies-version-type.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002210-add-new-activities-data"
+      sqlFile:
+        path: 002210-add-new-activities-data.sql
+  - changeSet:
+      author: "dtrace"
+      id: "002220-update-to-existing-pathways"
+      sqlFile:
+        path: 002220-update-to-existing-pathways.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002230-fix-index-on-activity"
+      sqlFile:
+        path: 002230-fix-index-on-activity.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002240-tag-release-1.6.0"
+      changes:
+        - tagDatabase:
+            tag: 1.6.0
+  - changeSet:
+      author: "fchessell"
+      id: "002240-add-start-date-to-assigned-requests-view"
+      sqlFile:
+        path: 002240-add-start-date-to-assigned-requests-view.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002250-add-delta-excluded-flag"
+      sqlFile:
+        path: 002250-add-delta-excluded-flag.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002260-add-project-tree-node-view"
+      sqlFile:
+        path: 002260-add-project-tree-node-view.sql
+  - changeSet:
+      author: "dtrace"
+      id: "002270-add-other-to-project-types"
+      sqlFile:
+        path: 002270-add-other-to-project-types.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002280-add-account-id-to-project-tree-node-view"
+      sqlFile:
+        path: 002280-add-account-id-to-project-tree-node-view.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002290-update-email-templates"
+      sqlFile:
+        path: 002290-update-email-templates.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002300-add-request-activity-skipped-flag"
+      sqlFile:
+        path: 002300-add-request-activity-skipped-flag.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002310-tag-release-1.7.0"
+      changes:
+        - tagDatabase:
+            tag: 1.7.0
+  - changeSet:
+      author: "dbutler"
+      id: "002320-update-request-status-email-templates"
+      sqlFile:
+        path: 002320-update-request-status-email-templates.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002330-tag-release-1.8.0"
+      changes:
+        - tagDatabase:
+            tag: 1.8.0
+  - changeSet:
+      author: "scronk"
+      id: "002340-invoice-amount-not-null"
+      sqlFile:
+        path: 002340-invoice-amount-not-null.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002350-all-my-request-view-add-last-status-change-date"
+      sqlFile:
+        path: 002350-all-my-request-view-add-last-status-change-date.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002360-swap-other-and-supporting-document-display-categories"
+      sqlFile:
+        path: 002360-swap-other-and-supporting-document-display-categories.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002370-all-my-request-view-add-last-status-change-date"
+      sqlFile:
+        path: 002370-all-my-request-view-add-last-status-change-date.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002380-update-review-assignment-notification-trigger"
+      sqlFile:
+        path: 002380-update-review-assignment-notification-trigger.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002390-add-round-2-review-mappings-to-request-status-notification"
+      sqlFile:
+        path: 002390-add-round-2-review-mappings-to-request-status-notification.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002400-add-methodology-update-tables"
+      sqlFile:
+        path: 002400-add-methodology-update-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002410-add-request-to-methodology-update"
+      sqlFile:
+        path: 002410-add-request-to-methodology-update.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002420-enable-automation-test-project-data-deletion-for-methodology-updates"
+      sqlFile:
+        path: 002420-enable-automation-test-project-data-deletion-for-methodology-updates.sql
+  - changeSet:
+      author: "jalam"
+      id: "002430-populate-missing-request-end-dates"
+      sqlFile:
+        path: 002430-populate-missing-request-end-dates.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002440-tag-release-1.9.0"
+      changes:
+        - tagDatabase:
+            tag: 1.9.0
+  - changeSet:
+      author: "mruocco"
+      id: "002450-populate-legacy-request-type-mappings"
+      sqlFile:
+        path: 002450-populate-legacy-request-type-mappings.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002460-tag-release-1.9.1"
+      changes:
+        - tagDatabase:
+            tag: 1.9.1
+  - changeSet:
+      author: "jalam"
+      id: "002470-add-ngo-table-and-ngo-notification-template"
+      sqlFile:
+        path: 002470-add-ngo-table-and-ngo-notification-template.sql
+  - changeSet:
+      author: "jalam"
+      id: "002480-populate-test-ngos"
+      sqlFile:
+        path: 002480-populate-test-ngos.sql
+      contextFilter: "!production"
+  - changeSet:
+      author: "jalam"
+      id: "002490-populate-prod-ngos"
+      sqlFile:
+        path: 002490-populate-prod-ngos.sql
+      contextFilter: "production"
+  - changeSet:
+      author: "jalam"
+      id: "002500-grant-permissions-for-ngo-table"
+      sqlFile:
+        path: 002500-grant-permissions-for-ngo-table.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002510-add-new-crediting-period-to-request"
+      sqlFile:
+        path: 002510-add-new-crediting-period-to-request.sql
+  - changeSet:
+      author: "jalam"
+      id: "002520-grant-permissions-for-request-crediting-period-table"
+      sqlFile:
+        path: 002520-grant-permissions-for-request-crediting-period-table.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002530-add-display-not-requested-status-request-flag"
+      sqlFile:
+        path: 002530-add-display-not-requested-status-request-flag.sql
+  - changeSet:
+      author: "scronk"
+      id: "002540-common-dashboard"
+      sqlFile:
+        path: "002540-common-dashboard.sql"
+  - changeSet:
+      author: "mruocco"
+      id: "002550-only-other-document-types-in-other-document-category"
+      sqlFile:
+        path: 002550-only-other-document-types-in-other-document-category.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002560-handle-no-invoice-on-common-dashboard"
+      sqlFile:
+        path: 002560-handle-no-invoice-on-common-dashboard.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002570-tag-release-1.10.0"
+      changes:
+        - tagDatabase:
+            tag: 1.10.0
+  - changeSet:
+      author: "dbutler"
+      id: "002580-rename-registry-update-add-destination"
+      sqlFile:
+        path: 002580-rename-registry-update-add-destination.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002590-add-notify-arm-team-template"
+      sqlFile:
+        path: 002590-add-notify-arm-team-template.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002600-create-monitoring-periods-tables"
+      sqlFile:
+        path: 002600-create-monitoring-periods-tables.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002610-grant-permissions-for-monitoring-periods-tables"
+      sqlFile:
+        path: 002610-grant-permissions-for-monitoring-periods-tables.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002620-grant-extended-permissions-for-monitoring-periods-tables"
+      sqlFile:
+        path: 002620-grant-extended-permissions-for-monitoring-periods-tables.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002630-add-verdict"
+      sqlFile:
+        path: 002630-add-verdict.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002640-add-display-not-requested-status-request-flag-batch-2"
+      sqlFile:
+        path: 002640-add-display-not-requested-status-request-flag-batch-2.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002650-add-new-methodologies"
+      sqlFile:
+        path: 002650-add-new-methodologies.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002660-add-reviewer-your-turn-assignee-notification.sql"
+      sqlFile:
+        path: 002660-add-reviewer-your-turn-assignee-notification.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002670-tag-release-1.11.0"
+      changes:
+        - tagDatabase:
+            tag: 1.11.0
+  - changeSet:
+      author: "mruocco"
+      id: "002680-replace-email-first-line-heading-with-paragraph"
+      sqlFile:
+        path: 002680-replace-email-first-line-heading-with-paragraph.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002690-common-dashboard-add-project-types-sort.sql"
+      sqlFile:
+        path: 002690-common-dashboard-add-project-types-sort.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002700-add-report-notification-template"
+      sqlFile:
+        path: 002700-add-report-notification-template.sql
+  - changeSet:
+      author: "jalam"
+      id: "002710-fix-common-dashboard-parent-master-searching-performance"
+      sqlFile:
+        path: 002710-fix-common-dashboard-parent-master-searching-performance.sql
+  - changeSet:
+      author: "jalam"
+      id: "002720-fix-common-dashboard-index-ignored-with-lowercase"
+      sqlFile:
+        path: 002720-fix-common-dashboard-index-ignored-with-lowercase.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002730-add-other-batch-mappings.sql"
+      sqlFile:
+        path: 002730-add-other-batch-mappings.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002740-allow-methodology-management"
+      sqlFile:
+        path: 002740-allow-methodology-management.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002750-add-qaqc-to-all-requests-dashboard.sql"
+      sqlFile:
+        path: 002750-add-qaqc-to-all-requests-dashboard.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002760-grant-methodology-insert-update"
+      sqlFile:
+        path: 002760-grant-methodology-insert-update.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002770-add-request-id-to-monitoring-periods-table"
+      sqlFile:
+        path: 002770-add-request-id-to-monitoring-periods-table.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002780-tag-release-1.12.0"
+      changes:
+        - tagDatabase:
+            tag: 1.12.0
+  - changeSet:
+      author: "dbutler"
+      id: "002790-add-project-risk-summary"
+      sqlFile:
+        path: 002790-add-project-risk-summary.sql
+  - changeSet:
+      author: "dbutler"
+      id: "002800-grant-project-risk-access"
+      sqlFile:
+        path: 002800-grant-project-risk-access.sql
+  - changeSet:
+      author: "jalam"
+      id: "002810-add-status-report-views"
+      sqlFile:
+        path: 002810-add-status-report-views.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002820-add-round-start-date-and-request-type-description-to-all-requests"
+      sqlFile:
+        path: 002820-add-round-start-date-and-request-type-description-to-all-requests.sql
+  - changeSet:
+      author: "lbarnes"
+      id: "002830-add-risk-summary-to-allrequest"
+      sqlFile:
+        path: 002830-add-risk-summary-to-all-requests.sql
+  - changeSet:
+      author: "lbarnes"
+      id: "002840-add-risksummary-to-assigned-requests"
+      sqlFile:
+        path: 002840-add-risk-summary-to-assigned-requests.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002850-tag-release-1.13.0"
+      changes:
+        - tagDatabase:
+            tag: 1.13.0
+  - changeSet:
+      author: "dbutler"
+      id: "002860-remove-verification-issuance"
+      sqlFile:
+        path: 002860-remove-verification-issuance.sql
+  - changeSet:
+      author: "scronk"
+      id: "002870-fee-schedule-monitoring-period"
+      sqlFile:
+        path: 002870-fee-schedule-monitoring-period.sql
+  - changeSet:
+      author: "mruocco"
+      id: "002880-batch3-display-luf-not-requested-status-requests"
+      sqlFile:
+        path: 002880-batch3-display-luf-not-requested-status-requests.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002890-create-pii-metadata-table"
+      sqlFile:
+        path: 002890-create-pii-metadata-table.sql
+  - changeSet:
+      author: "jalam"
+      id: "002900-support-document-pii-scanning"
+      sqlFile:
+        path: 002900-support-document-pii-scanning.sql
+  - changeSet:
+      author: "rburnett"
+      id: "002910-update-pii-metadata-table"
+      sqlFile:
+        path: 002910-update-pii-metadata-table.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002920-tag-release-1.14.0"
+      changes:
+        - tagDatabase:
+            tag: 1.14.0
+  - changeSet:
+      author: "mruocco"
+      id: "002930-allow-delete-permissions-on-pii-metadata-tables"
+      sqlFile:
+        path: 002930-allow-delete-permissions-on-pii-metadata-tables.sql
+  - changeSet:
+      author: "jalam"
+      id: "002940-add-pii-action-to-request-documents-view"
+      sqlFile:
+        path: 002940-add-pii-action-to-request-documents-view.sql
+  - changeSet:
+      author: "wkewell"
+      id: "002950-set-nullable-fields-pii-metadata-table"
+      sqlFile:
+        path: 002950-set-nullable-fields-pii-metadata-table.sql
+  - changeSet:
+      author: "jalam"
+      id: "002960-do-not-show-page-number-single-page-docs-pii"
+      sqlFile:
+        path: 002960-do-not-show-page-number-single-page-docs-pii.sql
+  - changeSet:
+      author: "scronk"
+      id: "002970-tag-release-1.15.0"
+      changes:
+        - tagDatabase:
+            tag: 1.15.0
+  - changeSet:
+      author: "scronk"
+      id: "002980-add-user-to-project-risk"
+      sqlFile:
+        path: 002980-add-user-to-project-risk.sql
+  - changeSet:
+      author: "scronk"
+      id: "002990-tag-release-1.15.1"
+      changes:
+        - tagDatabase:
+            tag: 1.15.1
+  - changeSet:
+      author: "rburnett"
+      id: "003000-multi-document-pii-template"
+      sqlFile:
+        path: 003000-multi-document-pii-template.sql
+  - changeSet:
+      author: "jalam"
+      id: "003010-add-comprehend-job-columns-for-document-pii-analysis"
+      sqlFile:
+        path: 003010-add-comprehend-job-columns-for-document-pii-analysis.sql
+  - changeSet:
+      author: "dbutler"
+      id: "003020-update-status-report-views"
+      sqlFile:
+        path: 003020-update-status-report-views.sql
+  - changeSet:
+      author: "jalam"
+      id: "003030-add-location-column-for-pii-results-and-update-email-template"
+      sqlFile:
+        path: 003030-add-location-column-for-pii-results-and-update-email-template.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003040-add-obsolete-action"
+      sqlFile:
+        path: 003040-add-obsolete-action.sql
+  - changeSet:
+      author: "jalam"
+      id: "003050-tag-release-1.16.0"
+      changes:
+        - tagDatabase:
+            tag: 1.16.0
+  - changeSet:
+      author: "wkewell"
+      id: "003060-create-assignments-summary-views"
+      sqlFile:
+        path: 003060-create-assignments-summary-views.sql
+  - changeSet:
+      author: "lbarnes"
+      id: "003070-common-dashboard-add-new-columns"
+      sqlFile:
+        path: 003070-common-dashboard-add-new-columns.sql
+  - changeSet:
+      author: "wkewell"
+      id: "003080-grant-permissions-on-assignment-summary-views"
+      sqlFile:
+        path: 003080-grant-permissions-on-assignment-summary-views.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003090-add-pii-project-scan-tables"
+      sqlFile:
+        path: 003090-add-pii-project-scan-tables.sql
+  - changeSet:
+      author: "jalam"
+      id: "003100-add-consultation-dates-to-project-documents-page"
+      sqlFile:
+        path: 003100-add-consultation-dates-to-project-documents-page.sql
+  - changeSet:
+      author: "robbie"
+      id: "003110-add-pii-project-scan-tables"
+      sqlFile:
+        path: 003110-add-pii-project-scan-tables.sql
+  - changeSet:
+      author: "jalam"
+      id: "003120-update-consultation-notifications-to-be-sent-daily"
+      sqlFile:
+        path: 003120-update-consultation-notifications-to-be-sent-daily.sql
+  - changeSet:
+      author: "jalam"
+      id: "003130-remove-link-from-private-consultation-notification"
+      sqlFile:
+        path: 003130-remove-link-from-private-consultation-notification.sql
+  - changeSet:
+      author: "scronk"
+      id: "003140-update-stakeholder-consultation-request-types"
+      sqlFile:
+        path: 003140-update-stakeholder-consultation-request-types.sql 
+  - changeSet:
+      author: "jalam"
+      id: "003150-fix-hyperlinks-in-ngo-consultation-notification"
+      sqlFile:
+        path: 003150-fix-hyperlinks-in-ngo-consultation-notification.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003160-remove-assignment-summary-views"
+      sqlFile:
+        path: 003160-remove-assignment-summary-views.sql
+  - changeSet:
+      author: "jalam"
+      id: "003170-add-stakeholder-consultation-dates-to-child-request-project-documents-page-in-batch"
+      sqlFile:
+        path: 003170-add-stakeholder-consultation-dates-to-child-request-project-documents-page-in-batch.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003180-tag-release-1.17.0"
+      changes:
+        - tagDatabase:
+            tag: 1.17.0
+  - changeSet:
+      author: "wkewell"
+      id: "003190-add-conversation-tables"
+      sqlFile:
+        path: 003190-add-conversation-tables.sql
+  - changeSet:
+      author: "wkewell"
+      id: "003200-add-conversation-status-to-reference-data-types"
+      sqlFile:
+        path: 003200-add-conversation-status-to-reference-data-types.sql
+  - changeSet:
+      author: "wkewell"
+      id: "003210-add-pii-back-to-reference-data-types"
+      sqlFile:
+        path: 003210-add-pii-back-to-reference-data-types.sql
+  - changeSet:
+      author: "wkewell"
+      id: "003220-add-conversation-message-tables"
+      sqlFile:
+        path: 003220-add-conversation-message-tables.sql
+  - changeSet:
+      author: "scronk"
+      id: "003230-tag-release-1.18.0"
+      changes:
+        - tagDatabase:
+            tag: 1.18.0
+  - changeSet:
+      author: "scronk"
+      id: "003240-unread-messages-view"
+      sqlFile:
+        path: 003240-unread-messages-view.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003250-correct-design-certification-request-type-code"
+      sqlFile:
+        path: 003250-correct-design-certification-request-type-code.sql
+  - changeSet:
+      author: "scronk"
+      id: "003260-missing-document-metadata"
+      sqlFile: 
+        path: 003260-missing-document-metadata.sql
+  - changeSet:
+      author: "robbie"
+      id: "003270-design-cert-date-matrix"
+      sqlFile:
+        path: 003270-design-cert-matrix.sql
+  - changeSet:
+      author: "scronk"
+      id: "003280-unread-messages-view-remove-reviewers"
+      sqlFile:
+        path: 003280-unread-messages-view-remove-reviewers.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003290-add-status-applied-at-to-conversation"
+      sqlFile:
+        path: 003290-add-status-applied-at-to-conversation.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003300-add-request-message-received-notification"
+      sqlFile:
+        path: 003300-add-request-message-received-notification.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003310-add-uploaded-by-user-to-document-table"
+      sqlFile:
+        path: 003310-add-uploaded-by-user-to-document-table.sql
+  - changeSet:
+      author: "scronk"
+      id: "003320-add-support-account-type"
+      sqlFile:
+        path: 003320-add-support-account-type.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003330-add-report-form-type"
+      sqlFile:
+        path: 003330-add-report-form-type.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003340-form-definition"
+      sqlFile:
+        path: 003340-form-definition.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003350-form-privileges"
+      sqlFile:
+        path: 003350-form-privileges.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003360-add-location-ldc-flag"
+      sqlFile:
+        path: 003360-add-location-ldc-flag.sql
+  - changeSet:
+      author: "scronk"
+      id: "003370-add-cancellation-reason"
+      sqlFile:
+        path: 003370-add-cancellation-reason.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003380-tag-release-1.19.0"
+      changes:
+        - tagDatabase:
+            tag: 1.19.0
+  - changeSet:
+      author: "rburnett"
+      id: "003390-unread-messages-view-add-account-id"
+      sqlFile:
+        path: 003390-unread-messages-view-add-account-id.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003400-add-multi-request-message-received-notification"
+      sqlFile:
+        path: 003400-add-multi-request-message-received-notification.sql
+  - changeSet:
+      author: "scronk"
+      id: "003410-unread-messages-view-permissions"
+      sqlFile:
+        path: "003410-unread-messages-view-permissions.sql"
+  - changeSet:
+      author: "mruocco"
+      id: "003420-form-definition-updates"
+      sqlFile:
+        path: 003420-form-definition-updates.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003430-add-request-type-form-type-mappings"
+      sqlFile:
+        path: 003430-add-request-type-form-type-mappings.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003440-add-project-registry-id"
+      sqlFile:
+        path: 003440-add-project-registry-id.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003450-re-add-cancellation-reason"
+      sqlFile:
+        path: 003450-re-add-cancellation-reason.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003460-clean-up-form-definition-status"
+      sqlFile:
+        path: 003460-clean-up-form-definition-status.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003470-request-form-setup"
+      sqlFile:
+        path: 003470-request-form-setup.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003480-add-categorised-request-forms"
+      sqlFile:
+        path: 003480-add-categorised-request-forms.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003490-categorised-request-forms-privileges"
+      sqlFile:
+        path: 003490-categorised-request-forms-privileges.sql
+  - changeSet:
+      author: "rburnett"
+      id: "003500-cancellation-notification-template"
+      sqlFile:
+        path: 003500-cancellation-notification-template.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003510-update-request-closed-notification-template"
+      sqlFile:
+        path: 003510-update-request-closed-notification-template.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003520-correct-cancel-notification-template"
+      sqlFile:
+        path: 003520-correct-cancel-notification-template.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003530-allow-request-form-deletion"
+      sqlFile:
+        path: 003530-allow-request-form-deletion.sql
+  - changeSet:
+      author: "scronk"
+      id: "003540-tag-release-1.20.0"
+      changes:
+        - tagDatabase:
+            tag: 1.20.0
+  - changeSet:
+      author: "mruocco"
+      id: "003550-add-gs-fabric-read-only-role"
+      sqlFile:
+        path: 003550-add-gs-fabric-read-only-role.sql
+  - changeSet:
+      author: "mruocco"
+      id: "003560-tag-release-1.20.1"
+      changes:
+        - tagDatabase:
+            tag: 1.20.1
+  - changeSet:
+      author: "scronk"
+      id: "003570-missing-reviewer-round-2-config"
+      sqlFile:
+        path: "003570-missing-reviewer-round-2-config.sql"
+  - changeSet:
+      author: "scronk"
+      id: "003580-tag-release-1.21.0"
+      changes:
+        - tagDatabase:
+            tag: 1.21.0
+  - changeSet:
+      author: "rburnett"
+      id: "003590-new-notification-template-versions"
+      sqlFile:
+        path: "003590-new-notification-template-versions.sql"
+  - changeSet:
+      author: "mruocco"
+      id: "003600-tag-release-1.21.1"
+      changes:
+        - tagDatabase:
+            tag: 1.21.1
+  - changeSet:
+      author: "mruocco"
+      id: "003610-notification-template-corrections"
+      sqlFile:
+        path: "003610-notification-template-corrections.sql"
+  - changeSet:
+      author: "mruocco"
+      id: "003620-tag-release-1.21.2"
+      changes:
+        - tagDatabase:
+            tag: 1.21.2
+  - changeSet:
+      author: "mruocco"
+      id: "003630-add-new-carbon-streams"
+      sqlFile:
+        path: "003630-add-new-carbon-streams.sql"
+  - changeSet:
+      author: "mruocco"
+      id: "003640-consultation-not-required-for-transition-review-request"
+      sqlFile:
+        path: "003640-consultation-not-required-for-transition-review-request.sql"
+  - include:
+      file: "003650-methodology-is-paa.yaml"
+  - changeSet:
+      author: "ghaslett"
+      id: "003655-tag-release-1.22.0"
+      changes:
+        - tagDatabase:
+            tag: 1.22.0
+  - include:
+      file: "003660-request-is-paa.yaml"
+  - changeSet:
+      author: "mruocco"
+      id: "003670-fix-common-dashboard-duplicate-requests"
+      sqlFile:
+        path: "003670-fix-common-dashboard-duplicate-requests.sql"
+  - changeSet:
+      author: "ghaslett"
+      id: "003675-tag-release-1.22.1"
+      changes:
+        - tagDatabase:
+            tag: 1.22.1

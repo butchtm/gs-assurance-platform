@@ -10,14 +10,14 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class RequestType extends ExtendedReferenceDataType {
 
-  public static final int PRELIMINARY_REVIEW_ID = 1000;
-  public static final int INCLUSION_REGULAR_VPA = 1004;
-  public static final int PERFORMANCE_CERTIFICATION_PROJECT = 1005;
-  public static final int PERFORMANCE_CERTIFICATION_VPA = 1006;
   public static final int LEGACY_PERFORMANCE_REVIEW_ID = 5;
+  public static final int PRELIMINARY_REVIEW_ID = 1000;
   public static final int DESIGN_CERTIFICATION_PROJECT = 1001;
   public static final int DESIGN_CERTIFICATION_POA_WITH_REAL_CASE_VPA = 1002;
   public static final int DESIGN_CERTIFICATION_REAL_CASE_VPA = 1003;
+  public static final int INCLUSION_REGULAR_VPA = 1004;
+  public static final int PERFORMANCE_CERTIFICATION_PROJECT = 1005;
+  public static final int PERFORMANCE_CERTIFICATION_VPA = 1006;
   public static final int DESIGN_CERTIFICATION_RENEWAL_PROJECT = 1007;
   public static final int DESIGN_CERTIFICATION_RENEWAL_POA_WITH_REAL_CASE_VPA = 1008;
   public static final int DESIGN_CERTIFICATION_RENEWAL_REAL_CASE_VPA = 1009;
@@ -76,6 +76,24 @@ public class RequestType extends ExtendedReferenceDataType {
           COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_VPA,
           INCLUSION_REGULAR_VPA);
 
+  private static final Collection<Integer> PAA_SUPPORTING_REQUEST_TYPES =
+      List.of(
+          COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_POA,
+          COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_PROJECT,
+          COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_VPA,
+          DESIGN_CERTIFICATION_RENEWAL_POA_WITH_REAL_CASE_VPA,
+          DESIGN_CERTIFICATION_RENEWAL_PROJECT,
+          DESIGN_CERTIFICATION_RENEWAL_REAL_CASE_VPA,
+          DESIGN_CERTIFICATION_RENEWAL_REGULAR_CASE_VPA,
+          DESIGN_CERTIFICATION_POA_WITH_REAL_CASE_VPA,
+          DESIGN_CERTIFICATION_PROJECT,
+          DESIGN_CERTIFICATION_REAL_CASE_VPA,
+          DESIGN_CHANGE_WITH_VVB,
+          INCLUSION_REGULAR_VPA,
+          PERFORMANCE_CERTIFICATION_PROJECT,
+          PERFORMANCE_CERTIFICATION_VPA,
+          PRELIMINARY_REVIEW_ID);
+
   public RequestType() {}
 
   public RequestType(Integer id) {
@@ -128,5 +146,9 @@ public class RequestType extends ExtendedReferenceDataType {
 
   public boolean shouldCalculateDesignCertificationDate() {
     return DESIGN_CERTIFICATION_DATE_REQUEST_TYPES.contains(id);
+  }
+
+  public boolean supportsPAA() {
+    return id != null && PAA_SUPPORTING_REQUEST_TYPES.contains(id);
   }
 }

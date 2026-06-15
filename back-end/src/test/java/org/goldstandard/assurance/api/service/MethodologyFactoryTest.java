@@ -16,11 +16,12 @@ class MethodologyFactoryTest {
 
   @Test
   void shouldCreateNewMethodology() {
-    var dto = MethodologyManagementDTO.builder().description("test").active(true).build();
+    var dto = MethodologyManagementDTO.builder().description("test").active(true).paa(true).build();
     var result = factory.create(dto);
     assertThat(result.getDescription()).isEqualTo(dto.getDescription());
     assertThat(result.getCode()).isEqualTo(dto.getDescription().toUpperCase());
     assertThat(result.getActive()).isEqualTo(dto.getActive());
+    assertThat(result.isPaa()).isEqualTo(dto.isPaa());
   }
 
   @Test
@@ -32,12 +33,14 @@ class MethodologyFactoryTest {
             .description("existing")
             .code("EXISTING")
             .isActive(false)
+            .paa(true)
             .build();
     var result = factory.update(existing, dto);
     assertThat(result.getId()).isEqualTo(existing.getId());
     assertThat(result.getDescription()).isEqualTo(dto.getDescription());
     assertThat(result.getCode()).isEqualTo(dto.getDescription().toUpperCase());
     assertThat(result.getActive()).isEqualTo(dto.getActive());
+    assertThat(result.isPaa()).isEqualTo(dto.isPaa());
   }
 
   @Test

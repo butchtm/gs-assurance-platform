@@ -1,19 +1,15 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { Formik, useFormikContext } from "formik";
 
-import {
-  getReferenceValueCodeById,
-  getReferenceValueDescriptionById,
-  ReferenceTypeContext,
-} from "../../../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes, mockAllReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
-import { mockPlatformAccounts } from "../../../../common/platform-accounts/DebugPlatformAccounts";
-import mockProjects, { mockPOAProjects } from "../../../../common/project/DebugProject";
-import { PermissionGroup } from "../../../../PermissionGroup";
-import { AuthContext, AuthContextType } from "../../../Auth/Login/AuthProvider";
-import { Account } from "../../../PlatformAccounts/PlatformAccountTypes";
-import { User } from "../../../User/User";
-import { getCandidatePOAs, getProject } from "../../Project";
+import { renderWithProviders } from "@/test/test-utils";
+import { getReferenceValueCodeById, getReferenceValueDescriptionById } from "@/common/data-types/DataReferenceTypes";
+import { mockActiveReferenceTypes, mockAllReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { mockPlatformAccounts } from "@/common/platform-accounts/DebugPlatformAccounts";
+import mockProjects, { mockPOAProjects } from "@/common/project/DebugProject";
+import { PermissionGroup } from "@/PermissionGroup";
+import { Account } from "@/components/PlatformAccounts/PlatformAccountTypes";
+import { User } from "@/components/User/User";
+import { getCandidatePOAs, getProject } from "@/components/Project/Project";
 
 import { Step1 } from "./Step1";
 
@@ -86,6 +82,7 @@ jest.mock("../../../../common/data-types/DataReferenceTypes", () => ({
   useReferenceTypes: () => ({
     activeReferenceTypes: mockActiveReferenceTypes,
     allReferenceTypes: mockAllReferenceTypes,
+    getCustomReferenceOptions: jest.fn().mockReturnValue([]),
   }),
   useCustomReferenceOptions: jest.fn().mockReturnValue([
     { value: 1, label: "Option 1" },
@@ -94,40 +91,29 @@ jest.mock("../../../../common/data-types/DataReferenceTypes", () => ({
   getReferenceValueDescriptionById: jest.fn(),
 }));
 
-const mockAuthProvider = {
-  isProjectDeveloperUser: jest.fn(),
-  isAdminUser: jest.fn(),
-  isArmUser: jest.fn(),
-} as Record<keyof AuthContextType, jest.Mock>;
-
 describe("Step1", () => {
   beforeEach(() => {
     (getReferenceValueDescriptionById as jest.Mock).mockReset();
     (getCandidatePOAs as jest.Mock).mockResolvedValue(mockPOAProjects);
-
-    mockAuthProvider.isProjectDeveloperUser.mockReturnValue(false);
-    mockAuthProvider.isAdminUser.mockReturnValue(false);
-    mockAuthProvider.isArmUser.mockReturnValue(false);
   });
 
   it("renders correctly", async () => {
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1 />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(false),
+            isAdminUser: jest.fn().mockReturnValue(false),
+            isArmUser: jest.fn().mockReturnValue(false),
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{}} onSubmit={jest.fn()}>
-            <Step1 />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -143,23 +129,22 @@ describe("Step1", () => {
       return "REGULAR_VPA";
     });
 
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{ projectClassificationId: "someId" }} onSubmit={jest.fn()}>
+        <Step1 />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(false),
+            isAdminUser: jest.fn().mockReturnValue(false),
+            isArmUser: jest.fn().mockReturnValue(false),
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{ projectClassificationId: "someId" }} onSubmit={jest.fn()}>
-            <Step1 />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -175,23 +160,22 @@ describe("Step1", () => {
       return "REAL_CASE_VPA";
     });
 
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{ projectClassificationId: "someId" }} onSubmit={jest.fn()}>
+        <Step1 />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(false),
+            isAdminUser: jest.fn().mockReturnValue(false),
+            isArmUser: jest.fn().mockReturnValue(false),
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{ projectClassificationId: "someId" }} onSubmit={jest.fn()}>
-            <Step1 />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -223,35 +207,30 @@ describe("Step1", () => {
       projectStartDate: "2023-01-01",
     });
 
-    mockAuthProvider.isProjectDeveloperUser.mockReturnValue(true);
-
-    render(
-      <AuthContext.Provider
-        value={{
-          ...(mockAuthProvider as unknown as AuthContextType),
-          user: {
-            account: {
-              id: 0,
-              name: "Waterworks project manager",
-            } as Account,
-          } as User,
-        }}
-      >
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1 />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(true),
+            isAdminUser: jest.fn().mockReturnValue(false),
+            isArmUser: jest.fn().mockReturnValue(false),
+            user: {
+              account: {
+                id: 0,
+                name: "Waterworks project manager",
+              } as Account,
+            } as User,
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
             allReferenceTypes: { ProjectClassification: [{ id: 1, code: "POA", description: "Master Legacy" }] },
-            referenceMethodologies: [],
             getCustomReferenceOptions: jest.fn().mockReturnValue([{ value: 1, label: "POA" }]),
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{}} onSubmit={jest.fn()}>
-            <Step1 />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     const input = screen.getAllByLabelText("Programme of Activities*")[0];
@@ -272,32 +251,24 @@ describe("Step1", () => {
   });
 
   it("DOES render update project status button for GS Admin when component rendered as update project form", async () => {
-    mockAuthProvider.isAdminUser.mockReturnValue(true);
-    render(
-      <AuthContext.Provider
-        value={{
-          ...(mockAuthProvider as unknown as AuthContextType),
-          isAuthenticated: true,
-          user: {
-            groups: [PermissionGroup.GS_ADMIN],
-          } as User,
-        }}
-      >
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1 projectId={mockProjects[1].id} isUpdate={true} />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isAdminUser: jest.fn().mockReturnValue(true),
+            isAuthenticated: true,
+            user: {
+              groups: [PermissionGroup.GS_ADMIN],
+            } as User,
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{}} onSubmit={jest.fn()}>
-            <Step1 projectId={mockProjects[1].id} isUpdate={true} />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -309,24 +280,20 @@ describe("Step1", () => {
   });
 
   it("DOES NOT render update project status button for Project Developer when component rendered as update project form", async () => {
-    mockAuthProvider.isProjectDeveloperUser.mockReturnValue(true);
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1 projectId={mockProjects[1].id} isUpdate={true} />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(true),
+          },
+          reference: {
             activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <Formik initialValues={{}} onSubmit={jest.fn()}>
-            <Step1 projectId={mockProjects[1].id} isUpdate={true} />
-          </Formik>
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
+          },
+        },
+      },
     );
 
     await waitFor(() => {

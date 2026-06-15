@@ -1,0 +1,1 @@
+delete from gs.batch_mapping where batch_type_id = 2 and project_classification_id = 2;

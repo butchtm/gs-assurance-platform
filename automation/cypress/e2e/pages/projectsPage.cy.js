@@ -5,7 +5,7 @@ class _ProjectsPage {
   }
 
   feature = {
-    projectSearchBar: () => cy.get('input[placeholder="Name or Exact GSID"]')
+    projectSearchBar: () => cy.get('[data-testid="global-search-input"]')
   }
 }
 

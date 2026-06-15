@@ -6,13 +6,14 @@ import { Box, Grid, Tab } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { getRequestAssignments, Assignment } from "../../components/requests/assignment/Assignment";
-import { GSDocument } from "../../common/document/GSDocument";
-import { Project } from "../../common/project/Project";
-import { GSRequest, RequestConsultation } from "../../common/request/GSRequest";
-import { AuthContext } from "../Auth/Login/AuthProvider";
-import { getProject } from "../Project/Project";
-import { TabLabel } from "../Reusable/Tab/TabLabel";
+import { Tag } from "@/common/tags";
+import { getRequestAssignments, Assignment } from "@/components/requests/assignment/Assignment";
+import { GSDocument } from "@/common/document/GSDocument";
+import { Project } from "@/common/project/Project";
+import { GSRequest, RequestConsultation } from "@/common/request/GSRequest";
+import { AuthContext } from "@/components/Auth/Login/AuthProvider";
+import { getProject } from "@/components/Project/Project";
+import { TabLabel } from "@/components/Reusable/Tab/TabLabel";
 
 import { ActionsDropdown } from "./actions/ActionsDropdown";
 import { ActivityDropdown } from "./activity/ActivityDropdown";
@@ -156,7 +157,7 @@ export const RequestDropdown = (props: {
   return (
     <div className="request-drop-down drop-down" id={"request-" + request.id}>
       <div className="request-key-information-container title-box" onClick={() => changeVisibility()}>
-        <div className="key-information">
+        <Box className="key-information" sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           <p
             className="request-name key-information"
             data-testid="request-name-key-information"
@@ -185,7 +186,8 @@ export const RequestDropdown = (props: {
           {!!request.conversation?.unreadMessages && request.conversation?.unreadMessages > 0 && (
             <MessagePill count={request.conversation.unreadMessages} />
           )}
-        </div>
+          {request.paa && <Tag variant="info" label="PAA" />}
+        </Box>
         <Box
           className="image-container-dropdown-arrow"
           onClick={() => changeVisibility()}

@@ -25,10 +25,14 @@ class _RequestCreationPage {
     createBatchRequest: () => cy.get(`[data-testid="createBatchRequest-select"]`).parent(),
     creditPeriodID: () => cy.get(`[id="creditingPeriodId-input"]`).parent(),
     batchCreditPeriodID: () => cy.get(`[data-testid="crediting-period-select"]`),
-    estimatedEmission: () => cy.get("label").contains("Estimated Annual Emission Reduction/Removal").parent().find("input"),
+    estimatedEmission: () => cy.get('[data-testid="emission-reduction-input"]').find("input"),
     batchRequestType: () => cy.get(`[id="batchRequestTypeId-input"]`).parent(),
     chooseProjectToBatch: () => cy.get("label").contains("Choose Projects to batch this request with"),
-    feeSchedule: () => cy.get('[data-testid="feeSchedule-select"]')
+    feeSchedule: () => cy.get('[data-testid="feeSchedule-select"]'),
+    paaStatus: () => cy.get('[data-testid="paa-select"]'),
+    paaStatusYes: () => cy.get('[data-testid="paa-option-true"]'),
+    paaStatusNo: () => cy.get('[data-testid="paa-option-false"]')
+
   }
 
   dropdowns = {
@@ -67,13 +71,12 @@ class _RequestCreationPage {
 
   navigation = {
     nextButton: () => cy.get('[type="submit"]').contains("Next"),
-    activePage: () => cy.get('[class="MuiStepLabel-root MuiStepLabel-horizontal MuiStepLabel-alternativeLabel css-1abj2s5"]'),
     finishButton: () => cy.get('[type="submit"]').contains("Finish")
   }
 
   checkPage(page) {
     if (parseInt(page) >= 4) {
-      this.navigation.activePage().contains(page)
+      cy.get('#stepper').contains(page)
     } else {
       throw new Error(`Page ${page} is not valid for batch requests`)
     }

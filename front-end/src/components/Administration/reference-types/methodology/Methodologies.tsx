@@ -7,10 +7,13 @@ import { FilterableSortableTable } from "../../../../common/filterable-sortable-
 import { IsActiveCell } from "../../../../common/filterable-sortable-table/cell/IsActiveCell";
 import { PaginationState } from "../../../Reusable/Pagination";
 import { getMethodologies, MethodologyReferenceType } from "../ReferenceTypes";
+import { Filter } from "../../../../common/filterable-sortable-table/model/Filter";
+import { PAACell } from "../../../../common/filterable-sortable-table/cell/PAACell";
 
 import { CreateEditMethodologyModal } from "./CreateEditMethodologyModal";
 
 export const Methodologies = () => {
+  const [filters, setFilters] = useState<Filter[]>([]);
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 25,
@@ -25,10 +28,13 @@ export const Methodologies = () => {
 
   const fetchMethodologies = async () => {
     setIsLoading(true);
+    const filterByPAA = filters.find((filter) => filter.field == "paa")?.value as boolean;
+
     const methodologyResponse = await getMethodologies(
       globalSearch,
       paginationState.pageIndex + 1,
       paginationState.pageSize,
+      filterByPAA,
     );
     if (methodologyResponse) {
       setMethodologies(methodologyResponse.content);
@@ -39,7 +45,7 @@ export const Methodologies = () => {
 
   useEffect(() => {
     fetchMethodologies();
-  }, [paginationState.pageIndex, paginationState.pageSize, globalSearch]);
+  }, [paginationState.pageIndex, paginationState.pageSize, globalSearch, filters]);
 
   const handleCloseModal = (submitted: boolean, created?: boolean) => {
     setIsModalOpen(false);
@@ -72,6 +78,13 @@ export const Methodologies = () => {
               enableSorting: false,
             },
             {
+              accessorKey: "paa",
+              header: "PAA",
+              filterVariant: "checkbox",
+              Cell: PAACell,
+              enableSorting: false,
+            },
+            {
               accessorKey: "active",
               header: "Active",
               Cell: IsActiveCell,
@@ -81,6 +94,7 @@ export const Methodologies = () => {
           ]}
           data={methodologies}
           onPaginationChange={setPaginationState}
+          onFilterUpdate={setFilters}
           rowCount={rowCount}
           state={{
             pagination: paginationState,

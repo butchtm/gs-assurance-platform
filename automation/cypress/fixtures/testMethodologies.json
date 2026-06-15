@@ -1,0 +1,22 @@
+[
+    {
+    "description": "automated test new inactive methodology non PAA",
+    "active": false,
+    "paa": false
+    },
+    {
+    "description": "automated test new inactive methodology PAA",
+    "active": false,
+    "paa": true
+    },
+    {
+    "description": "automated test new active methodology non PAA",
+    "active": true,
+    "paa": false
+    },
+    {
+    "description": "automated test new active methodology PAA",
+    "active": true,
+    "paa": true
+    }
+]

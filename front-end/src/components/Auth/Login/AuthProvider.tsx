@@ -215,13 +215,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     [isAuthenticated, user],
   );
 
-  const renderChildren = (): ReactNode => {
-    if (isAuthLoading) return <></>;
+  if (isAuthLoading) return <></>;
 
-    if (isAuthenticated) {
-      return <ReferenceTypeProvider>{children}</ReferenceTypeProvider>;
-    }
-    return children;
-  };
-  return <AuthContext.Provider value={value}>{renderChildren()}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {isAuthenticated ? <ReferenceTypeProvider>{children}</ReferenceTypeProvider> : children}
+    </AuthContext.Provider>
+  );
 };

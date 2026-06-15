@@ -147,6 +147,7 @@ const UpdateRequestWizard: React.FC = () => {
     feeSchedule: request.batchId
       ? (parentRequestWithBatchedRequests?.feeSchedule ?? null)
       : getStandaloneFeeScheduleValue(request),
+    paa: request.paa,
   };
 
   const updateRequestWrapper = useUpdateRequest();

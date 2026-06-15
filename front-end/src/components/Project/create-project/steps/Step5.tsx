@@ -41,11 +41,7 @@ export const Step5 = ({ probablePii = [] }: Step5Props) => {
       <Field name="feeScheduleId" validate={validateFeeSchedule} component={() => null} />
       <Grid container spacing={4}>
         <Grid item xs={12} md={9}>
-          <EmissionsReductionInput
-            fieldValue={values.estimatedAnnualUnits}
-            helpText={"Please indicate the average annual emission reductions or removals for this crediting period"}
-            onChange={handleEmissionReductionChange}
-          />
+          <EmissionsReductionInput fieldValue={values.estimatedAnnualUnits} onChange={handleEmissionReductionChange} />
         </Grid>
 
         <Grid item xs={12} md={3}>

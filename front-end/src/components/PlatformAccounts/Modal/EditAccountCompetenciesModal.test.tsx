@@ -1,9 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 
-import { ReferenceTypeContext } from "../../../common/data-types/DataReferenceTypes";
-import { mockPlatformAccounts } from "../../../common/platform-accounts/DebugPlatformAccounts";
-import { debugProject } from "../../../common/project/DebugProject";
-import { getAllProjects } from "../../Project/Project";
+import { renderWithProviders } from "@/test/test-utils";
+import { mockPlatformAccounts } from "@/common/platform-accounts/DebugPlatformAccounts";
+import { debugProject } from "@/common/project/DebugProject";
+import { getAllProjects } from "@/components/Project/Project";
+
 import * as PlatformAccountModule from "../PlatformAccount";
 
 import { EditAccountCompetenciesModal } from "./EditAccountCompetenciesModal";
@@ -28,27 +29,13 @@ describe("EditAccountCompetenciesModal", () => {
   });
 
   it("correctly displays the options for a selected competency", async () => {
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: jest.fn().mockReturnValue([
-            { value: 1, label: "Option 1" },
-            { value: 2, label: "Option 2" },
-          ]),
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <EditAccountCompetenciesModal
-          isOpen={true}
-          onClose={jest.fn()}
-          account={mockPlatformAccounts[0]}
-          accounts={[]}
-        />
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <EditAccountCompetenciesModal
+        isOpen={true}
+        onClose={jest.fn()}
+        account={mockPlatformAccounts[0]}
+        accounts={[]}
+      />,
     );
 
     fireEvent.mouseDown(screen.getByLabelText(/Project Scale/i));
@@ -76,27 +63,13 @@ describe("EditAccountCompetenciesModal", () => {
       sustainableDevelopmentGoalIds: [],
     });
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: jest.fn().mockReturnValue([
-            { value: 1, label: "Option 1" },
-            { value: 2, label: "Option 2" },
-          ]),
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <EditAccountCompetenciesModal
-          isOpen={true}
-          onClose={jest.fn()}
-          account={mockPlatformAccounts[0]}
-          accounts={[]}
-        />
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <EditAccountCompetenciesModal
+        isOpen={true}
+        onClose={jest.fn()}
+        account={mockPlatformAccounts[0]}
+        accounts={[]}
+      />,
     );
 
     // Wait for the component to fetch and set the competencies

@@ -1,5 +1,9 @@
 package org.goldstandard.assurance.api.repository;
 
+import static org.goldstandard.assurance.api.entity.lookup.RequestStatus.CANCELLED_ID;
+import static org.goldstandard.assurance.api.entity.lookup.RequestStatus.NOT_REQUESTED_ID;
+import static org.goldstandard.assurance.api.entity.lookup.RequestStatus.OMITTED_ID;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +69,28 @@ public interface RequestRepository
                     AND sc.consultation_type_id = 0
                     """)
   Page<Request> findAllInConsultation(Pageable pageable);
+
+  default Optional<Integer> findCurrentRequestIdByProjectId(@Param("projectId") Integer projectId) {
+    return findCurrentRequestIdByProjectId(
+        projectId, List.of(NOT_REQUESTED_ID, OMITTED_ID, CANCELLED_ID));
+  }
+
+  @Query(
+      nativeQuery = true,
+      value =
+          """
+        select r.id
+        from gs.request r
+        join gs.base_project_request bpr
+          on bpr.request_id = r.id
+        where bpr.project_id = :projectId
+          and r.current_request_status_id not in (:excludedStatusIds)
+        order by r.index desc, r.id desc
+        limit 1
+        """)
+  Optional<Integer> findCurrentRequestIdByProjectId(
+      @Param("projectId") Integer projectId,
+      @Param("excludedStatusIds") Collection<Integer> excludedStatusIds);
 
   <T> List<T> findByProjectAccountId(Integer accountId, Class<T> type);
 }

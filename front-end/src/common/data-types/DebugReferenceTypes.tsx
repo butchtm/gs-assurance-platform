@@ -52,9 +52,9 @@ export const mockActiveReferenceTypes = {
     { id: 2, code: "ProjectTypeCode2", description: "ProjectType2", active: true },
   ],
   Methodology: [
-    { id: 1, code: "MethodologyCode1", description: "Methodology1", active: true },
-    { id: 2, code: "MethodologyCode2", description: "Methodology2", active: true },
-    { id: 3, code: "MethodologyCode3", description: "Methodology3", active: true },
+    { id: 1, code: "MethodologyCode1", description: "Methodology1", active: true, paa: true },
+    { id: 2, code: "MethodologyCode2", description: "Methodology2", active: true, paa: true },
+    { id: 3, code: "MethodologyCode3", description: "Methodology3", active: true, paa: true },
   ],
   FeeSchedule: [
     { id: 1, code: "FeeScheduleCode1", description: "Cash per credit", active: true },

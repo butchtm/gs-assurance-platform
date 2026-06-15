@@ -12,7 +12,7 @@ spring:
         default_schema: gs
         show_sql: false
   datasource:
-    password: ${DB_PASSWORD:changeme}
+    password: MySuperSafePostgresPassword
     username: postgres
     driver-class-name: org.h2.Driver
     url: "jdbc:h2:mem:postgres;MODE=PostgreSQL;NON_KEYWORDS=user;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT EXISTS gs"

@@ -8,6 +8,7 @@ import allRequestDashboard from "../pages/allRequestDashboardPage.cy.js"
 import myRequestDashboard from "../pages/myRequestDashboardPage.cy.js"
 import commonDashboard from "../pages/reportDashboardPage.cy.js"
 
+
 And("I type {string} into {string}", (text, field) => {
   const actions = {
     "project title": projectCreationPage.fields.projectTitle,
@@ -88,15 +89,6 @@ Then("Field contains {string} in {string}", (text, type) => {
   }
 })
 
-Then("I am taken to page {string}", (page) => {
-  const validPages = ["2", "3", "4", "5", "6"]
-
-  if (validPages.includes(page)) {
-    projectCreationPage.navigation.activePage().contains(page)
-  } else {
-    throw new Error(`page ${page} not found`)
-  }
-})
 
 Then("{string} can be seen", (verify) => {
   if (verify == "Project Characteristics") {
@@ -109,4 +101,8 @@ Then("{string} can be seen", (verify) => {
 
 Then("This page has an accessability check performed", () => {
   cy.injectAxeAndLogViolation()
+})
+
+Given("I login to the API as an admin", () => {
+  cy.loginApi()
 })

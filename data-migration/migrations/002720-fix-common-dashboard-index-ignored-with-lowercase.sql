@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX project_gsid_lower_key ON gs.project (LOWER(gsid));

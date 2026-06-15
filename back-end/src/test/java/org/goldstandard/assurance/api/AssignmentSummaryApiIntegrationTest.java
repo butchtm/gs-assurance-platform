@@ -23,13 +23,13 @@ import static org.goldstandard.assurance.api.service.PermissionsService.PROJECT_
 import static org.goldstandard.assurance.api.service.PermissionsService.TAC_ROLE;
 import static org.goldstandard.assurance.api.service.PermissionsService.VVB_ROLE;
 
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.goldstandard.assurance.api.dto.AssignmentSummaryDTO;
 import org.goldstandard.assurance.api.entity.lookup.RequestType;
 import org.goldstandard.assurance.api.fixtures.ProjectMother;
+import org.goldstandard.assurance.api.fixtures.ZonedDateTimeMother;
 import org.goldstandard.assurance.api.helper.AccountHelper;
 import org.goldstandard.assurance.api.helper.RequestHelper;
 import org.goldstandard.assurance.api.populator.ProjectPopulator;
@@ -128,7 +128,8 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             3, IN_ROUND_COMPLETION_ID, QAQC_ASSIGNMENT_TYPE_ID, account1);
 
     var activityId = HARMONISATION_OF_FEEDBACK_IDS.iterator().next();
-    var dueDate = ZonedDateTime.now().plusDays(5);
+    var now = ZonedDateTimeMother.now();
+    var dueDate = now.plusDays(5);
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, dueDate);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, dueDate);
 
@@ -177,7 +178,8 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             3, IN_ROUND_COMPLETION_ID, QAQC_ASSIGNMENT_TYPE_ID, account3);
 
     var activityId = HARMONISATION_OF_FEEDBACK_IDS.iterator().next();
-    var dueDate = ZonedDateTime.now().plusDays(5);
+    var now = ZonedDateTimeMother.now();
+    var dueDate = now.plusDays(5);
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, dueDate);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, dueDate);
     requestHelper.createRequestActivityForRequest(request3.getId(), activityId, dueDate);
@@ -217,16 +219,17 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             2, IN_ROUND_COMPLETION_ID, QAQC_ASSIGNMENT_TYPE_ID, account1);
 
     int activityId = HARMONISATION_OF_FEEDBACK_IDS.stream().findFirst().orElseThrow();
-    var overdue = ZonedDateTime.now().minusDays(1);
-    var due = ZonedDateTime.now().plusDays(1);
-    var notInRange = ZonedDateTime.now().plusDays(10);
+    var now = ZonedDateTimeMother.now();
+    var overdue = now.minusDays(1);
+    var due = now.plusDays(1);
+    var notInRange = now.plusDays(10);
 
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, overdue);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, due);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, notInRange);
 
     try {
-      var filterDate = ZonedDateTime.now().plusDays(5);
+      var filterDate = now.plusDays(5);
       var filter = "requestDueBefore=" + filterDate;
       var response = client.getArmAssignmentSummary(filter, ARM_TEAM_ROLE, ANY_USER_ID);
 
@@ -275,7 +278,8 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             1008);
 
     int activityId = HARMONISATION_OF_FEEDBACK_IDS.stream().findFirst().orElseThrow();
-    var due = ZonedDateTime.now().plusDays(1);
+    var now = ZonedDateTimeMother.now();
+    var due = now.plusDays(1);
 
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, due);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, due);
@@ -318,7 +322,8 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             project3, IN_ROUND_COMPLETION_ID, QAQC_ASSIGNMENT_TYPE_ID, account1, 1001);
 
     int activityId = HARMONISATION_OF_FEEDBACK_IDS.stream().findFirst().orElseThrow();
-    var due = ZonedDateTime.now().plusDays(1);
+    var now = ZonedDateTimeMother.now();
+    var due = now.plusDays(1);
 
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, due);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, due);
@@ -432,16 +437,17 @@ class AssignmentSummaryApiIntegrationTest extends AbstractApiTest {
             2, IN_PROGRESS_ID, REVIEW_ASSIGNMENT_TYPE_ID, account1);
 
     int activityId = CONCLUSION_OF_REVIEW_IDS.stream().findFirst().orElseThrow();
-    var overdue = ZonedDateTime.now().minusDays(1);
-    var due = ZonedDateTime.now().plusDays(1);
-    var notInRange = ZonedDateTime.now().plusDays(10);
+    var now = ZonedDateTimeMother.now();
+    var overdue = now.minusDays(1);
+    var due = now.plusDays(1);
+    var notInRange = now.plusDays(10);
 
     requestHelper.createRequestActivityForRequest(request1.getId(), activityId, overdue);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, due);
     requestHelper.createRequestActivityForRequest(request2.getId(), activityId, notInRange);
 
     try {
-      var filterDate = ZonedDateTime.now().plusDays(5);
+      var filterDate = now.plusDays(5);
       var filter = "requestDueBefore=" + filterDate;
       var response = client.getReviewAssignmentSummary(filter, ARM_TEAM_ROLE, ANY_USER_ID);
 

@@ -51,6 +51,7 @@ public class MethodologyConverter {
         .description(methodology.getDescription())
         .code(methodology.getCode())
         .active(methodology.getActive())
+        .paa(methodology.isPaa())
         .inUse(inUse)
         .build();
   }

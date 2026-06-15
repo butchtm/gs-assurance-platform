@@ -1,0 +1,72 @@
+--
+-- Add missing request type 'Manage Project Information'
+--
+INSERT INTO gs.request_type 
+  (id, code, description, is_active)
+VALUES
+  (1020, 'MANAGE_PROJECT_INFORMATION', 'Manage Project Information', true)
+;
+
+CREATE TABLE pg_temp.temp_request_assignment_map_1 (
+  request_type_code text NOT NULL,
+  assignment_type_code text NOT NULL,
+  mandatory boolean NOT NULL,
+  PRIMARY KEY (request_type_code, assignment_type_code)
+);
+
+INSERT INTO pg_temp.temp_request_assignment_map_1
+  (request_type_code, assignment_type_code, mandatory)
+VALUES
+   ('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'AUDIT', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'COMPLETENESS_CHECK', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'REVIEW', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'STAKEHOLDER_CONSULTATION', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'COLLECT_FEE', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA', 'QA/QC', false)
+
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'AUDIT', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'COMPLETENESS_CHECK', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'REVIEW', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'STAKEHOLDER_CONSULTATION', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'COLLECT_FEE', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT', 'QA/QC', false)
+
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'AUDIT', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'COMPLETENESS_CHECK', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'REVIEW', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'STAKEHOLDER_CONSULTATION', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'COLLECT_FEE', true)
+  ,('COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA', 'QA/QC', false)
+
+  ,('PROJECT_DECERTIFICATION', 'COMPLETENESS_CHECK', true)
+  ,('PROJECT_DECERTIFICATION', 'REVIEW', true)
+  ,('PROJECT_DECERTIFICATION', 'QA/QC', false)
+
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'AUDIT', false)
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'COMPLETENESS_CHECK', true)
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'REVIEW', true)
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'STAKEHOLDER_CONSULTATION', true)
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'COLLECT_FEE', true)
+  ,('TRANSITION_REVIEW_|_GS_CDM_TO_GS_VER', 'QA/QC', false)
+
+  ,('MANAGE_PROJECT_INFORMATION', 'COMPLETENESS_CHECK', true)
+  ,('MANAGE_PROJECT_INFORMATION', 'REVIEW', false)
+  ;
+
+INSERT INTO gs.request_type_assignment_type
+  (request_type_id, assignment_type_id, mandatory)
+SELECT
+  rt.id, at1.id, m.mandatory
+FROM
+  pg_temp.temp_request_assignment_map_1 m
+JOIN
+  gs.request_type rt
+ON
+  m.request_type_code = rt.code
+JOIN
+  gs.assignment_type at1
+ON
+  m.assignment_type_code = at1.code
+-- only set up mappings for new request types (and work round new and old PRELIMINARY_REVIEW)  
+WHERE rt.is_active = true
+;

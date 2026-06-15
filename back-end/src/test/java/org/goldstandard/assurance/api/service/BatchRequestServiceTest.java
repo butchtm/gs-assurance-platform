@@ -53,7 +53,12 @@ class BatchRequestServiceTest {
 
   @Test
   void shouldCreateBatchRequest() {
-    BatchRequestCreateDTO dto = new BatchRequestCreateDTO(6, 7, List.of());
+    BatchRequestCreateDTO dto =
+        BatchRequestCreateDTO.builder()
+            .requestTypeId(6)
+            .batchTypeId(7)
+            .projectRequestInfos(List.of())
+            .build();
     var expectedBatchId = 8;
     when(creator.createBatchRequest(dto)).thenReturn(expectedBatchId);
 

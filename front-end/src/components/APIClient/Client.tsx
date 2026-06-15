@@ -95,7 +95,7 @@ export class APIClient {
         window.location.href = "/NoAccess";
       }
       if (error.response?.headers?.server) {
-        (error as Error & { serverHeader?: string }).serverHeader = error.response.headers.server;
+        (error as Error & { serverHeader?: unknown }).serverHeader = error.response.headers.server;
       }
     } else if (error instanceof Error) {
       console.error("Error making request:", error.message);
@@ -117,7 +117,8 @@ export class APIClient {
 
     try {
       const response = await axios({
-        url: `${APIClient.BACKEND_ROOT_PATH + endpoint}`,
+        baseURL: APIClient.BACKEND_ROOT_PATH,
+        url: endpoint,
         responseType: responseType,
         method: method,
         headers: headers,

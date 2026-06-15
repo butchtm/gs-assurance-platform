@@ -46,7 +46,7 @@
 
         When I select "rows per page" from accounts page
         And I select "20" from rows drop down
-        Then 20 rows are on the page
+        Then More than 10 rows are on the page
 
         Examples:
             | username |

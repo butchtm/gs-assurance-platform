@@ -1,0 +1,2 @@
+ALTER TABLE gs.user
+ALTER COLUMN email_address DROP NOT NULL;

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+CONTEXTS=${CONTEXTS:-dev}
+
+liquibase update-to-tag \
+  --contexts "${CONTEXTS}" \
+  --tag "${1}" \
+  --changelog-file $(dirname $0)/changelog.yaml
