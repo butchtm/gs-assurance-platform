@@ -7,6 +7,7 @@ import org.goldstandard.assurance.api.dto.BatchProjectsDTO;
 import org.goldstandard.assurance.api.dto.ProjectRiskSummaryDTO;
 import org.goldstandard.assurance.api.entity.BatchRequest;
 import org.goldstandard.assurance.api.entity.BatchRequests;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.service.PermissionsService;
 import org.goldstandard.assurance.api.service.ProjectRiskSummaryService;
 import org.springframework.stereotype.Component;
@@ -42,7 +43,9 @@ public class BatchRequestConverter {
             .id(project.getId())
             .gsid(project.getGsid())
             .name(project.getName())
-            .classification(project.getProjectClassification().getDescription())
+            .classification(
+                ProjectClassificationSemantics.toDisplayDescription(
+                    project.getProjectClassification()))
             .requestId(request.getId())
             .creditingPeriods(project.getCreditingPeriods())
             .methodologies(project.getMethodologies());

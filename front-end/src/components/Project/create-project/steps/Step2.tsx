@@ -2,16 +2,20 @@ import { Box, Grid, Typography } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import { useFormikContext } from "formik";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { Options, ReferenceTypeContext, useReferenceTypes } from "../../../../common/data-types/DataReferenceTypes";
+import { Options, useReferenceTypes } from "../../../../common/data-types/DataReferenceTypes";
 import { ProbablePii } from "../../../../common/piiAnalysis/PiiAnalysis";
 import { CreateProjectForm } from "../../../../common/project/Project";
 import { CustomCountrySelect } from "../../../Reusable/FormFields/CustomCountrySelect";
 import { CustomFormSelect } from "../../../Reusable/FormFields/CustomFormSelect";
 import { CustomMultiAutoComplete } from "../../../Reusable/FormFields/CustomMultiAutoComplete";
 import CustomHelperText, { CustomTooltip } from "../../../Reusable/FormFields/CustomTooltipText";
-import { getProject } from "../../Project";
+import { getCandidateParentDetails } from "../../Project";
+import {
+  getCanonicalProjectClassificationCodeById,
+  isPoaProjectClassification,
+} from "../../ProjectClassificationSemantics";
 import { getWarning, getWarningForDate, getWarningForProjectTypes, warningText } from "../CreateProject";
 import { helperTexts } from "../HelperText";
 
@@ -25,7 +29,6 @@ export const Step2 = ({ probablePii = [] }: Step2Props) => {
   const { values, setFieldValue } = useFormikContext<CreateProjectForm>();
   const referenceDataContext = useReferenceTypes();
   const [scaleOptions, setScaleOptions] = useState<Options[]>([]);
-  const { activeReferenceTypes } = useContext(ReferenceTypeContext);
 
   useEffect(() => {
     if (!values.startDate) {
@@ -40,23 +43,33 @@ export const Step2 = ({ probablePii = [] }: Step2Props) => {
   };
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchScaleOptions = async () => {
       const allScaleOptions = referenceDataContext.getCustomReferenceOptions("ProjectSize", null);
       const projectId = values.parentProjectId || values.masterProjectId;
-      if (projectId === null || projectId === undefined) {
-        setScaleOptions(allScaleOptions);
-        return;
+      let sizeId: number | undefined;
+
+      if (projectId != null && values.accountId != null && values.projectClassificationId != null) {
+        const project = await getCandidateParentDetails({
+          accountId: values.accountId,
+          classificationId: values.projectClassificationId,
+          candidateProjectId: projectId,
+          masterProjectId: values.masterProjectId,
+        });
+        sizeId = project?.projectSize?.id;
       }
-      const project = await getProject(projectId);
-      const sizeId = project?.projectSize?.id;
-      if (sizeId === null || sizeId === undefined) {
-        setScaleOptions(allScaleOptions);
-        return;
+
+      if (!ignore) {
+        setScaleOptions(sizeId == null ? allScaleOptions : filterScaleOptions(allScaleOptions, sizeId));
       }
-      setScaleOptions(filterScaleOptions(allScaleOptions, sizeId));
     };
     fetchScaleOptions();
-  }, [values.masterProjectId, values.parentProjectId]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [values.accountId, values.masterProjectId, values.parentProjectId, values.projectClassificationId]);
 
   const typeOptions = referenceDataContext.getCustomReferenceOptions("ProjectType", values.typeIds);
   const carbonStreamOptions = referenceDataContext.getCustomReferenceOptions("CarbonStream", values.carbonStreamId);
@@ -71,15 +84,16 @@ export const Step2 = ({ probablePii = [] }: Step2Props) => {
 
   let projectScaleHelperText = helperTexts.projectScale();
 
-  const poa = activeReferenceTypes.ProjectClassification.find((x) => x.description === "Programme of Activities");
-  const realCaseVpa = activeReferenceTypes.ProjectClassification.find((x) => x.description === "Real Case VPA");
-  const regularCaseVpa = activeReferenceTypes.ProjectClassification.find((x) => x.description === "Regular Case VPA");
+  const projectClassificationCode = getCanonicalProjectClassificationCodeById(
+    values.projectClassificationId,
+    referenceDataContext.allReferenceTypes?.ProjectClassification ?? [],
+  );
 
-  if (values.projectClassificationId === poa?.id) {
+  if (isPoaProjectClassification(projectClassificationCode)) {
     projectScaleHelperText = helperTexts.poaTooltip();
-  } else if (values.projectClassificationId === realCaseVpa?.id) {
+  } else if (projectClassificationCode === "REAL_CASE_VPA") {
     projectScaleHelperText = helperTexts.realCaseVpaTooltip();
-  } else if (values.projectClassificationId === regularCaseVpa?.id) {
+  } else if (projectClassificationCode === "REGULAR_VPA" || projectClassificationCode === "REGULAR_CASE_VPA") {
     projectScaleHelperText = helperTexts.regularCaseVpaTooltip();
   }
 

@@ -149,6 +149,14 @@ public class ProjectController {
   }
 
   @RolesAllowed({ADMIN_ROLE, ARM_TEAM_ROLE, PROJECT_DEVELOPER_ROLE})
+  @PostMapping("/projects/candidate-parent-details")
+  public ResponseEntity<CandidateParentProjectDetailsDTO> getCandidateParentDetails(
+      @RequestBody GetCandidateParentProjectDetailsRequest request) {
+    var project = projectService.getCandidateParentDetails(request);
+    return ResponseEntity.ok(converter.toCandidateParentDetailsDto(project));
+  }
+
+  @RolesAllowed({ADMIN_ROLE, ARM_TEAM_ROLE, PROJECT_DEVELOPER_ROLE})
   @PutMapping("/projects/{projectId}")
   public ResponseEntity<Integer> updateProject(
       @PathVariable(name = "projectId") Integer projectId,

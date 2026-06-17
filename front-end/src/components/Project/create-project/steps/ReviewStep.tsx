@@ -4,19 +4,21 @@ import { useFormikContext } from "formik";
 import { useContext, useEffect } from "react";
 
 import { getReferenceValueDescriptionById, useReferenceTypes } from "../../../../common/data-types/DataReferenceTypes";
-import { analyseText, TextAnalysis } from "../../../../common/piiAnalysis/PiiAnalysis";
+import { analyseText, TextAnalysis, TextAnalysisResponse } from "../../../../common/piiAnalysis/PiiAnalysis";
 import { CreateProjectForm, ReferenceType } from "../../../../common/project/Project";
 import { AuthContext } from "../../../Auth/Login/AuthProvider";
 import { useFormikStepContext } from "../../../Reusable/Formik/FormikStepper";
 import { predefinedGSV } from "../../Project";
+import { getCanonicalProjectClassificationDescriptionById } from "../../ProjectClassificationSemantics";
 
 import { ReviewValueLabelPair } from "./ReviewLabelValuePair";
 import { ReviewStepCreditingPeriods } from "./ReviewStepCreditingPeriods";
 import { ReviewStepTransitionInformation } from "./ReviewStepTransitionInformation";
 
 export const ReviewStep = () => {
-  const { activeReferenceTypes } = useReferenceTypes();
+  const { activeReferenceTypes, allReferenceTypes } = useReferenceTypes();
   const locations = activeReferenceTypes.ProjectLocation;
+  const projectClassifications = allReferenceTypes?.ProjectClassification ?? activeReferenceTypes.ProjectClassification;
   const { values, setFieldValue } = useFormikContext<CreateProjectForm>();
   const { setStep } = useFormikStepContext();
   const authContext = useContext(AuthContext);
@@ -37,13 +39,8 @@ export const ReviewStep = () => {
     return authContext.isAdminUser() || authContext.isArmUser();
   };
 
-  const analyseFreeTextFields = async (toAnalyse: TextAnalysis) => {
-    if (toAnalyse != null) {
-      setFieldValue("textAnalysisResults", await analyseText(toAnalyse));
-    }
-  };
-
   useEffect(() => {
+    let ignore = false;
     const textToAnalyse = [];
     if (values.name != "") {
       textToAnalyse.push({ field: "title", text: values.name });
@@ -57,8 +54,20 @@ export const ReviewStep = () => {
     const toAnalyse: TextAnalysis = {
       fieldsToAnalyse: textToAnalyse,
     };
-    analyseFreeTextFields(toAnalyse);
-  }, []);
+
+    const analyseFreeTextFields = async () => {
+      const analysisResults: TextAnalysisResponse = await analyseText(toAnalyse);
+      if (!ignore) {
+        setFieldValue("textAnalysisResults", analysisResults);
+      }
+    };
+
+    analyseFreeTextFields();
+
+    return () => {
+      ignore = true;
+    };
+  }, [setFieldValue, values.description, values.name, values.notes]);
 
   return (
     <Paper elevation={3} style={{ padding: "20px", margin: "20px" }}>
@@ -104,9 +113,9 @@ export const ReviewStep = () => {
           />
           <ReviewValueLabelPair
             label="Project Classification"
-            value={getReferenceValueDescriptionById(
+            value={getCanonicalProjectClassificationDescriptionById(
               values.projectClassificationId,
-              activeReferenceTypes.ProjectClassification,
+              projectClassifications,
             )}
             onEdit={() => setStep(0)}
           />

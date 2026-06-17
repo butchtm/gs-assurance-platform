@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 import { useReferenceTypes } from "../../../common/data-types/DataReferenceTypes";
 import { CreateProjectForm, CreateProjectPayload, TransitionProjectDetails } from "../../../common/project/Project";
-import { AuthContext } from "../../Auth/Login/AuthProvider";
+import { AuthContext, AuthContextType } from "../../Auth/Login/AuthProvider";
 import { FormikStep } from "../../Reusable/Formik/FormikStep";
 import { FormikStepper } from "../../Reusable/Formik/FormikStepper";
 import { createProject, getInitialEmptyValues } from "../Project";
@@ -28,6 +28,32 @@ import { Step4 } from "./steps/Step4";
 import { Step5 } from "./steps/Step5";
 
 export const warningText = "This value differs from that of the PoA. Ensure this is correct before proceeding.";
+
+export const buildCreateProjectPayload = (
+  formValues: CreateProjectForm,
+  authContext: Pick<AuthContextType, "isAdminUser" | "isArmUser" | "user">,
+): CreateProjectPayload => {
+  const transitionProjectDetails: TransitionProjectDetails = {
+    projectLinkInOtherScheme: formValues.projectLinkInOtherScheme,
+    creditingPeriodStartDateOtherSchemes: formValues.creditingPeriodStartDateOtherSchemes,
+    creditingPeriodEndDateOtherSchemes: formValues.creditingPeriodEndDateOtherSchemes,
+    transitionApprovalProcedureId: formValues.transitionApprovalProcedureId,
+    transitionFromOtherSchemeId: formValues.transitionFromOtherSchemeId,
+    transitionPathwayId: formValues.transitionPathwayId,
+  };
+
+  const accountId =
+    (authContext.isAdminUser() || authContext.isArmUser()) && formValues.accountId
+      ? formValues.accountId
+      : authContext.user?.account?.id;
+
+  return {
+    ...formValues,
+    transitionProject: formValues.transitioningProject == "yes" ? transitionProjectDetails : null,
+    accountId: Number(accountId),
+    currentStandardId: 2, //Default always to Gold Standard Version
+  };
+};
 
 const currentValueEqualsMasterValue = (a?: number[], b?: number[]) => {
   if (!a && !b) return true;
@@ -106,27 +132,7 @@ export const CreateProjectWizard = () => {
       }
     }
 
-    // If Admin, get from Account Search Field otherwise get the current logged in User Account ID
-    let accountId = authContext.user?.account?.id;
-    if (authContext.isAdminUser() && formValues.accountId) {
-      accountId = formValues.accountId;
-    }
-
-    const transitionProjectDetails: TransitionProjectDetails = {
-      projectLinkInOtherScheme: formValues.projectLinkInOtherScheme,
-      creditingPeriodStartDateOtherSchemes: formValues.creditingPeriodStartDateOtherSchemes,
-      creditingPeriodEndDateOtherSchemes: formValues.creditingPeriodEndDateOtherSchemes,
-      transitionApprovalProcedureId: formValues.transitionApprovalProcedureId,
-      transitionFromOtherSchemeId: formValues.transitionFromOtherSchemeId,
-      transitionPathwayId: formValues.transitionPathwayId,
-    };
-
-    const payload: CreateProjectPayload = {
-      ...formValues,
-      transitionProject: formValues.transitioningProject == "yes" ? transitionProjectDetails : null,
-      accountId: Number(accountId),
-      currentStandardId: 2, //Default always to Gold Standard Version
-    };
+    const payload = buildCreateProjectPayload(formValues, authContext);
 
     try {
       const project = await createProject(payload);

@@ -50,8 +50,16 @@ public interface ProjectRepository
         accountId, masterProjectId, ProjectClassification.getRealCaseVpaIds());
   }
 
+  default Collection<Project> findAllRealCaseVPAsByMasterProjectId(Integer masterProjectId) {
+    return findAllByMasterProjectIdAndProjectClassificationIdIn(
+        masterProjectId, ProjectClassification.getRealCaseVpaIds());
+  }
+
   Collection<Project> findAllByAccountIdAndMasterProjectIdAndProjectClassificationIdIn(
       Integer accountId, Integer masterProjectId, Collection<Integer> classificationIds);
+
+  Collection<Project> findAllByMasterProjectIdAndProjectClassificationIdIn(
+      Integer masterProjectId, Collection<Integer> classificationIds);
 
   boolean existsByMasterProjectIdAndProjectClassificationId(
       Integer masterProjectId, Integer classificationId);

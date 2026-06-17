@@ -11,6 +11,7 @@ interface CustomAccountSearchProps {
   onChange?: (account: Options | null) => void;
   accountTypeId: number;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export const CustomAccountSearchAutoComplete: React.FC<CustomAccountSearchProps> = ({
@@ -19,6 +20,7 @@ export const CustomAccountSearchAutoComplete: React.FC<CustomAccountSearchProps>
   onChange,
   accountTypeId,
   required,
+  disabled,
 }) => {
   const [field, meta, helpers] = useField(name);
   const [accountSearch, setAccountSearch] = useState("");
@@ -94,6 +96,7 @@ export const CustomAccountSearchAutoComplete: React.FC<CustomAccountSearchProps>
         }}
         value={selectedAccount}
         onChange={handleOnChange}
+        disabled={disabled}
         getOptionLabel={(option) => option.label}
         isOptionEqualToValue={(option, value) => option.value === value.value}
         aria-required={!!required}

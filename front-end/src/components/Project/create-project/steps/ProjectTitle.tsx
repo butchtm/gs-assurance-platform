@@ -8,7 +8,9 @@ import { helperTexts } from "../HelperText";
 import { ProbablePii } from "../../../../common/piiAnalysis/PiiAnalysis";
 import { Project } from "../../../../common/project/Project";
 
-const getProjectTitlePrefix = (parentPoa?: Project, parentRealCase?: Project) => {
+type ProjectTitleParent = Pick<Project, "gsid">;
+
+const getProjectTitlePrefix = (parentPoa?: ProjectTitleParent, parentRealCase?: ProjectTitleParent) => {
   let titlePrefix = "";
   if (parentPoa) {
     titlePrefix = parentPoa.gsid + "-";
@@ -26,8 +28,8 @@ export const ProjectTitle = ({
   isUpdate,
 }: {
   probablePii?: ProbablePii[];
-  parentPoa?: Project;
-  parentRealCase?: Project;
+  parentPoa?: ProjectTitleParent;
+  parentRealCase?: ProjectTitleParent;
   isUpdate?: boolean;
 }) => {
   const [field, meta, helpers] = useField("name");

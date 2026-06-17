@@ -3,10 +3,16 @@ import * as Yup from "yup";
 import { ReferenceTypes } from "../../common/data-types/DataReferenceTypes";
 import { AuthContextType } from "../Auth/Login/AuthProvider";
 
+import {
+  projectClassificationRequiresPoa,
+  projectClassificationRequiresRealCaseVpa,
+} from "./ProjectClassificationSemantics";
+
 export const getValidationSchemaStep1 = (allReferenceTypes: ReferenceTypes, authContext: AuthContextType) => {
   const noneClassification = allReferenceTypes.ProjectClassification.find((x) => x.code === "NONE");
+  const canSelectDeveloperAccount = authContext.isAdminUser() || authContext.isArmUser();
   return Yup.object().shape({
-    accountId: authContext.isAdminUser()
+    accountId: canSelectDeveloperAccount
       ? Yup.string().required("Project developer account is required")
       : Yup.string().notRequired(),
     projectClassificationId: Yup.string()
@@ -14,30 +20,13 @@ export const getValidationSchemaStep1 = (allReferenceTypes: ReferenceTypes, auth
       .notOneOf([noneClassification?.id.toString()], "Project classification is required"),
     name: Yup.string().required("Project title is required").max(255, "Project title must be 255 characters or fewer"),
     masterProjectId: Yup.string().when("projectClassificationId", {
-      is: (val: string) => {
-        const classificationIds = allReferenceTypes.ProjectClassification.filter((classification) =>
-          ["REGULAR_VPA", "REGULAR_CASE_VPA", "REAL_CASE_VPA", "REAL_CASE_VPA_LEGACY", "VPA_CPA"].includes(
-            classification.code,
-          ),
-        ).map((x) => x.id);
-        return classificationIds.includes(Number(val));
-      },
+      is: (val: string) => projectClassificationRequiresPoa(val, allReferenceTypes.ProjectClassification),
       then: (schema) => schema.required("Programme of Activities is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
     parentProjectId: Yup.string().when("projectClassificationId", {
-      is: (val: string) => {
-        const classificationId = allReferenceTypes.ProjectClassification.find((classification) =>
-          ["REGULAR_VPA", "REGULAR_CASE_VPA"].includes(classification.code),
-        )?.id;
-        return Number(val) === classificationId;
-      },
-      then: (schema) =>
-        schema.when("masterProjectId", {
-          is: (val: string) => val !== null,
-          then: (sch) => sch.required("Real Case VPA is required"),
-          otherwise: (sch) => sch.notRequired(),
-        }),
+      is: (val: string) => projectClassificationRequiresRealCaseVpa(val, allReferenceTypes.ProjectClassification),
+      then: (schema) => schema.required("Real Case VPA is required"),
       otherwise: (schema) => schema.notRequired(),
     }),
   });

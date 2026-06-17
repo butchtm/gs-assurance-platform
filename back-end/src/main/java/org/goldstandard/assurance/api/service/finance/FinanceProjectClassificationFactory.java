@@ -2,12 +2,13 @@ package org.goldstandard.assurance.api.service.finance;
 
 import lombok.extern.slf4j.Slf4j;
 import org.goldstandard.assurance.api.entity.lookup.ProjectClassification;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 
 @Slf4j
 public class FinanceProjectClassificationFactory {
 
   public String toFinanceProjectClassificationCode(ProjectClassification classification) {
-    var code = classification.getCode();
+    var code = ProjectClassificationSemantics.toDisplayCode(classification.getCode());
     return switch (code) {
       case "REGULAR_CASE_VPA", "REGULAR_VPA" -> "REGULAR_VPA";
       case "REAL_CASE_VPA_LEGACY", "REAL_CASE_VPA" -> "REAL_CASE_VPA";

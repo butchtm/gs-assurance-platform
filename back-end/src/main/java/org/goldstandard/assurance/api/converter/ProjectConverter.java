@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.goldstandard.assurance.api.dto.BundleDTO;
+import org.goldstandard.assurance.api.dto.CandidateParentProjectDetailsDTO;
 import org.goldstandard.assurance.api.dto.MethodologyHistoryDTO;
 import org.goldstandard.assurance.api.dto.MethodologyUpdateDTO;
 import org.goldstandard.assurance.api.dto.PiiMetadataDTO;
@@ -15,6 +16,7 @@ import org.goldstandard.assurance.api.dto.ProjectTreeNodeDTO;
 import org.goldstandard.assurance.api.entity.*;
 import org.goldstandard.assurance.api.entity.creditingperiod.DbMethodologyUpdate;
 import org.goldstandard.assurance.api.entity.creditingperiod.ProjectMethodologyUpdate;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.projection.ProjectMinimal;
 import org.goldstandard.assurance.api.projection.RequestProject;
 import org.goldstandard.assurance.api.service.PermissionsService;
@@ -45,6 +47,25 @@ public class ProjectConverter {
               projectRiskSummaryService.getCurrentRiskSummary(project.getId())));
     }
     return builder.build();
+  }
+
+  public CandidateParentProjectDetailsDTO toCandidateParentDetailsDto(Project project) {
+    return CandidateParentProjectDetailsDTO.builder()
+        .id(project.getId())
+        .gsid(project.getGsid())
+        .name(project.getName())
+        .projectClassificationId(project.getProjectClassification().getId())
+        .projectClassification(project.getProjectClassification())
+        .projectStatus(project.getProjectStatus())
+        .projectStartDate(project.getProjectStartDate())
+        .carbonStream(project.getCarbonStream())
+        .projectSize(project.getProjectSize())
+        .projectTypes(project.getProjectTypes())
+        .projectLocations(project.getProjectLocations())
+        .projectAssets(project.getProjectAssets())
+        .sustainableDevelopmentGoals(project.getSustainableDevelopmentGoals())
+        .creditingPeriods(creditingPeriodConverter.toDtos(project.getCreditingPeriods()))
+        .build();
   }
 
   public ProjectDTO toMinimalProjectDto(Project project) {
@@ -87,7 +108,9 @@ public class ProjectConverter {
   public ProjectDTO toDetailedProjectDto(Project project) {
     var builder =
         toOverviewProjectDtoBuilder(project)
-            .projectClassification(project.getProjectClassification())
+            .projectClassification(
+                ProjectClassificationSemantics.toDisplayClassification(
+                    project.getProjectClassification()))
             .projectStartDate(project.getProjectStartDate())
             .registrationType(project.getRegistrationType())
             .hasProjectAssets(project.getHasProjectAssets())

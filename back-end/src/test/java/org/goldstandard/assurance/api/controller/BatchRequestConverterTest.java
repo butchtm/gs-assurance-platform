@@ -96,6 +96,38 @@ class BatchRequestConverterTest {
   }
 
   @Test
+  void shouldConvertBatchProjectCrossLinkClassificationsToCanonicalDisplayLabels() {
+    var parentRequest =
+        buildRequest(
+            22,
+            buildProject(
+                2,
+                ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID,
+                ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_CODE,
+                "Real Case VPA - Cross Linking"));
+    var childRequest =
+        buildRequest(
+            11,
+            buildProject(
+                1,
+                ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_ID,
+                ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_CODE,
+                "Regular VPA - Cross Linking"));
+    var batchRequests =
+        BatchRequests.builder()
+            .batch(buildBatch(parentRequest))
+            .requests(List.of(toBatchRequest(childRequest), toBatchRequest(parentRequest)))
+            .build();
+
+    var batchProjects = converter.toBatchProjects(batchRequests);
+
+    assertThat(batchProjects.getParent().getClassification())
+        .isEqualTo(ProjectClassification.REAL_CASE_VPA_DESCRIPTION);
+    assertThat(batchProjects.getChildren().getFirst().getClassification())
+        .isEqualTo(ProjectClassification.REGULAR_VPA_DESCRIPTION);
+  }
+
+  @Test
   void shouldIncludeRiskSummaryForAdminUsers() {
     BatchRequests batchRequests = buildBatchRequests();
     var mockRiskSummary = buildRiskSummary();
@@ -158,9 +190,23 @@ class BatchRequestConverterTest {
     return project;
   }
 
+  private static Project buildProject(int id, int classificationId, String code, String label) {
+    var project = buildProject(id);
+    project.setProjectClassification(buildClassification(classificationId, code, label));
+    return project;
+  }
+
   private static ProjectClassification buildClassification(int id) {
     var classification = new ProjectClassification();
     classification.setDescription(String.format("Class %d", id));
+    return classification;
+  }
+
+  private static ProjectClassification buildClassification(int id, String code, String label) {
+    var classification = new ProjectClassification();
+    classification.setId(id);
+    classification.setCode(code);
+    classification.setDescription(label);
     return classification;
   }
 

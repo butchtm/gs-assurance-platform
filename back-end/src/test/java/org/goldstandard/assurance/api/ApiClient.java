@@ -35,6 +35,7 @@ import org.goldstandard.assurance.api.dto.AssignmentSummaryResponseDTO;
 import org.goldstandard.assurance.api.dto.BatchProjectsDTO;
 import org.goldstandard.assurance.api.dto.BatchRequestCreateDTO;
 import org.goldstandard.assurance.api.dto.BundleProjectDTO;
+import org.goldstandard.assurance.api.dto.CandidateParentProjectDetailsDTO;
 import org.goldstandard.assurance.api.dto.CommentCreateDTO;
 import org.goldstandard.assurance.api.dto.CommentDTO;
 import org.goldstandard.assurance.api.dto.CommonDashboardRequestDTO;
@@ -48,6 +49,7 @@ import org.goldstandard.assurance.api.dto.FormDefinitionPublishDTO;
 import org.goldstandard.assurance.api.dto.FormDefinitionUpdateDTO;
 import org.goldstandard.assurance.api.dto.GetBatchTypesDTO;
 import org.goldstandard.assurance.api.dto.GetCandidatePOAsRequest;
+import org.goldstandard.assurance.api.dto.GetCandidateParentProjectDetailsRequest;
 import org.goldstandard.assurance.api.dto.GetCandidateRealCaseVPAsRequest;
 import org.goldstandard.assurance.api.dto.GetProjectDeveloperRequestsDTO;
 import org.goldstandard.assurance.api.dto.InvoiceCreateDTO;
@@ -612,6 +614,23 @@ public class ApiClient {
   public ResponseEntity<List<Project>> getCandidatePOAs(
       String role, GetCandidatePOAsRequest request) {
     var entity = getHttpEntityWithTokenAndBodyForRole(request, role);
+    return getCandidatePOAs(entity);
+  }
+
+  public ResponseEntity<List<Project>> getCandidatePOAs(
+      String role, UUID userId, GetCandidatePOAsRequest request) {
+    var entity = getHttpEntityWithTokenAndBodyForRoleWithId(request, role, userId);
+    return getCandidatePOAs(entity);
+  }
+
+  public ResponseEntity<String> getCandidatePOAsJson(
+      String role, UUID userId, GetCandidatePOAsRequest request) {
+    var entity = getHttpEntityWithTokenAndBodyForRoleWithId(request, role, userId);
+    var url = String.format("%s/projects/candidate-poas", baseUrl);
+    return restTemplate.exchange(url, POST, entity, String.class);
+  }
+
+  private ResponseEntity<List<Project>> getCandidatePOAs(HttpEntity<?> entity) {
     var url = String.format("%s/projects/candidate-poas", baseUrl);
     return restTemplate.exchange(url, POST, entity, new ParameterizedTypeReference<>() {});
   }
@@ -619,8 +638,32 @@ public class ApiClient {
   public ResponseEntity<List<Project>> getCandidateRealCaseVPAs(
       String role, GetCandidateRealCaseVPAsRequest request) {
     var entity = getHttpEntityWithTokenAndBodyForRole(request, role);
+    return getCandidateRealCaseVPAs(entity);
+  }
+
+  public ResponseEntity<List<Project>> getCandidateRealCaseVPAs(
+      String role, UUID userId, GetCandidateRealCaseVPAsRequest request) {
+    var entity = getHttpEntityWithTokenAndBodyForRoleWithId(request, role, userId);
+    return getCandidateRealCaseVPAs(entity);
+  }
+
+  private ResponseEntity<List<Project>> getCandidateRealCaseVPAs(HttpEntity<?> entity) {
     var url = String.format("%s/projects/candidate-real-case-vpas", baseUrl);
     return restTemplate.exchange(url, POST, entity, new ParameterizedTypeReference<>() {});
+  }
+
+  public ResponseEntity<CandidateParentProjectDetailsDTO> getCandidateParentDetails(
+      String role, UUID userId, GetCandidateParentProjectDetailsRequest request) {
+    var entity = getHttpEntityWithTokenAndBodyForRoleWithId(request, role, userId);
+    var url = String.format("%s/projects/candidate-parent-details", baseUrl);
+    return restTemplate.exchange(url, POST, entity, CandidateParentProjectDetailsDTO.class);
+  }
+
+  public ResponseEntity<String> getCandidateParentDetailsJson(
+      String role, UUID userId, GetCandidateParentProjectDetailsRequest request) {
+    var entity = getHttpEntityWithTokenAndBodyForRoleWithId(request, role, userId);
+    var url = String.format("%s/projects/candidate-parent-details", baseUrl);
+    return restTemplate.exchange(url, POST, entity, String.class);
   }
 
   public ResponseEntity<PagedResource<RequestActivityDTO>> getRequestActivityHistory(
@@ -770,6 +813,16 @@ public class ApiClient {
 
   public ResponseEntity<PagedResource<ProjectTreeNodeDTO>> getProjectTrees(String role) {
     var entity = getHttpEntityWithTokenForRole(role);
+    return getProjectTrees(entity);
+  }
+
+  public ResponseEntity<PagedResource<ProjectTreeNodeDTO>> getProjectTrees(
+      String role, UUID userId) {
+    var entity = getHttpEntityWithTokenForRoleWithId(role, userId);
+    return getProjectTrees(entity);
+  }
+
+  private ResponseEntity<PagedResource<ProjectTreeNodeDTO>> getProjectTrees(HttpEntity<?> entity) {
     var url = String.format("%s/projects/trees/pages", baseUrl);
     var response = restTemplate.exchange(url, GET, entity, String.class);
     return toPagedResourceResponse(response, ProjectTreeNodeDTO.class);
@@ -777,6 +830,17 @@ public class ApiClient {
 
   public ResponseEntity<ProjectTreeNodeDTO> getProjectTree(String role, Integer projectId) {
     var entity = getHttpEntityWithTokenForRole(role);
+    return getProjectTree(entity, projectId);
+  }
+
+  public ResponseEntity<ProjectTreeNodeDTO> getProjectTree(
+      String role, UUID userId, Integer projectId) {
+    var entity = getHttpEntityWithTokenForRoleWithId(role, userId);
+    return getProjectTree(entity, projectId);
+  }
+
+  private ResponseEntity<ProjectTreeNodeDTO> getProjectTree(
+      HttpEntity<?> entity, Integer projectId) {
     var url = String.format("%s/projects/%d/trees", baseUrl, projectId);
     return restTemplate.exchange(url, GET, entity, ProjectTreeNodeDTO.class);
   }

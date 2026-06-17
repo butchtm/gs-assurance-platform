@@ -263,6 +263,7 @@ export interface TransitionDetail {
 }
 
 export interface UpdateProjectPayload {
+  accountId: number | null;
   projectClassificationId: number | null;
   locationIds: number[];
   description: string;

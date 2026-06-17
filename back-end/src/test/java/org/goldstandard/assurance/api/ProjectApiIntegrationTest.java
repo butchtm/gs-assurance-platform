@@ -2,6 +2,8 @@ package org.goldstandard.assurance.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.goldstandard.assurance.api.populator.CrossLinkingProjectFixture.ALPHA_PD_USER_ID;
+import static org.goldstandard.assurance.api.populator.CrossLinkingProjectFixture.BETA_PD_USER_ID;
 import static org.goldstandard.assurance.api.populator.ProjectPopulator.FIXED_DATE;
 import static org.goldstandard.assurance.api.populator.ProjectPopulator.NUMBER_OF_PROJECTS;
 import static org.goldstandard.assurance.api.populator.ProjectPopulator.PROGRAMME_OF_ACTIVITIES_ID;
@@ -37,6 +39,7 @@ import org.goldstandard.assurance.api.dto.BundleDTO;
 import org.goldstandard.assurance.api.dto.CreditingPeriodDTO;
 import org.goldstandard.assurance.api.dto.CreditingPeriodMethodologyDTO;
 import org.goldstandard.assurance.api.dto.GetCandidatePOAsRequest;
+import org.goldstandard.assurance.api.dto.GetCandidateParentProjectDetailsRequest;
 import org.goldstandard.assurance.api.dto.GetCandidateRealCaseVPAsRequest;
 import org.goldstandard.assurance.api.dto.MethodologyHistoryDTO;
 import org.goldstandard.assurance.api.dto.MethodologyUpdateDTO;
@@ -67,6 +70,7 @@ import org.goldstandard.assurance.api.enumeration.ProjectUpdateVerdict;
 import org.goldstandard.assurance.api.fixtures.CreateBatchRequestDTOMother;
 import org.goldstandard.assurance.api.helper.BatchRequestCleanup;
 import org.goldstandard.assurance.api.helper.RiskSummaryCleanup;
+import org.goldstandard.assurance.api.populator.CrossLinkingProjectFixture;
 import org.goldstandard.assurance.api.populator.ProjectPopulator;
 import org.goldstandard.assurance.api.repository.AuditRepository;
 import org.goldstandard.assurance.api.repository.ProjectCreditingPeriodRepository;
@@ -92,8 +96,6 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
   private static final String ENDPOINT_TO_TEST = "/projects";
 
   private static final Integer ACCOUNT_ID = 1;
-  private static final Integer UPDATE_ACCOUNT_ID = 9;
-  private static final Integer UPDATE_CLASSIFICATION_ID = 0;
 
   private static final Project INVALID_PROJECT = buildInvalidProject();
   private static final Project TEST_PROJECT = TEST_PROJECTS.get(2);
@@ -123,6 +125,38 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
 
   private static final List<Integer> UPDATE_PROJECT_LOCATION_IDS = List.of();
 
+  private static final Set<String> CANDIDATE_PARENT_DETAIL_ALLOWED_FIELDS =
+      Set.of(
+          "id",
+          "gsid",
+          "name",
+          "projectClassificationId",
+          "projectClassification",
+          "projectStatus",
+          "projectStartDate",
+          "carbonStream",
+          "projectSize",
+          "projectTypes",
+          "projectLocations",
+          "projectAssets",
+          "sustainableDevelopmentGoals",
+          "creditingPeriods");
+
+  private static final Set<String> CANDIDATE_PARENT_DETAIL_FORBIDDEN_FIELDS =
+      Set.of(
+          "notes",
+          "piiMetadata",
+          "currentRiskSummary",
+          "registryUrl",
+          "currentRequestId",
+          "feeSchedule",
+          "estimatedAnnualUnits",
+          "bundle",
+          "account",
+          "accountId",
+          "accountName",
+          "accountEmailAddress");
+
   @Autowired ProjectRepository projectRepository;
 
   @Autowired ProjectCreditingPeriodRepository projectCreditingPeriodRepository;
@@ -132,6 +166,8 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
   @Autowired UserRepository userRepository;
 
   @Autowired ProjectPopulator projectPopulator;
+
+  @Autowired CrossLinkingProjectFixture crossLinkingProjectFixture;
 
   @Autowired ApiClient client;
 
@@ -199,13 +235,13 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
     return ProjectUpdateDTO.builder()
         .description(project.getDescription() + UPDATE_SUFFIX)
         .name(project.getName() + UPDATE_SUFFIX)
-        .accountId(UPDATE_ACCOUNT_ID)
+        .accountId(project.getAccountId())
         .carbonStreamId(UPDATE_CARBON_STREAM_ID)
         .typeIds(UPDATE_PROJECT_TYPE_IDS)
         .locationIds(UPDATE_PROJECT_LOCATION_IDS)
         .notes(UPDATE_SUFFIX)
-        .masterProjectId(1)
-        .parentProjectId(2)
+        .masterProjectId(toId(project.getMasterProject()))
+        .parentProjectId(toId(project.getParentProject()))
         .startDate(startDate)
         .projectStatusId(PROJECT_STATUS_ID)
         .methodologyIds(PROJECT_METHODOLOGIES.stream().toList())
@@ -214,9 +250,13 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
                 createCreditingPeriodDTO(1, startDate.plusDays(1)),
                 createCreditingPeriodDTO(2, startDate.plusDays(2))))
         .transitionProject(createTransitionProjectDetails())
-        .projectClassificationId(UPDATE_CLASSIFICATION_ID)
+        .projectClassificationId(project.getProjectClassification().getId())
         .feeScheduleId(1)
         .build();
+  }
+
+  private static Integer toId(Project project) {
+    return project == null ? null : project.getId();
   }
 
   private static Project buildInvalidProject() {
@@ -239,7 +279,13 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
         Arguments.of(ADMIN_ROLE, 2, List.of()),
         Arguments.of(ADMIN_ROLE, 3, List.of(1, 4)),
         Arguments.of(ADMIN_ROLE, 4, List.of(1)),
-        Arguments.of(ADMIN_ROLE, 5, List.of()));
+        Arguments.of(ADMIN_ROLE, 5, List.of()),
+        Arguments.of(ARM_TEAM_ROLE, 0, List.of()),
+        Arguments.of(ARM_TEAM_ROLE, 1, List.of()),
+        Arguments.of(ARM_TEAM_ROLE, 2, List.of()),
+        Arguments.of(ARM_TEAM_ROLE, 3, List.of(1, 4)),
+        Arguments.of(ARM_TEAM_ROLE, 4, List.of(1)),
+        Arguments.of(ARM_TEAM_ROLE, 5, List.of()));
   }
 
   private static Stream<Arguments>
@@ -663,8 +709,8 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
           .containsExactlyElementsOf(update.getLocationIds());
       assertThat(updatedProject.getNotes()).isEqualTo(update.getNotes());
       assertThat(updatedProject.getProjectStartDate()).isEqualTo(update.getStartDate());
-      assertThat(updatedProject.getMasterProject().getId()).isEqualTo(update.getMasterProjectId());
-      assertThat(updatedProject.getParentProject().getId()).isEqualTo(update.getParentProjectId());
+      assertThat(toId(updatedProject.getMasterProject())).isEqualTo(update.getMasterProjectId());
+      assertThat(toId(updatedProject.getParentProject())).isEqualTo(update.getParentProjectId());
       assertThat(
               updatedProject.getCreditingPeriods().stream()
                   .map(ProjectCreditingPeriod::getPeriodId)
@@ -869,7 +915,10 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
     var request =
         GetCandidatePOAsRequest.builder().accountId(1).classificationId(classificationId).build();
 
-    var response = client.getCandidatePOAs(userRole, request);
+    var response =
+        PROJECT_DEVELOPER_ROLE.equals(userRole)
+            ? client.getCandidatePOAs(userRole, ASSIGNED_ACCOUNT1_USER_ID, request)
+            : client.getCandidatePOAs(userRole, request);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody())
@@ -883,16 +932,235 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
       String userRole, int masterProjectId, Collection<Integer> expectedProjectIds) {
     var request =
         GetCandidateRealCaseVPAsRequest.builder()
-            .accountId(3)
+            .accountId(1)
             .masterProjectId(masterProjectId)
+            .classificationId(ProjectClassification.REGULAR_CASE_VPA_ID)
             .build();
 
-    var response = client.getCandidateRealCaseVPAs(userRole, request);
+    var response =
+        PROJECT_DEVELOPER_ROLE.equals(userRole)
+            ? client.getCandidateRealCaseVPAs(userRole, ASSIGNED_ACCOUNT1_USER_ID, request)
+            : client.getCandidateRealCaseVPAs(userRole, request);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody())
         .map(Project::getId)
         .containsExactlyElementsOf(expectedProjectIds);
+  }
+
+  @Test
+  void shouldApplyCrossLinkCandidatePoliciesThroughApi() {
+    var projects = crossLinkingProjectFixture.populate();
+    try {
+      assertCrossLinkCandidatePOAsIncludeBetaPOAs(projects);
+      assertCrossLinkCandidateRealCaseVPAsIncludeBetaRealCase(projects);
+      assertCrossLinkCandidateParentDetailAllowsBetaNewPoa(projects);
+      assertInvalidCrossLinkCandidateParentDetailIsRejected(projects);
+      assertProjectDeveloperCannotSpoofCandidateAccount(projects);
+      assertProjectDeveloperCannotSpoofCandidateParentDetailAccount(projects);
+      assertNativeCreateRejectsCrossAccountParents(projects);
+      assertBetaProjectDeveloperTreeDoesNotExposeAlphaCrossLinkChild(projects);
+    } finally {
+      cleanupCrossLinkingFixture(projects);
+    }
+  }
+
+  private void assertCrossLinkCandidatePOAsIncludeBetaPOAs(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    for (int classificationId :
+        List.of(
+            ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID,
+            ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_ID)) {
+      var request =
+          GetCandidatePOAsRequest.builder()
+              .accountId(projects.alphaAccount().getId())
+              .classificationId(classificationId)
+              .build();
+
+      var response = client.getCandidatePOAs(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+
+      assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(response.getBody())
+          .map(Project::getId)
+          .contains(
+              projects.betaNewPoaWithoutRealCase().getId(),
+              projects.betaListedPoa().getId(),
+              projects.betaDesignCertifiedPoa().getId());
+    }
+  }
+
+  private void assertCrossLinkCandidateRealCaseVPAsIncludeBetaRealCase(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request =
+        GetCandidateRealCaseVPAsRequest.builder()
+            .accountId(projects.alphaAccount().getId())
+            .masterProjectId(projects.betaListedPoa().getId())
+            .classificationId(ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_ID)
+            .build();
+
+    var response =
+        client.getCandidateRealCaseVPAs(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody())
+        .map(Project::getId)
+        .contains(projects.betaRealCaseAcm0001().getId());
+  }
+
+  private void assertCrossLinkCandidateParentDetailAllowsBetaNewPoa(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request =
+        GetCandidateParentProjectDetailsRequest.builder()
+            .accountId(projects.alphaAccount().getId())
+            .classificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .candidateProjectId(projects.betaNewPoaWithoutRealCase().getId())
+            .build();
+
+    var detailResponse =
+        client.getCandidateParentDetails(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+    var rawDetailResponse =
+        client.getCandidateParentDetailsJson(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+    var normalGetResponse =
+        client.getProject(
+            projects.betaNewPoaWithoutRealCase().getId(), PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID);
+
+    assertThat(detailResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(detailResponse.getBody()).isNotNull();
+    assertThat(detailResponse.getBody().getId())
+        .isEqualTo(projects.betaNewPoaWithoutRealCase().getId());
+    assertThat(detailResponse.getBody().getProjectAssets()).isNotEmpty();
+    assertThat(detailResponse.getBody().getCreditingPeriods()).isEmpty();
+    assertThat(rawDetailResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertCandidateParentDetailJsonContract(rawDetailResponse.getBody());
+    assertThat(normalGetResponse.getStatusCode()).isEqualTo(UNAUTHORIZED);
+  }
+
+  private void assertInvalidCrossLinkCandidateParentDetailIsRejected(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request =
+        GetCandidateParentProjectDetailsRequest.builder()
+            .accountId(projects.alphaAccount().getId())
+            .classificationId(ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_ID)
+            .candidateProjectId(projects.betaRealCaseAcm0001().getId())
+            .masterProjectId(projects.betaDesignCertifiedPoa().getId())
+            .build();
+
+    var response =
+        client.getCandidateParentDetails(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  private void assertProjectDeveloperCannotSpoofCandidateAccount(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request =
+        GetCandidatePOAsRequest.builder()
+            .accountId(projects.betaAccount().getId())
+            .classificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .build();
+
+    var response = client.getCandidatePOAsJson(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+
+    assertThat(response.getStatusCode()).isEqualTo(UNAUTHORIZED);
+  }
+
+  private void assertProjectDeveloperCannotSpoofCandidateParentDetailAccount(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request =
+        GetCandidateParentProjectDetailsRequest.builder()
+            .accountId(projects.betaAccount().getId())
+            .classificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .candidateProjectId(projects.betaNewPoaWithoutRealCase().getId())
+            .build();
+
+    var response =
+        client.getCandidateParentDetails(PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID, request);
+
+    assertThat(response.getStatusCode()).isEqualTo(UNAUTHORIZED);
+  }
+
+  private void assertNativeCreateRejectsCrossAccountParents(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request = createTestProject(FIXED_DATE.plusDays(1), "Rejected native cross-account VPA");
+    request.setAccountId(projects.alphaAccount().getId());
+    request.setProjectClassificationId(ProjectClassification.REAL_CASE_VPA_ID);
+    request.setMasterProjectId(projects.betaListedPoa().getId());
+    request.setParentProjectId(projects.betaListedPoa().getId());
+
+    var response = client.createProject(request, PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+  }
+
+  private void assertBetaProjectDeveloperTreeDoesNotExposeAlphaCrossLinkChild(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var crossLinkChild = createAlphaCrossLinkChild(projects);
+    try {
+      var singleTreeResponse =
+          client.getProjectTree(
+              PROJECT_DEVELOPER_ROLE, BETA_PD_USER_ID, projects.betaListedPoa().getId());
+      var pageTreeResponse = client.getProjectTrees(PROJECT_DEVELOPER_ROLE, BETA_PD_USER_ID);
+
+      assertThat(singleTreeResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(flattenTree(singleTreeResponse.getBody()))
+          .map(ProjectTreeNodeDTO::getId)
+          .doesNotContain(crossLinkChild.getId())
+          .contains(projects.betaListedPoa().getId(), projects.betaRealCaseAcm0001().getId());
+
+      assertThat(pageTreeResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+      assertThat(pageTreeResponse.getBody()).isNotNull();
+      assertThat(
+              pageTreeResponse.getBody().getContent().stream()
+                  .flatMap(root -> flattenTree(root).stream())
+                  .map(ProjectTreeNodeDTO::getId)
+                  .toList())
+          .doesNotContain(crossLinkChild.getId())
+          .contains(projects.betaListedPoa().getId(), projects.betaRealCaseAcm0001().getId());
+    } finally {
+      projectPopulator.deleteProject(crossLinkChild.getId());
+    }
+  }
+
+  private Project createAlphaCrossLinkChild(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    var request = createTestProject(FIXED_DATE.plusDays(2), "Alpha cross-link tree child");
+    request.setAccountId(projects.alphaAccount().getId());
+    request.setProjectClassificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID);
+    request.setMasterProjectId(projects.betaListedPoa().getId());
+    request.setParentProjectId(projects.betaListedPoa().getId());
+
+    var response = client.createProject(request, PROJECT_DEVELOPER_ROLE, ALPHA_PD_USER_ID);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isNotNull();
+    return projectRepository.findById(response.getBody()).orElseThrow();
+  }
+
+  private static List<ProjectTreeNodeDTO> flattenTree(ProjectTreeNodeDTO root) {
+    if (root == null) {
+      return List.of();
+    }
+    return Stream.concat(
+            Stream.of(root),
+            root.getChildren().stream().flatMap(child -> flattenTree(child).stream()))
+        .toList();
+  }
+
+  private void assertCandidateParentDetailJsonContract(String responseBody) {
+    var fields = jsonConverter.toMap(responseBody).keySet();
+
+    assertThat(fields).containsExactlyInAnyOrderElementsOf(CANDIDATE_PARENT_DETAIL_ALLOWED_FIELDS);
+    assertThat(fields).doesNotContainAnyElementsOf(CANDIDATE_PARENT_DETAIL_FORBIDDEN_FIELDS);
+  }
+
+  private void cleanupCrossLinkingFixture(
+      CrossLinkingProjectFixture.CrossLinkingProjects projects) {
+    projectPopulator.deleteProjects(
+        projects.betaRealCaseAcm0001(),
+        projects.betaRealCaseAcm0002(),
+        projects.betaNewPoaWithoutRealCase(),
+        projects.betaListedPoa(),
+        projects.betaDesignCertifiedPoa());
   }
 
   @Test
@@ -947,9 +1215,11 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
     var firstPeriodDto = createCreditingPeriodDTO(firstPeriod.getPeriodId(), startDate.plusDays(1));
     return ProjectUpdateDTO.builder()
         .name("test")
-        .accountId(UPDATE_ACCOUNT_ID)
+        .accountId(project.getAccountId())
         .creditingPeriods(List.of(firstPeriodDto))
-        .projectClassificationId(PROJECT_CLASSIFICATION.getId())
+        .projectClassificationId(project.getProjectClassification().getId())
+        .masterProjectId(toId(project.getMasterProject()))
+        .parentProjectId(toId(project.getParentProject()))
         .typeIds(ORIGINAL_PROJECT_TYPES.stream().map(ProjectType::getId).toList())
         .methodologyIds(PROJECT_METHODOLOGIES.stream().toList())
         .projectStatusId(PROJECT_STATUS_ID)

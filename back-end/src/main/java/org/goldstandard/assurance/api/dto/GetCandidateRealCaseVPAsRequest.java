@@ -13,4 +13,5 @@ public class GetCandidateRealCaseVPAsRequest {
 
   private final Integer accountId;
   private final Integer masterProjectId;
+  private final Integer classificationId;
 }

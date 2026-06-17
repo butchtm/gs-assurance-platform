@@ -24,6 +24,9 @@ class RegistryProjectClassificationConverterTest {
   private static Stream<Arguments>
       assuranceClassificationCodeAndExpectedRegistryClassificationCode() {
     return Stream.of(
-        Arguments.of("NONE", "STANDALONE"), Arguments.of("STANDALONE_PROJECT", "STANDALONE"));
+        Arguments.of("NONE", "STANDALONE"),
+        Arguments.of("STANDALONE_PROJECT", "STANDALONE"),
+        Arguments.of("REAL_CASE_VPA_CROSS_LINKAGE", "VPA"),
+        Arguments.of("REGULAR_VPA_CROSS_LINKAGE", "VPA"));
   }
 }

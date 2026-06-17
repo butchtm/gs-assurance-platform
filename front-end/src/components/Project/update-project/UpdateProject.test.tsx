@@ -40,6 +40,7 @@ jest.mock("../Project", () => ({
   updateProject: jest.fn().mockResolvedValue(true),
   getInitialEmptyValues: jest.fn().mockReturnValue(mockCreateProjectFormValues),
   getCandidatePOAs: jest.fn().mockResolvedValue([]),
+  getCandidateParentDetails: jest.fn().mockResolvedValue(mockCreateProjectFormValues),
   getCandidateRealCaseVPAs: jest.fn().mockResolvedValue([]),
 }));
 

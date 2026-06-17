@@ -3,11 +3,13 @@ package org.goldstandard.assurance.api.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.goldstandard.assurance.api.dto.GetCandidatePOAsRequest;
+import org.goldstandard.assurance.api.dto.GetCandidateParentProjectDetailsRequest;
 import org.goldstandard.assurance.api.dto.GetCandidateRealCaseVPAsRequest;
 import org.goldstandard.assurance.api.dto.ProjectCreateDTO;
 import org.goldstandard.assurance.api.dto.ProjectStatusUpdateDTO;
@@ -33,6 +35,7 @@ import org.goldstandard.assurance.api.entity.lookup.SustainableDevelopmentGoal;
 import org.goldstandard.assurance.api.entity.lookup.TransitionApprovalProcedure;
 import org.goldstandard.assurance.api.entity.lookup.TransitionFromOtherScheme;
 import org.goldstandard.assurance.api.entity.lookup.TransitionPathway;
+import org.goldstandard.assurance.api.exception.BadRequestException;
 import org.goldstandard.assurance.api.projection.ProjectMinimal;
 import org.goldstandard.assurance.api.service.external.ExternalUpdateExecutor;
 import org.goldstandard.assurance.api.service.permission.AuthenticatedUserSupplier;
@@ -57,6 +60,8 @@ public class ProjectService {
   private final MethodologyHistoryService methodologyHistoryService;
   private final CreditingPeriodFactory creditingPeriodFactory;
   private final ProjectUpdateApplier updateApplier;
+  private final CandidateParentEligibilityPolicy parentEligibilityPolicy;
+  private final PermissionsService permissionsService;
 
   public Project getProjectById(Integer projectId) {
     var project = finder.forceGetProjectById(projectId);
@@ -86,9 +91,10 @@ public class ProjectService {
   }
 
   public Project createProject(ProjectCreateDTO createRequest) {
-    accessPolicy.validateCanCreateProjectForAccount(createRequest.getAccountId());
+    var effectiveAccountId = accessPolicy.resolveProjectAccountId(createRequest.getAccountId());
+    validateCreateParentEligibility(createRequest, effectiveAccountId);
     var project = new Project();
-    initialiseProject(project, createRequest);
+    initialiseProject(project, createRequest, effectiveAccountId);
     var creditingPeriods =
         creditingPeriodFactory.toCreditingPeriods(project, createRequest.getCreditingPeriods());
     var savedProject =
@@ -100,6 +106,7 @@ public class ProjectService {
 
   public Project updateProject(Integer projectId, ProjectUpdateDTO projectUpdate) {
     var originalProject = findProjectIfAccessible(projectId);
+    validateUpdateKeepsAccountAndHierarchy(originalProject, projectUpdate);
     var updatedProject = updateApplier.applyUpdates(originalProject, projectUpdate);
     var creditingPeriods =
         creditingPeriodFactory.toCreditingPeriods(
@@ -126,7 +133,12 @@ public class ProjectService {
 
   public ProjectTree getProjectTree(Integer projectId) {
     var project = finder.forceGetProjectById(projectId);
-    return projectTreeFactory.buildProjectTree(project.getId());
+    accessPolicy.validateUserCanViewProject(project);
+    if (permissionsService.canAccessAllProjects()) {
+      return projectTreeFactory.buildProjectTree(project.getId());
+    }
+    return projectTreeFactory.buildAuthorizedProjectTree(
+        project.getId(), getAuthorizedProjectTreeIds(projectId));
   }
 
   public Collection<ProjectMinimal> getCandidatePOAs(GetCandidatePOAsRequest request) {
@@ -142,6 +154,10 @@ public class ProjectService {
     return candidateParentProjectFinder.getCandidateRealCaseVPAs(request);
   }
 
+  public Project getCandidateParentDetails(GetCandidateParentProjectDetailsRequest request) {
+    return candidateParentProjectFinder.getCandidateParentDetails(request);
+  }
+
   public Page<ProjectMethodologyUpdate> getMethodologyHistory(
       Integer projectId, Integer periodId, Pageable pageable) {
     return methodologyHistoryService.getHistory(projectId, periodId, pageable);
@@ -153,7 +169,69 @@ public class ProjectService {
     return project;
   }
 
-  private void initialiseProject(Project project, ProjectCreateDTO createRequest) {
+  private Collection<Integer> getAuthorizedProjectTreeIds(Integer requestedProjectId) {
+    return permissionsService
+        .getAccountIdForUser()
+        .map(finder::getProjectIdsByAccountId)
+        .orElse(Set.of(requestedProjectId));
+  }
+
+  private void validateCreateParentEligibility(
+      ProjectCreateDTO createRequest, Integer effectiveAccountId) {
+    var targetClassification =
+        new ProjectClassification(createRequest.getProjectClassificationId());
+    if (Objects.isNull(targetClassification.getId())
+        || (!targetClassification.isRealCaseVpa() && !targetClassification.isRegularCaseVpa())) {
+      return;
+    }
+
+    var masterProject = findProjectIfPresent(createRequest.getMasterProjectId());
+    var parentProject = findProjectIfPresent(createRequest.getParentProjectId());
+    parentEligibilityPolicy.validateParentEligibility(
+        effectiveAccountId, targetClassification, masterProject, parentProject);
+  }
+
+  private Project findProjectIfPresent(Integer projectId) {
+    if (Objects.isNull(projectId)) {
+      return null;
+    }
+    return finder.forceGetProjectById(projectId);
+  }
+
+  private void validateUpdateKeepsAccountAndHierarchy(
+      Project originalProject, ProjectUpdateDTO projectUpdate) {
+    assertUnchanged("accountId", originalProject.getAccountId(), projectUpdate.getAccountId());
+    assertUnchanged(
+        "projectClassificationId",
+        getReferenceId(originalProject.getProjectClassification()),
+        projectUpdate.getProjectClassificationId());
+    assertUnchanged(
+        "masterProjectId",
+        getReferenceId(originalProject.getMasterProject()),
+        projectUpdate.getMasterProjectId());
+    assertUnchanged(
+        "parentProjectId",
+        getReferenceId(originalProject.getParentProject()),
+        projectUpdate.getParentProjectId());
+  }
+
+  private void assertUnchanged(String fieldName, Integer existingId, Integer requestedId) {
+    if (Objects.equals(existingId, requestedId)) {
+      return;
+    }
+    throw new BadRequestException("Project %s cannot be changed by project update", fieldName);
+  }
+
+  private static Integer getReferenceId(ReferenceDataType reference) {
+    return Objects.isNull(reference) ? null : reference.getId();
+  }
+
+  private static Integer getReferenceId(Project project) {
+    return Objects.isNull(project) ? null : project.getId();
+  }
+
+  private void initialiseProject(
+      Project project, ProjectCreateDTO createRequest, Integer effectiveAccountId) {
     project.setName(createRequest.getName());
     project.setDescription(createRequest.getDescription());
     project.setProjectStartDate(createRequest.getStartDate());
@@ -185,7 +263,7 @@ public class ProjectService {
         toRefDataItems(createRequest.getLocationIds(), ProjectLocation::new));
     project.setProjectAssets(toRefDataItems(createRequest.getProjectAssetIds(), ProjectAsset::new));
     project.setHasProjectAssets(!project.getProjectAssets().isEmpty());
-    project.setAccountId(createRequest.getAccountId());
+    project.setAccountId(effectiveAccountId);
 
     // We don't really know what status means but all existing projects have status true so hard
     // code for now

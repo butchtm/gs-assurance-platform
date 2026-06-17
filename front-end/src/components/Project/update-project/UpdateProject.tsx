@@ -148,6 +148,11 @@ const UpdateProject: React.FC = () => {
 
     const payload: UpdateProjectPayload = {
       ...formValues,
+      accountId: project?.accountId ?? formValues.accountId,
+      projectClassificationId:
+        project?.projectClassificationId ?? project?.projectClassification?.id ?? formValues.projectClassificationId,
+      masterProjectId: project?.masterProject?.id ?? null,
+      parentProjectId: project?.parentProject?.id ?? null,
       transitionProject: isAtLeastOneDetailDefined(transitionProjectDetails) ? transitionProjectDetails : null,
     };
 

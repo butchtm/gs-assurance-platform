@@ -159,6 +159,37 @@ export function getProject(projectId: number): Promise<Project> {
   return apiClient.makeRequest(`/projects/${projectId}`, "GET");
 }
 
+export interface CandidateParentDetailsRequest {
+  accountId: number;
+  classificationId: number;
+  candidateProjectId: number;
+  masterProjectId?: number | null;
+}
+
+export type CandidateParentProjectDetails = Pick<
+  Project,
+  | "id"
+  | "gsid"
+  | "name"
+  | "projectClassificationId"
+  | "projectClassification"
+  | "projectStatus"
+  | "projectStartDate"
+  | "carbonStream"
+  | "projectSize"
+  | "projectTypes"
+  | "projectLocations"
+  | "projectAssets"
+  | "sustainableDevelopmentGoals"
+  | "creditingPeriods"
+>;
+
+export function getCandidateParentDetails(
+  request: CandidateParentDetailsRequest,
+): Promise<CandidateParentProjectDetails> {
+  return apiClient.makeRequest(`/projects/candidate-parent-details`, "POST", JSON.stringify(request));
+}
+
 export function getProjectByGsid(gsid: string): Promise<Project> {
   return apiClient.makeRequest(`/projects/gsid/${gsid}`, "GET");
 }
@@ -225,11 +256,15 @@ export const getCandidatePOAs = (accountId: number, classificationId: number): P
   return apiClient.makeRequest(`/projects/candidate-poas`, "POST", JSON.stringify({ accountId, classificationId }));
 };
 
-export const getCandidateRealCaseVPAs = (accountId: number, masterProjectId: number): Promise<Project[]> => {
+export const getCandidateRealCaseVPAs = (
+  accountId: number,
+  masterProjectId: number,
+  classificationId: number | null,
+): Promise<Project[]> => {
   return apiClient.makeRequest(
     `/projects/candidate-real-case-vpas`,
     "POST",
-    JSON.stringify({ accountId, masterProjectId }),
+    JSON.stringify({ accountId, masterProjectId, classificationId }),
   );
 };
 

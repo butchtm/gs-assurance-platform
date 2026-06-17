@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -17,6 +18,8 @@ import org.goldstandard.assurance.api.dto.ProjectUpdateDTO;
 import org.goldstandard.assurance.api.entity.Project;
 import org.goldstandard.assurance.api.entity.ProjectSearchCriteriaDTO;
 import org.goldstandard.assurance.api.entity.creditingperiod.ProjectCreditingPeriod;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassification;
+import org.goldstandard.assurance.api.exception.BadRequestException;
 import org.goldstandard.assurance.api.exception.PermissionException;
 import org.goldstandard.assurance.api.service.external.ExternalUpdateExecutor;
 import org.goldstandard.assurance.api.service.permission.AuthenticatedUserSupplier;
@@ -54,6 +57,8 @@ class ProjectServiceTest {
   @Mock CreditingPeriodFactory creditingPeriodFactory;
 
   @Mock ProjectUpdateApplier updateApplier;
+
+  @Mock CandidateParentEligibilityPolicy parentEligibilityPolicy;
 
   @Captor ArgumentCaptor<Project> savedProjectCaptor;
 
@@ -113,11 +118,74 @@ class ProjectServiceTest {
   }
 
   @Test
+  void createProjectValidatesVpaParentEligibilityBeforeSaving() {
+    var effectiveAccountId = 44;
+    var create = buildProjectCreateDTO();
+    create.setAccountId(effectiveAccountId);
+    create.setProjectClassificationId(ProjectClassification.REAL_CASE_VPA_ID);
+    create.setMasterProjectId(10);
+    create.setParentProjectId(10);
+    var parentProject =
+        Project.builder()
+            .id(10)
+            .accountId(effectiveAccountId)
+            .projectClassification(ProjectClassification.programmeOfActivities())
+            .build();
+    var creditingPeriods = givenCreditingPeriods(create.getCreditingPeriods());
+    when(accessPolicy.resolveProjectAccountId(create.getAccountId()))
+        .thenReturn(effectiveAccountId);
+    when(finder.forceGetProjectById(parentProject.getId())).thenReturn(parentProject);
+    when(transaction.performCreate(any(Project.class), eq(creditingPeriods), eq(null)))
+        .thenReturn(new Project());
+
+    projectService.createProject(create);
+
+    verify(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(effectiveAccountId),
+            any(ProjectClassification.class),
+            eq(parentProject),
+            eq(parentProject));
+  }
+
+  @Test
+  void createProjectDoesNotSaveWhenVpaParentEligibilityFails() {
+    var effectiveAccountId = 44;
+    var create = buildProjectCreateDTO();
+    create.setAccountId(effectiveAccountId);
+    create.setProjectClassificationId(ProjectClassification.REAL_CASE_VPA_ID);
+    create.setMasterProjectId(10);
+    create.setParentProjectId(10);
+    var parentProject =
+        Project.builder()
+            .id(10)
+            .accountId(effectiveAccountId)
+            .projectClassification(ProjectClassification.programmeOfActivities())
+            .build();
+    var expectedError = new BadRequestException("invalid parent");
+    when(accessPolicy.resolveProjectAccountId(create.getAccountId()))
+        .thenReturn(effectiveAccountId);
+    when(finder.forceGetProjectById(parentProject.getId())).thenReturn(parentProject);
+    doThrow(expectedError)
+        .when(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(effectiveAccountId),
+            any(ProjectClassification.class),
+            eq(parentProject),
+            eq(parentProject));
+
+    var error = catchThrowable(() -> projectService.createProject(create));
+
+    assertThat(error).isEqualTo(expectedError);
+    verifyNoInteractions(transaction);
+  }
+
+  @Test
   void shouldUpdateProject() {
     int projectId = 1;
-    var originalProject = new Project();
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
     when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
-    var update = ProjectUpdateDTO.builder().build();
+    var update = buildProjectUpdateWithImmutableFields(originalProject);
     var creditingPeriods = givenCreditingPeriods(update.getCreditingPeriods());
     var updatedProject = mock(Project.class);
     when(updateApplier.applyUpdates(originalProject, update)).thenReturn(updatedProject);
@@ -149,6 +217,46 @@ class ProjectServiceTest {
     projectService.updateProject(projectId, update);
 
     verify(externalUpdateExecutor).executeAsync(savedProjects);
+  }
+
+  @Test
+  void updateProjectRejectsAccountChangeBeforeApplyingUpdates() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    var update =
+        ProjectUpdateDTO.builder()
+            .accountId(99)
+            .projectClassificationId(originalProject.getProjectClassification().getId())
+            .masterProjectId(originalProject.getMasterProject().getId())
+            .parentProjectId(originalProject.getParentProject().getId())
+            .build();
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+
+    var error = catchThrowable(() -> projectService.updateProject(projectId, update));
+
+    assertThat(error).isInstanceOf(BadRequestException.class).hasMessageContaining("accountId");
+    verifyNoInteractions(updateApplier, transaction);
+  }
+
+  @Test
+  void updateProjectRejectsHierarchyChangeBeforeApplyingUpdates() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    var update =
+        ProjectUpdateDTO.builder()
+            .accountId(originalProject.getAccountId())
+            .projectClassificationId(originalProject.getProjectClassification().getId())
+            .masterProjectId(99)
+            .parentProjectId(originalProject.getParentProject().getId())
+            .build();
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+
+    var error = catchThrowable(() -> projectService.updateProject(projectId, update));
+
+    assertThat(error)
+        .isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("masterProjectId");
+    verifyNoInteractions(updateApplier, transaction);
   }
 
   @Test
@@ -211,6 +319,26 @@ class ProjectServiceTest {
 
   private static Project buildProject(int id) {
     return Project.builder().id(id).build();
+  }
+
+  private static Project buildProjectWithImmutableFields(
+      int projectId, int accountId, int masterProjectId, int parentProjectId) {
+    return Project.builder()
+        .id(projectId)
+        .accountId(accountId)
+        .projectClassification(ProjectClassification.realCaseVpa())
+        .masterProject(new Project(masterProjectId))
+        .parentProject(new Project(parentProjectId))
+        .build();
+  }
+
+  private static ProjectUpdateDTO buildProjectUpdateWithImmutableFields(Project project) {
+    return ProjectUpdateDTO.builder()
+        .accountId(project.getAccountId())
+        .projectClassificationId(project.getProjectClassification().getId())
+        .masterProjectId(project.getMasterProject().getId())
+        .parentProjectId(project.getParentProject().getId())
+        .build();
   }
 
   private List<ProjectCreditingPeriod> givenCreditingPeriods(List<CreditingPeriodDTO> dtos) {

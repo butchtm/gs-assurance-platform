@@ -13,6 +13,7 @@ import org.goldstandard.assurance.api.dto.CreditingPeriodDTO;
 import org.goldstandard.assurance.api.dto.pub.stakeholder.request.PublicStakeholderRequestDetailDTO;
 import org.goldstandard.assurance.api.entity.lookup.Methodology;
 import org.goldstandard.assurance.api.entity.lookup.ProjectAsset;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.entity.lookup.ProjectLocation;
 import org.goldstandard.assurance.api.entity.lookup.ProjectType;
 import org.goldstandard.assurance.api.entity.lookup.SustainableDevelopmentGoal;
@@ -70,7 +71,8 @@ public class PublicStakeholderProjectDetailDTO {
     this.masterProject = project.getMasterProject();
     this.parentProject = project.getParentProject();
     this.masterProjectGsid = project.getMasterProjectGsid();
-    this.projectClassification = project.getProjectClassification();
+    this.projectClassification =
+        ProjectClassificationSemantics.toDisplayDescription(project.getProjectClassification());
     this.projectStartDate = project.getProjectStartDate();
     this.registrationType = project.getRegistrationType();
     this.hasProjectAssets = project.getHasProjectAssets();

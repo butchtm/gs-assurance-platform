@@ -35,7 +35,7 @@ export const mapProjectDataToFormValues = (project: Project): CreateProjectForm 
     const form = {
       accountId: project.accountId,
       accountName: null,
-      projectClassificationId: project.projectClassification?.id,
+      projectClassificationId: project.projectClassificationId ?? project.projectClassification?.id ?? null,
       masterProjectId: project.masterProject?.id,
       parentProjectId: project.parentProject?.id,
       locationIds: toIdArray(project.countries),
