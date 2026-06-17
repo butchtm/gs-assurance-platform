@@ -1127,6 +1127,11 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
                   .toList())
           .doesNotContain(crossLinkChild.getId())
           .contains(projects.betaListedPoa().getId(), projects.betaRealCaseAcm0001().getId());
+
+      var directGetResponse =
+          client.getProject(crossLinkChild.getId(), PROJECT_DEVELOPER_ROLE, BETA_PD_USER_ID);
+
+      assertThat(directGetResponse.getStatusCode()).isEqualTo(UNAUTHORIZED);
     } finally {
       projectPopulator.deleteProject(crossLinkChild.getId());
     }

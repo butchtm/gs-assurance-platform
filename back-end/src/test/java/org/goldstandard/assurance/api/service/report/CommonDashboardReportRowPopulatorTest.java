@@ -11,22 +11,38 @@ import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.goldstandard.assurance.api.entity.lookup.ProjectClassification;
 import org.goldstandard.assurance.api.entity.view.CommonDashboardView;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class CommonDashboardReportRowPopulatorTest {
 
   private final CommonDashboardReportRowPopulator populator =
       new CommonDashboardReportRowPopulator();
 
-  @Test
-  void shouldPopulateCrossLinkClassificationAsCanonicalDisplayLabel() {
+  @DisplayName("should populate cross-link classifications as canonical display labels")
+  @ParameterizedTest
+  @CsvSource({
+    ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID
+        + ","
+        + ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_CODE
+        + ",Real Case VPA - Cross Linking,"
+        + ProjectClassification.REAL_CASE_VPA_DESCRIPTION,
+    ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_ID
+        + ","
+        + ProjectClassification.REGULAR_VPA_CROSS_LINKAGE_CODE
+        + ",Regular Case VPA - Cross Linking,"
+        + ProjectClassification.REGULAR_VPA_DESCRIPTION
+  })
+  void shouldPopulateCrossLinkClassificationAsCanonicalDisplayLabel(
+      Integer classificationId,
+      String classificationCode,
+      String classificationDescription,
+      String expectedDescription) {
     var view =
         CommonDashboardView.builder()
             .projectClassification(
-                classification(
-                    ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID,
-                    ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_CODE,
-                    "Real Case VPA - Cross Linking"))
+                classification(classificationId, classificationCode, classificationDescription))
             .build();
 
     var cells = new HashMap<Integer, SXSSFCell>();
@@ -43,7 +59,7 @@ class CommonDashboardReportRowPopulatorTest {
     populator.populateDataRow(row, view);
 
     assertThat(cells).containsKey(10);
-    verify(cells.get(10)).setCellValue(ProjectClassification.REAL_CASE_VPA_DESCRIPTION);
+    verify(cells.get(10)).setCellValue(expectedDescription);
   }
 
   private static ProjectClassification classification(Integer id, String code, String description) {

@@ -53,23 +53,27 @@ Source plan: `docs/plan/2026-06-16_proposal2_cross_linking_final_plan.md`
   - Reset stale selections and use candidate-detail hydration for cross-account parents.
   - Localhost check: cross-link Real shows the PoA selector only; cross-link Regular shows PoA and Real Case selectors, and selecting a Beta PoA hydrates the related Beta Real Case options.
 
-- [ ] Task 8: Authorized Tree/List, Dashboard, Export, And Reporting Surfaces
+- [x] Task 8: Authorized Tree/List, Dashboard, Export, And Reporting Surfaces
   - Ensure linked parent PDs do not gain access.
   - Render pruned authorized tree lineage for cross-linked projects.
   - Normalize labels to normal Real Case/Regular VPA outside create flow.
   - Completed slice: Alpha can see Alpha-owned cross-link children, Beta cannot list or direct-GET Alpha cross-link children, and authorized tree lineage is pruned correctly.
+  - Evidence: `ProjectApiIntegrationTest` covers Alpha/Beta cross-link visibility and pruned tree lineage; `ProjectAccessPolicyTest` and `ProjectApiIntegrationTest#testUpdateProjectPermission` cover Admin/ARM edit permission shape.
+  - Evidence: `CommonDashboardConverterTest`, `DashboardRequestSpecFactoryTest`, and `CommonDashboardReportRowPopulatorTest` cover dashboard filter expansion, dashboard DTO label normalization, and common-dashboard export label normalization for cross-link classifications.
+  - Evidence: status reporting is grouped by project type/request type through `gs.v_status_report_projects` and `gs.v_status_report_requests`, so it has no cross-link project-classification label to leak; `StatusReportApiIntegrationTest` covers Admin/ARM access to the reporting endpoints.
 
-- [ ] Task 9: Demo Readiness And Runbook
+- [x] Task 9: Demo Readiness And Runbook
   - Document local setup, migration, seed, demo, evidence, and cleanup steps.
   - Include local readiness gates and stop conditions.
-  - Verify demo can run from a clean local database after migrations.
+  - Verify clean local database migration and seed readiness for the demo.
+  - Added `docs/mops/features/proposal2-cross-linking-demo.md` with clean database reset, migration, idempotent seed, login, browser smoke-test, dashboard/export/report evidence capture, cleanup steps, and an evidence manifest.
+  - Verified clean-db migration plus idempotent seed replay with direct SQL checks for cross-link classification rows, batch mappings, and projects `910101` through `910105`.
 
 ## Handover Gaps
 
-- Task 8: Seed or identify request/report data that exercises cross-link Real Case and Regular projects, then verify normalized labels and access boundaries in dashboard, export, and reporting screens.
-- Task 8: Verify ARM-role edit behavior with an ARM credential or seeded ARM test user if stakeholders require that exact role path; admin edit was verified locally with `patslaurel`.
-- Task 9: Convert the localhost evidence into a repeatable clean-db runbook covering setup, migration, seed, login, smoke-test, evidence capture, and cleanup.
-- Manual demo gate: Capture a full React wizard submit pass; selector behavior and create APIs were verified already.
+- Manual dashboard table evidence gate: request rows now exist for the browser-created cross-link children, and the authenticated common-dashboard DTO shows normal Real Case VPA / Regular VPA labels. Still capture the visible dashboard table after clearing the default First RoR Start Date filter or advancing the requests into a round.
+- Manual export/reporting evidence gate: common-dashboard export returned `202 Accepted`, but the asynchronous spreadsheet artifact was not captured. Status reporting has no project-classification label to normalize; capture either the expected project-type/request-type grouping after the requests become reportable or record that the `In Preparation` demo requests do not appear.
+- Optional role-evidence gate: capture an ARM browser screenshot showing edit access if stakeholders want role-specific visual evidence. Backend permission coverage already exists.
 
 ## Completion Gates
 
@@ -78,8 +82,16 @@ Source plan: `docs/plan/2026-06-16_proposal2_cross_linking_final_plan.md`
 - [x] Backend integration tests pass for candidate APIs, create/update validation, tree authorization, and batch mapping.
   - Verified with `mvn -f back-end/pom.xml test -Dtest=ProjectApiIntegrationTest -DfailIfNoTests=false`.
 - [x] Frontend focused tests pass for helper/schema/create wizard behavior.
-  - Verified with `node ./node_modules/jest/bin/jest.js --runTestsByPath src/components/Project/create-project/steps/Step1.test.tsx src/components/Project/create-project/steps/Step3.test.tsx src/components/Project/create-project/createProject.test.tsx --coverage=false --maxWorkers=50%`.
+  - Verified with `(cd front-end && $HOME/.nvm/versions/node/v20.19.0/bin/node ./node_modules/jest/bin/jest.js --runTestsByPath src/components/Project/create-project/steps/Step1.test.tsx src/components/Project/create-project/steps/Step3.test.tsx src/components/Project/create-project/createProject.test.tsx --coverage=false --maxWorkers=50%)`.
 - [x] Local migration and seed checks pass.
-- [ ] Manual browser demo passes on `http://localhost:3000`.
-  - Completed: login, selector behavior, candidate hydration, API create/update guardrails, visibility, tree authorization, and batch type mapping.
-  - Remaining: dashboard/report/export evidence and full React wizard submit capture.
+  - Verified with clean local Compose volume, Liquibase update, idempotent seed replay, and direct SQL checks for cross-link classifications, batch mappings, and seeded Beta fixture projects.
+- [x] Focused Task 8 backend checks pass.
+  - Verified with `mvn -f back-end/pom.xml test -Dtest=ProjectApiIntegrationTest,ProjectClassificationSemanticsTest,CommonDashboardConverterTest,DashboardRequestSpecFactoryTest,CommonDashboardReportRowPopulatorTest,StatusReportApiIntegrationTest,ProjectAccessPolicyTest -DfailIfNoTests=false`.
+- [x] Focused cross-link frontend checks pass.
+  - Verified with `(cd front-end && $HOME/.nvm/versions/node/v20.19.0/bin/node ./node_modules/jest/bin/jest.js --runTestsByPath src/components/Project/ProjectClassificationSemantics.test.ts src/components/Project/create-project/steps/Step1.test.tsx src/components/Project/create-project/steps/Step3.test.tsx src/components/Project/create-project/createProject.test.tsx src/components/Project/view-project/ViewProjectHierarchyTree.test.tsx --coverage=false --maxWorkers=50%)`.
+- [x] Manual browser demo passes on `http://localhost:3000`.
+  - Completed: login, selector behavior, cross-linkage helper note, candidate hydration, full React wizard submit for UI-created `GS910108` and `GS910109`, request creation for both UI-created projects, visibility, tree authorization, normalized detail labels, linked parent PD access denial, dashboard DTO normalization, and batch type mapping.
+  - Verified with screenshot walkthrough and evidence manifest under `docs/mops/evidence/proposal2-cross-linking-demo/2026-06-17/`.
+- [x] Focused helper text regression check passes.
+  - Verified with `(cd front-end && $HOME/.nvm/versions/node/v20.19.0/bin/node ./node_modules/jest/bin/jest.js --runTestsByPath src/components/Project/create-project/HelperText.test.tsx src/components/Project/create-project/steps/Step1.test.tsx --coverage=false --maxWorkers=50%)`.
+  - Remaining for non-core visual handoff: visible dashboard table screenshot after clearing/avoiding the default First RoR filter, asynchronous export spreadsheet artifact, status-report evidence after requests become reportable, and optional ARM browser edit screenshot.
