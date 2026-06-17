@@ -13,4 +13,5 @@ public class MethodologyManagementDTO {
   private final String description;
   private final Boolean active;
   private final boolean inUse;
+  private final boolean paa;
 }

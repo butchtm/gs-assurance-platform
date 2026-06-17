@@ -1,23 +1,15 @@
-import { ThemeProvider } from "@emotion/react";
 import { Box, Card, Container, Typography } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Form, Formik } from "formik";
 import React from "react";
-import { MemoryRouter } from "react-router-dom";
 
-import {
-  ReferenceDataIdsOrId,
-  ReferenceType,
-  ReferenceTypeContext,
-} from "../../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes } from "../../../common/data-types/DebugReferenceTypes";
-import { ProbablePii } from "../../../common/piiAnalysis/PiiAnalysis";
-import { mockCreateProjectFormValues } from "../../../common/project/DebugProject";
-import { theme } from "../../../theme";
-import { AuthContext, AuthContextType } from "../../Auth/Login/AuthProvider";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceDataIdsOrId, ReferenceType } from "@/common/data-types/DataReferenceTypes";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { ProbablePii } from "@/common/piiAnalysis/PiiAnalysis";
+import { mockCreateProjectFormValues } from "@/common/project/DebugProject";
+
 import { Step1 } from "../create-project/steps/Step1";
 import { Step2 } from "../create-project/steps/Step2";
 import { Step3 } from "../create-project/steps/Step3";
@@ -26,13 +18,6 @@ import { Step5 } from "../create-project/steps/Step5";
 
 import { StepUpdateFields } from "./steps/StepUpdateFields";
 import { usePiiAnalysis } from "./usePiiAnalysis";
-
-const mockAuthProvider = {
-  isProjectDeveloperUser: jest.fn(),
-  isAdminUser: jest.fn().mockReturnValue(true),
-  isArmUser: jest.fn(),
-  isUserOwnerOf: jest.fn().mockReturnValue(true),
-} as Record<keyof AuthContextType, jest.Mock>;
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
@@ -203,41 +188,31 @@ describe("UpdateProject PiiAnalysis Popover Tests", () => {
       notes: "Contact John Doe at 555-123-4567",
     };
 
-    return render(
-      <MemoryRouter>
-        <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-          <ReferenceTypeContext.Provider
-            value={{
-              activeReferenceTypes: mockActiveReferenceTypes,
-              inactiveReferenceTypes: {},
-              allReferenceTypes: {},
-              referenceMethodologies: [
-                { id: 1, description: "Methodology 1", active: true, inUse: true, code: "METH1" },
-                { id: 2, description: "Methodology 2", active: true, inUse: true, code: "METH2" },
-                { id: 3, description: "Methodology 3", active: false, inUse: false, code: "METH3" },
-              ],
-              getCustomReferenceOptions: mockGetCustomReferenceOptions,
-              refreshReferenceData: () => Promise.resolve(),
-            }}
-          >
-            <ThemeProvider theme={theme}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Container maxWidth="md">
-                  <Card className="wizard-card">
-                    <Box>
-                      <Typography variant="h4">Update Project</Typography>
-                      <br />
-                    </Box>
-                    <Formik initialValues={formValues} onSubmit={jest.fn()}>
-                      <FormContent probablePii={customPiiData} />
-                    </Formik>
-                  </Card>
-                </Container>
-              </LocalizationProvider>
-            </ThemeProvider>
-          </ReferenceTypeContext.Provider>
-        </AuthContext.Provider>
-      </MemoryRouter>,
+    renderWithProviders(
+      <Container maxWidth="md">
+        <Card className="wizard-card">
+          <Box>
+            <Typography variant="h4">Update Project</Typography>
+            <br />
+          </Box>
+          <Formik initialValues={formValues} onSubmit={jest.fn()}>
+            <FormContent probablePii={customPiiData} />
+          </Formik>
+        </Card>
+      </Container>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            referenceMethodologies: [
+              { id: 1, description: "Methodology 1", active: true, inUse: true, code: "METH1" },
+              { id: 2, description: "Methodology 2", active: true, inUse: true, code: "METH2" },
+              { id: 3, description: "Methodology 3", active: false, inUse: false, code: "METH3" },
+            ],
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
   };
 

@@ -142,6 +142,7 @@ export function useUpdateRequest() {
                 ? formValues.feeSchedule
                 : null,
             ),
+            paa: formValues.paa,
           },
           parentRequest.projectId,
         );
@@ -164,6 +165,7 @@ export function useUpdateRequest() {
                   projectData.newMonitoringPeriodEndDate,
                   formValues.feeSchedule ?? null,
                 ),
+                paa: formValues.paa,
               },
               parseInt(projectId, 10),
             ),
@@ -188,6 +190,7 @@ export function useUpdateRequest() {
               endDate: formValues.newMonitoringPeriodEndDate?.toISOString() ?? null,
               feeSchedule: formValues.feeSchedule,
             },
+            paa: formValues.paa,
           },
           location.state.request.project?.id,
         );

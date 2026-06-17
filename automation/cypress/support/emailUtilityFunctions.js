@@ -14,33 +14,6 @@ class _EmailHelper {
     return `${day}/${month}/${year}`
   }
 
-  /*
-  changelogMap = {
-    "Completeness Check": [
-      {
-        account: "George Jennings",
-        changedAt: this.getFormattedDate(),
-        fromStatus: "In Preparation",
-        toStatus: "Completeness Check"
-      },
-      {
-        account: "George Jennings",
-        changedAt: this.getFormattedDate(),
-        fromStatus: "",
-        toStatus: "In Preparation"
-      }
-    ],
-    "Final Review": [
-      {
-        account: "George Jennings",
-        changedAt: "08/10/2025",
-        fromStatus: "Completeness Check",
-        toStatus: "Final Review"
-      }
-    ]
-    // Add more statuses as needed
-  }*/
-
   getChangelogRowsForStatus = (targetStatus) => {
     const rows = this.changelogMap[targetStatus]
     return this.formatTextChangelog(rows)
@@ -88,8 +61,33 @@ class _EmailHelper {
 
   determineLink = (emails) => {
     const firstTextBody = emails[0].textBody
-    const linkMatch = firstTextBody.match(/https:\/\/[^\s]+/)
+    const linkMatch = firstTextBody.match(/https:\/\/[^\s"')]+/)
     return linkMatch ? linkMatch[0] : ""
+  }
+
+   determineLinkPOA = (emails) => {
+    const firstTextBody = emails[0].textBody
+    const linkMatch = firstTextBody.match(/POA\/VPA\s*\(https:\/\/[^\s"')]+\)/)
+    return linkMatch ? linkMatch[0] : ""
+  }
+
+   determineLinkProjectActivity = (emails) => {
+    const firstTextBody = emails[0].textBody
+    const linkMatch = firstTextBody.match(/Project Activity\s*\(https:\/\/[^\s"')]+\)/)
+    return linkMatch ? linkMatch[0] : ""
+  }
+  
+  generateReviewDate = () => {
+    const reviewDate = new Date()
+    reviewDate.setDate(reviewDate.getDate() + 28)
+
+    const day = String(reviewDate.getDate()).padStart(2, '0');
+    const month = String(reviewDate.getMonth() + 1).padStart(2, '0');
+    const year = reviewDate.getFullYear();
+
+    const formattedDate = `${day}/${month}/${year}`
+
+    return formattedDate
   }
 
   getValueFromPlatformInfo = (key) => {

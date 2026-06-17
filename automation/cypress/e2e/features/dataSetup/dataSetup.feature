@@ -1,6 +1,14 @@
 @groupDS
 Feature: Data setup tasks & project creation tests
 
+
+    Scenario: Cleardown all existing test data
+        Given I delete all existing projects
+        When I visit assurance platform
+        And "ADMIN" click "projects" from the navbar successfully
+        Then There are no projects shown on the projects page
+
+
     Scenario: Create standalone project as PD
         Given I login as "PD"
         And "PD" click "projects" from the navbar successfully

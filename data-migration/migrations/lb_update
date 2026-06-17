@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+CONTEXTS=${CONTEXTS:-dev}
+
+liquibase update \
+  --contexts "${CONTEXTS}" \
+  --changelog-file $(dirname $0)/changelog.yaml

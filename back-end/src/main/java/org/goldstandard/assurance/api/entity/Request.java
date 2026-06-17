@@ -108,6 +108,8 @@ public class Request {
 
   private Boolean internal;
 
+  private boolean paa;
+
   @With @ManyToOne private RequestActivity currentActivity;
 
   @OneToMany(mappedBy = "requestId", fetch = FetchType.LAZY)

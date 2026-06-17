@@ -1,0 +1,16 @@
+databaseChangeLog:
+- changeSet:
+    author: "agee"
+    id: "003650-methodology-is-paa"
+    changes:
+    - addColumn:
+        schemaName: gs
+        tableName: methodology
+        columns:
+        - column:
+            name: paa
+            type: boolean
+            valueBoolean: false
+            defaultValueBoolean: true
+            constraints:
+              nullable: false

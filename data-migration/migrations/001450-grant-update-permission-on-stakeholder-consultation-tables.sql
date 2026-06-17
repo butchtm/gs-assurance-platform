@@ -1,0 +1,1 @@
+GRANT UPDATE ON gs.stakeholder_consultation TO gs_assurance_db_writer;

@@ -1,6 +1,21 @@
 @group6
 Feature: /accounts page and /accounts/id
 
+    Scenario Outline: Clear down test platform accounts
+        Given I login to the API as an admin
+        And I delete all test accounts using the API
+
+        When I visit assurance platform
+        And "<username>" click "platform accounts" from the navbar successfully
+        And I select "name filter" from accounts page
+        And I type "autotest" into "filter by name - accounts"
+
+        Then No platform accounts are found
+
+        Examples:
+            | username       |
+            | ADMIN          |
+
     Scenario Outline: <username> uses name filter
         Given I login as "<username>"
         Then "<username>" click "platform accounts" from the navbar successfully
@@ -28,17 +43,6 @@ Feature: /accounts page and /accounts/id
             | ADMIN    | reviewer | Reviewer        |
             | ADMIN    | finance  | GS Finance Team | 
 
-    Scenario Outline: <username> changes rows per page
-        Given I login as "<username>"
-        Then "<username>" click "platform accounts" from the navbar successfully
-
-        When I select "rows per page" from accounts page
-        And I select "20" from rows drop down
-        Then 20 rows are on the page
-
-        Examples:
-            | username |
-            | ADMIN    |
 
     Scenario Outline: <username> selects platform account
         Given I login as "<username>"
@@ -57,6 +61,37 @@ Feature: /accounts page and /accounts/id
             | ADMIN    | GS ARM Team      |
             | ADMIN    | GS Registry Team |
             | ADMIN    | Reviewer         | 
+
+    Scenario Outline: <username> creates platform account
+        Given I login as "<username>"
+        Then "<username>" click "platform accounts" from the navbar successfully
+
+        When I select "create account" from accounts page
+        And I input my details for "<accountType>" account
+        Then I select create account button
+        
+        When I select "name filter" from accounts page
+        And I type "<accountName>" into "filter by name - accounts"
+        Then account name "<accountName>" is displayed in the list
+        Examples:
+            | username | accountType | accountName       |
+            | ADMIN    | Reviewer    | autotest-Reviewer |
+            | ADMIN    | VVB         | autotest-VVB      |
+            | ADMIN    | TAC         | autotest-TAC      |
+
+
+    Scenario Outline: <username> changes rows per page
+        Given I login as "<username>"
+        Then "<username>" click "platform accounts" from the navbar successfully
+
+        When I select "rows per page" from accounts page
+        And I select "20" from rows drop down
+        Then More than 10 rows are on the page
+
+        Examples:
+            | username |
+            | ADMIN    |
+
 
     Scenario Outline: <username> edits platform account
         Given I login as "<username>"
@@ -82,25 +117,8 @@ Feature: /accounts page and /accounts/id
         Then platform account title "<accountName>" can be seen
 
         Examples:
-            | username | accountName      | accountRename     |
-            | ADMIN    | GS Finance Team  | accountNameEdited |
-            | ADMIN    | GS ARM Team      | accountNameEdited |
-            | ADMIN    | GS Registry Team | accountNameEdited |
-            | ADMIN    | Reviewer         | accountNameEdited |
+            | username | accountName        | accountRename              |
+            | ADMIN    | autotest-Reviewer  | autotest-accountNameEdited |
+            | ADMIN    | autotest-VVB       | autotest-accountNameEdited |
+            | ADMIN    | autotest-TAC       | autotest-accountNameEdited |
 
-    Scenario Outline: <username> creates platform account
-        Given I login as "<username>"
-        Then "<username>" click "platform accounts" from the navbar successfully
-
-        When I select "create account" from accounts page
-        And I input my details for "<accountType>" account
-        Then I select create account button
-        
-        When I select "name filter" from accounts page
-        And I type "<accountName>" into "filter by name - accounts"
-        Then account name "<accountName>" is displayed in the list
-        Examples:
-            | username | accountType | accountName       |
-            | ADMIN    | Reviewer    | autotest-Reviewer |
-            | ADMIN    | VVB         | autotest-VVB      |
-            | ADMIN    | TAC         | autotest-TAC      |

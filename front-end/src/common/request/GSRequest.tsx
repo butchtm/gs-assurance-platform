@@ -2,13 +2,12 @@ import dayjs from "dayjs";
 
 import { AccountType } from "../../components/PlatformAccounts/PlatformAccountTypes";
 import {
-  CreateRequestForm,
   MethodologyConfiguration,
   MonitoringPeriodConfiguration,
   ProjectIdWithRequestValues,
 } from "../../components/requests/create-request/Wizard/Request";
 import { BatchedProjectRequest } from "../../components/requests/Requests";
-import { ReferenceType } from "../data-types/DataReferenceTypes";
+import { ReferenceType, RequestType } from "../data-types/DataReferenceTypes";
 import { PiiMetadata } from "../piiAnalysis/PiiAnalysis";
 import { Conversation } from "../../components/requests/conversation/Conversation";
 
@@ -27,17 +26,13 @@ export type RequestStatusCode =
   | "IN_AUDIT"
   | "IN_ASSIGNMENT"
   | "IN_ROUND_COMPLETION";
-
 export interface GSRequest {
   id: number;
   startDate: string;
   endDate: string;
   bookingDate: string;
-  requestType: {
-    id: number;
-    code: string;
-    description: string;
-  };
+  paa: boolean;
+  requestType: RequestType;
   index: number;
   reviewName: string;
   sameReviewTypeCount: number;
@@ -188,6 +183,7 @@ export interface CreateUpdateRequestPayload {
   monitoringPeriod: MonitoringPeriodConfiguration | null;
   cancellationReasonId: string | undefined;
   otherCancellationReason: string | undefined;
+  paa: boolean;
 }
 
 interface ProjectRequestInfo {
@@ -201,6 +197,7 @@ export interface CreateBatchRequestPayload {
   requestTypeId: number;
   batchTypeId: number;
   projectRequestInfos: ProjectRequestInfo[];
+  paa?: boolean;
 }
 
 export interface RequestConsultation {
@@ -389,6 +386,17 @@ export function hasNoRounds(request: GSRequest): boolean {
 }
 
 const ISSUANCE_REQUEST_TYPE_ID = 1012;
-export function isForIssuanceRequest(values: CreateRequestForm) {
-  return values.requestType && Number(values.requestType) === ISSUANCE_REQUEST_TYPE_ID;
+export function isForIssuanceRequest(requestTypeId?: number) {
+  return requestTypeId && Number(requestTypeId) === ISSUANCE_REQUEST_TYPE_ID;
+}
+
+const EMISSIONS_REMOVAL_REQUESTS = [
+  1017, // COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_POA
+  1018, // COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_PROJECT
+  1019, // COMBINED_DESIGN_AND_PERFORMANCE_CERTIFICATION_|_VPA
+  1005, // PERFORMANCE_CERTIFICATION_|_PROJECT
+  1006, // PERFORMANCE_CERTIFICATION_|_VPA
+];
+export function isForEmissionsRemovalRequest(requestTypeId?: number) {
+  return requestTypeId && EMISSIONS_REMOVAL_REQUESTS.includes(requestTypeId);
 }

@@ -1,0 +1,1 @@
+GRANT USAGE, SELECT ON gs.seq_stakeholder_consultation TO gs_assurance_db_writer;

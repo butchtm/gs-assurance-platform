@@ -9,7 +9,7 @@ import { AccountTypeIds } from "../../../../AccountType";
 import {
   getReferenceValueCodeById,
   Options,
-  ReferenceTypeContext,
+  useReferenceTypes,
 } from "../../../../common/data-types/DataReferenceTypes";
 import { ProbablePii } from "../../../../common/piiAnalysis/PiiAnalysis";
 import { CreateProjectForm, Project, ReferenceType } from "../../../../common/project/Project";
@@ -38,19 +38,16 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
   const { values, setFieldValue } = useFormikContext<CreateProjectForm>();
   const [pdAccountId, setPdAccountId] = useState<number | null>(values.accountId ?? null);
   const authContext = useContext(AuthContext);
-  const referenceDataContext = useContext(ReferenceTypeContext);
+  const { getCustomReferenceOptions, allReferenceTypes, activeReferenceTypes } = useReferenceTypes();
 
   const classificationId = values?.projectClassificationId ?? null;
-  const classificationOptions = referenceDataContext.getCustomReferenceOptions(
-    "ProjectClassification",
-    classificationId,
-  );
+  const classificationOptions = getCustomReferenceOptions("ProjectClassification", classificationId);
 
   const [selectedMasterProjectId, setSelectedMasterProjectId] = useState<number | null>(null);
 
   const projectClassificationCode = getReferenceValueCodeById(
     values.projectClassificationId,
-    referenceDataContext.allReferenceTypes.ProjectClassification,
+    allReferenceTypes?.ProjectClassification,
   );
 
   const fetchCandidateRealCases = async (masterProjectId: number | null) => {
@@ -143,7 +140,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
   const handleUpdateProjectStatus = () => {
     navigate("/update-project-status", {
       state: {
-        status: referenceDataContext.activeReferenceTypes.ProjectState.find((x) => x.id === values.projectStatusId),
+        status: activeReferenceTypes.ProjectState.find((x) => x.id === values.projectStatusId),
         projectId: projectId,
       },
     });
@@ -254,10 +251,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
               Project Status
             </InputLabel>
             <Typography variant="body1" component="div">
-              {
-                referenceDataContext.activeReferenceTypes.ProjectState.find((x) => x.id === values.projectStatusId)
-                  ?.description
-              }
+              {activeReferenceTypes.ProjectState.find((x) => x.id === values.projectStatusId)?.description}
             </Typography>
           </div>
           {isUpdate && (

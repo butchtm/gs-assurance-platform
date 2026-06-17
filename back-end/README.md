@@ -9,49 +9,84 @@
 
 Provides a Spring Boot based API application for the Gold Standard Assurance service
 
-# Getting Started
+# Local Development Quickstart
 
-Install:
-
-- Java 21 (preferably managed by SDKMan or equivalent as described below)
-- Maven
-- Docker
+The following are prerequisites:
+- [Maven](https://maven.apache.org/install.html#apt)
+- [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- [SDKMan](https://sdkman.io/install/)
 
 ## Java Version
 
-This repo requires the use of Java 21. If you also work with other repos that required different versions of Java,
-[SDKMan](https://sdkman.io/) is a useful tool for enabling you to switch between version of Java
-(or other Java SDK based languages) easily when required.
-
-The local build for this repo has been tested using Java 21.0.8 of the [Bellsoft Liberica JDK](https://bell-sw.com/libericajdk/)
-(as this is the default JDK used by the spring boot maven plugin) which can be set up by running the following command
-once you have SDKMan installed.
+This repo requires the use of Java 21. We use SDKMan to switch between versions 
+of Java when required. Specifically, we follow the spring boot maven plugin and 
+use Java 21.0.8 of the [Bellsoft Liberica JDK](https://bell-sw.com/libericajdk/).
+To install this version, run the following command from the root directory of
+this repository:
 
 ```bash
 sdk env install
 ```
 
-This will set the java version based on the config defined in the .sdkmanrc file at the root of this project.
-If you also update the file at ~/.sdkman/etc/config to contain sdkman_auto_env=true then each time you
-navigate into the root project directory in a terminal sdk man will auto set the java version for you.
-
-Alternatively if you would rather manually configure your sdk versions using sdk man you can use the following commands
-
-```bash
-sdk install java 21.0.8-librca
-sdk use java 21.0.8-librca
+This sets the java version based on the contents of `.sdkmanrc` located in the 
+root of this project. Additionally, edit `~/.sdkman/etc/config` to be:
 ```
+sdkman_auto_env=true
+```
+and SDKMan will automatically set the java version when you navigate to the root
+directory of this project.
 
-Note - the second command is only required if you do not choose to make the Java 21 Liberica version your default JVM
-when installing.
 
-Once this is set up it will give the following output when the `java -version` command is run:
+Now the `java -version` command should give this output:
 
 ```bash
 openjdk version "21.0.8" 2025-07-15 LTS
 OpenJDK Runtime Environment (build 21.0.8+12-LTS)
 OpenJDK 64-Bit Server VM (build 21.0.8+12-LTS, mixed mode, sharing)
 ```
+
+## Database setup
+
+Clone the [data migration](https://git.iig.caci.co.uk/gold-standard/data-migration)
+repo so that it is a sibling of this one.
+
+Run this command to setup a container running the database:
+```
+docker compose -f local/compose.yml up --build -d
+```
+
+## Setup env variables to use Development Cognito
+
+The Assurance service uses AWS Cognito to manage authentication. For local development, we make use of the Cognito User pool from the Development environment. In order to do so, we need to acquire some keys and ids from the Development Environment.
+
+This information can only be obtained by a user with the `AdministratorAccess` role. You can request this role from any user who is an admin on the `GS-Assurance` account. That individual should follow the process outlined in this [document](https://goldstandardfoundation.atlassian.net/wiki/x/AwDtVQ#Adding-new-users-to-IAM-Access-Management-for-S3-bucket-and-other-access).
+
+Once that has been done, follow this [document](https://goldstandardfoundation.atlassian.net/wiki/x/AoDJVw) to acquire the relevant data. The values can then be set up as environment variables like this:
+
+```bash
+export AWS_ACCESS_KEY_ID={aws-access-key-id}
+export AWS_SECRET_ACCESS_KEY={aws-secret-access-key}
+export AWS_SESSION_TOKEN={aws-session-token}
+export COGNITO_USER_POOL_ID={user-pool-id}
+export COGNITO_APP_CLIENT_ID={app-client-id}
+```
+
+## Run the back-end application
+
+Run this command:
+
+```bash
+mvn clean spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
+```
+
+If successful, you should see something like:
+```
+12:49:07   CSD013014-LW10  INFO [main] o.g.assurance.api.AssuranceApplication   : Started AssuranceApplication in 14.663 seconds (process running for 14.965)
+```
+
+## Next steps
+
+Follow the [front-end](https://git.iig.caci.co.uk/gold-standard/front-end) quickstart to setup the front end.
 
 # Spring Boot Features
 
@@ -117,64 +152,78 @@ Then to start run `docker run -p 8080:8080 my-assurance-api:latest`
 
 # Local Development
 
+## Managing the Java version
+
+This usage [guide](https://sdkman.io/usage/) provides more details on SDKman commands.
+
 ## Setting up a database
 
-To run locally you should have a Postgres instance. You can use the docker compose script in the local folder. Using
-the compose file requires that you have changed out the
-[data migration](https://git.iig.caci.co.uk/gold-standard/data-migration) repo alongside this `back-end` repo as it
-will use the migration scripts from that repo to set up your local database schema.
+To run locally you should have a Postgres instance.
+You can use the Docker Compose configuration
+in [the `./local` subdirectory](./local).
+Using the `compose.yaml` file **requires** that you have checked out the
+[`data-migration`](https://git.iig.caci.co.uk/gold-standard/data-migration)
+repository alongside this `back-end` repository.
+The `data-migration` repository contains database migration scripts
+that are used by Liquibase to set up the local database schema.
 
 From the root directory of this project you can run the following command:
 
 ```bash
-docker-compose -f local/compose.yml up -d
+docker compose -f local/compose.yml up --build -d
 ```
 
-## With DEV Cognito to work with a local front-end
+If more fine-grained control is required,
+it is possible to issue individual commands to Liquibase
+by overriding the Docker container command.
+
+```bash
+# if in the directory, the configuration is picked up automatically
+cd local
+# manually validate the changelog
+docker compose run --rm liquibase validate
+# check the SQL that will be executed by an "update" prior to executing
+docker compose run --rm liquibase update-sql
+# manually execute an "update"
+docker compose run --rm liquibase update
+# check the SQL that will be executed by a "rollback-count" prior to executing
+docker compose run --rm liquibase rollback-count-sql --count=1
+# manually execute a "rollback-count"
+docker compose run --rm liquibase rollback-count --count=1
+# if you forget to include "--rm", remember to clean up your stopped containers
+```
+
+These might be useful for locally verifying a migration
+prior to deploying to the Development environment.
+
+Note that some parameters are configured via environment variables
+in the Docker Compose configuration.
+So to change the Liquibase changeset context,
+the `compose.yaml` configuration may need to be modified.
+
+## With Development Cognito to work with a local front-end
 
 Once the database is running, the back-end application can be run locally pointing at Cognito in
 the development AWS account by setting up environment variables to point at the Cognito user pool
 by running the following:
 
 ```bash
+export AWS_ACCESS_KEY_ID={aws-access-key-id}
+export AWS_SECRET_ACCESS_KEY={aws-secret-access-key}
+export AWS_SESSION_TOKEN={aws-session-token}
 export COGNITO_USER_POOL_ID={user-pool-id}
 export COGNITO_APP_CLIENT_ID={app-client-id}
 ```
 
 Then providing the local spring profile from the command line by running, the command below.
 
-Note - you will need to configure the stubbed cognito import to generate a user using
-your cognito sub from DEV, you can get this value by inspecting one of your cognito tokens in
-from the DEV environment, or by logging into the AWS console to check the subject against the user credentials
-you would like to use to log in locally. Once you have this value you can set it either as
-an environment variable named `GS_ADMIN_SUBS={YOUR_SUBS}` or by setting a command line property
-`--stubbed.users.gs-admin.subs={YOUR_SUBS}` as in the example below:
-
 ```bash
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local '--stubbed.users.gs-admin.subs={YOUR_SUBS}'"
+mvn clean spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=local"
 ```
 
-Note - in both cases `YOUR_SUBS` can be a single value or pipe separated list of UUID values, and it is possible
-to set other role subjects as well as gs-admin (e.g. `stubbed.users.project-developers.subs` or
-`PROJECT_DEVELOPER_SUBS` for project developers) the full list of variables for each role are listed below:
-
-* `GS-Admin` -> `GS_ADMIN_SUBS` or `stubbed.users.gs-admin.subs`
-* `Project-Developer` -> `PROJECT_DEVELOPER_SUBS` or `stubbed.users.project-developers.subs`
-* `Arm-team` -> `ARM_TEAM_SUBS` or `stubbed.users.arm-team.subs`
-* `GS-Registry` -> `GS_REGISTRY_SUBS` or `stubbed.users.gs-registry.subs`
-* `GS-Finance` -> `GS_FINANCE_SUBS` or `stubbed.users.gs-finance.subs`
-* `GS-Reviewer` -> `GS_REVIEWER_SUBS` or `stubbed.users.gs-reviewer.subs`
-* `VVB` -> `VVB_SUBS` or `stubbed.users.vvb.subs`
-* `TAC` -> `TAC_SUBS` or `stubbed.users.tac.subs`
-
-With the API up and running pointing at DEV cognito you will be able to run the
+With the API up and running pointing at Development cognito you will be able to run the
 [front-end](https://git.iig.caci.co.uk/gold-standard/front-end) pointing at the `back-end` instance running on your
 local machine.
-
-## Testing MFA in DEV Cognito
-If you want to test MFA in DEV Cognito, you will need to set the a valid IdpUserId in dev aws to one of the 
-stubbed users in the database, you can then set mfa up for this account as an administrator or once logged in
-
 
 ## Accessing AWS S3 buckets from local
 
@@ -238,7 +287,7 @@ not get committed!) once this change is made if you restart your backend applica
 also set the AWS secret key and access key as required for downloading then you will be
 able to upload documents to the development S3 bucket from your local API.
 
-## Without DEV Cognito to run API standalone
+## Without Development Cognito to run API standalone
 
 The same command can be used to run the test profile for the backend application, although
 using this method will not work with the `front-end` running locally.
@@ -253,7 +302,9 @@ Example curl command for getting a locally generated Admin token:<br>
 ```TOKEN=$(curl -s "http://127.0.0.1:8080/api/token?role=GS-Admin")```
 
 Example curl command for getting the projects list using the above generated token:<br>
-```curl -v POST http://127.0.0.1:8080/api/projects -H 'Authorization: Bearer '$TOKEN'' | json_pp```
+```
+curl -v POST http://127.0.0.1:8080/api/projects -H 'Authorization: Bearer '$TOKEN'' | json_pp
+```
 
 # Testing
 

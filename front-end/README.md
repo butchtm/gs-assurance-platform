@@ -1,9 +1,30 @@
 # Gold Standard Assurance Platform Front End
 
-### Prerequisites
+### Quickstart
 
-- NPM (`npm install npm@latest -g`)
-- Git (see [Getting Started Installing Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git))
+[Install nvm](https://github.com/nvm-sh/nvm#installing-and-updating)  
+Node version 20.19.0 is the preferred development version for this project since
+it is used in both the pipeline build and the deployed container. Install and set
+it to be your default with the following commands:
+```
+nvm install 20.19.0
+nvm alias default 20.19.0
+```
+
+Then run `npm install` followed by `npm start` to start the front end in a browser window.
+
+#### Quickstart using development back-end
+The instructions above start a front-end that calls to the local back-end. To use
+Gold Standard's Development Account, create a file in the root of this repository
+named `.env`. In that file, paste the following:
+```
+VITE_PROXY_TARGET=https://dev.goldstandard-assurance.org
+VITE_ENVIRONMENT=development
+ESLINT_NO_DEV_ERRORS=true
+VITE_GIT_TAG=test-tag-value
+```
+
+The front-end will now use the local back-end when started with `npm start`.
 
 ### Starting the front-end (React Development Server Build)
 

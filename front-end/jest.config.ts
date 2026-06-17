@@ -26,10 +26,11 @@ const config: Config = {
     "\\.(css|scss)$": "<rootDir>/jest/__mocks__/styleMock.ts",
     "\\.(jpg|jpeg|png|gif|webp|svg)$": "<rootDir>/jest/__mocks__/svgMock.ts",
     "react-markdown": "<rootDir>/src/mock/ReactMarkdownMock.tsx",
+    "^@/(.*)$": "<rootDir>/src/$1",
     "^uuid$": "uuid",
   },
   testResultsProcessor: "jest-sonar-reporter",
-  testEnvironment: "jsdom",
+  testEnvironment: "jest-fixed-jsdom",
   // Transform selected ESM packages (MUI v5, emotion, date pickers, formik-mui)
   transformIgnorePatterns: [`<rootDir>/node_modules/(?!(^${esModules}))`],
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],

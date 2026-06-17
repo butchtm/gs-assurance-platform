@@ -1,0 +1,246 @@
+# Common configuration for PostgreSQL dump/restore jobs
+.dump_pg_tools: &dump_pg_tools
+  image: python:3.12.6
+  before_script:
+    - apt-get update && apt-get install -y postgresql-client
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+
+stages:
+  - migrate
+  - runner
+  - statistic_comparison_script
+  - database_deltas
+  - document_migration
+  - methodology_migrations
+  - dump_and_restore
+
+# Liquibase throws out warnings about invalid LIQUIBASE_* environment variables
+# so we abbreviate our variables to LB_* e.g. LB_CONTEXTS, LB_COMMAND, LB_JOB
+liquibase-job:
+  stage: migrate
+  image: ${NEXUS_PREFIX}/gold_standard/gitlab_runners/liquibase
+  environment:
+    name: $JOB_ENVIRONMENT
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    cd migrations
+    liquibase \
+      --url=jdbc:postgresql://127.0.0.1:15432/assurance_db \
+      --username=${DB_USER:-postgres} \
+      --password=${DB_PASSWORD} \
+      --changeLogFile=./changelog.yaml \
+      --contexts=${LB_CONTEXTS} \
+      ${LB_COMMAND:-update-sql}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $LB_JOB'
+  
+liquibase-job-clear-checksums:
+  stage: migrate
+  image: ${NEXUS_PREFIX}/gold_standard/gitlab_runners/liquibase
+  environment:
+    name: $JOB_ENVIRONMENT
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    cd migrations
+    liquibase \
+      --url=jdbc:postgresql://127.0.0.1:15432/assurance_db \
+      --username=${DB_USER:-postgres} \
+      --password=${DB_PASSWORD} \
+      --changeLogFile=./changelog.yaml \
+      --contexts=${LB_CONTEXTS} \
+      clear-checksums
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $LB_JOB_CLEAR_CHECKSUMS'
+
+runner-job:
+  stage: runner
+  image: ${NEXUS_PREFIX}/docker-runner
+  services:
+  - name: ${NEXUS_PREFIX}/docker:dind
+    alias: docker
+  script:
+    - cd gitlab_runners/${RUNNER_NAME}
+    - docker build --build-arg NEXUS_PREFIX=${NEXUS_PREFIX} ${DOCKER_BUILD_ARGS} -t ${NEXUS_PREFIX}/gold_standard/gitlab_runners/${RUNNER_IMAGE} .
+    - docker push ${NEXUS_PREFIX}/gold_standard/gitlab_runners/${RUNNER_IMAGE}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $RUNNER_JOB'
+
+database-deltas-job:
+  stage: database_deltas
+  image: python:3.9  
+  environment:
+    name: $JOB_ENVIRONMENT
+  before_script:
+    # Add Microsoft package repository and install ODBC Driver and unixODBC
+    - apt-get update && apt-get install -y curl apt-transport-https gnupg2
+    - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+    - curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+    - apt-get update
+    - ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
+    - export ASSURANCE_DB_USER=${DB_USER:-postgres}
+    - export ASSURANCE_DB_PASSWORD=${DB_PASSWORD}
+    - export SC_DB_USER=${SC_DB_USER}
+    - export SC_DB_PASSWORD=${SC_DB_PASSWORD}
+    - export FINAL_MIGRATION=${FINAL_MIGRATION}
+    - export ASSURANCE_DB_HOST="127.0.0.1"
+    - export ASSURANCE_DB_PORT="15432"
+    - export ASSURANCE_DB_NAME="assurance_db"
+    - python -m venv venv
+    - source venv/bin/activate
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    
+    pip install --upgrade pip
+
+    cd deltas
+
+    pip install -r requirements.txt
+    
+    python main.py
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DELTAS_JOB'
+
+methodology-migrations-job:
+  stage: methodology_migrations
+  image: python:3.9  
+  environment:
+    name: $JOB_ENVIRONMENT
+  before_script:
+    # Add Microsoft package repository and install ODBC Driver and unixODBC
+    - apt-get update && apt-get install -y curl apt-transport-https gnupg2
+    - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+    - curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+    - apt-get update
+    - ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
+    - export ASSURANCE_DB_USER=${DB_USER:-postgres}
+    - export ASSURANCE_DB_PASSWORD=${DB_PASSWORD}
+    - export ASSURANCE_DB_HOST="127.0.0.1"
+    - export ASSURANCE_DB_PORT="15432"
+    - export ASSURANCE_DB_NAME="assurance_db"
+    - python -m venv venv
+    - source venv/bin/activate
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    
+    pip install --upgrade pip
+
+    cd methodology_migrations
+
+    pip install -r requirements.txt
+    
+    python main.py
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $METHODOLOGY_JOB'
+
+document-migration-job:
+  stage: document_migration
+  image: python:3.9
+  environment:
+    name: $JOB_ENVIRONMENT
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    export RCLONE_COMMAND="rclone -v copy gs_sc_azure_source:scfilestore/GSProjectDocuments gs_aws_target:gs-ssrnc-dcmts-$JOB_ENVIRONMENT"
+    ssh -tt -o StrictHostKeyChecking=no -p 22 ec2-user@${DOCUMENT_MIGRATION_HOST} "$RCLONE_COMMAND"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DOCUMENT_MIGRATION_JOB'
+
+dump_prod_db:
+  stage: dump_and_restore
+  <<: *dump_pg_tools
+  environment:
+    name: production
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    
+    cd dump_prod_db
+    pip install -r requirements.txt
+    
+    # Use the CLI tool to dump the production database
+    export DUMP_AND_RESTORE_SOURCE=prod
+    export PROD_ASSURANCE_DB_HOST="127.0.0.1"
+    export PROD_ASSURANCE_DB_PORT="15432"
+    export PROD_ASSURANCE_DB_NAME=${DB_NAME}
+    export PROD_ASSURANCE_DB_USER=${DB_USER}
+    export PROD_ASSURANCE_DB_PASSWORD=${DB_PASSWORD}
+    
+    python -m cli dump
+  artifacts:
+    paths:
+      - dump_prod_db/dump_file.dump
+    expire_in: 2 hrs
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DUMP_PROD_DB_JOB'
+
+restore_to_staging:
+  stage: dump_and_restore
+  <<: *dump_pg_tools
+  environment:
+    name: staging
+  needs: ["dump_prod_db"]
+  script: |
+    eval $(ssh-agent -s)
+    ssh-add <(echo "${BASTION_PRIVATE_KEY}" | base64 -d)
+    
+    ssh -o StrictHostKeyChecking=no \
+        -f \
+        -N \
+        -p ${BASTION_PORT} \
+        -L 127.0.0.1:15432:${DB_HOST}:5432 \
+        ${BASTION_USERNAME}@${BASTION_HOST}
+    
+    cd dump_prod_db
+    pip install -r requirements.txt
+    
+    # Use the CLI tool to clear and restore to staging database
+    export DUMP_AND_RESTORE_TARGET=staging
+    export STAGING_ASSURANCE_DB_NAME=${DB_NAME}
+    export STAGING_ASSURANCE_DB_USER=${DB_USER}
+    export STAGING_ASSURANCE_DB_HOST="127.0.0.1"
+    export STAGING_ASSURANCE_DB_PORT="15432"
+    export STAGING_ASSURANCE_DB_PASSWORD=${DB_PASSWORD}
+    
+    python -m cli clear
+    python -m cli restore
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $DUMP_PROD_DB_JOB'

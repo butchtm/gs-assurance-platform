@@ -1,0 +1,3 @@
+UPDATE gs.assignment_status_notification
+SET assignment_status_id=0
+WHERE assignment_type_id=1;

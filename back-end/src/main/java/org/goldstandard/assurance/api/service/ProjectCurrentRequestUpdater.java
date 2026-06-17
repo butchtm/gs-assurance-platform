@@ -1,11 +1,9 @@
 package org.goldstandard.assurance.api.service;
 
-import java.util.Comparator;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goldstandard.assurance.api.entity.Project;
-import org.goldstandard.assurance.api.entity.Request;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -24,22 +22,17 @@ public class ProjectCurrentRequestUpdater {
 
   private void updateCurrentRequestId(Project project) {
     var originalCurrentRequestId = project.getCurrentRequestId();
-    var newCurrentRequestId =
-        getCurrentRequestExcludingNotRequestedStatus(project.getId())
-            .map(Request::getId)
-            .orElse(null);
+    var newCurrentRequestId = getCurrentRequestIdExcludingNotRequestedStatus(project.getId());
     log.info(
         "project {} {} replacing original current request id {} with {}",
         project.getId(),
         project.getGsid(),
         originalCurrentRequestId,
         newCurrentRequestId);
-    project.setCurrentRequestId(newCurrentRequestId);
+    newCurrentRequestId.ifPresent(project::setCurrentRequestId);
   }
 
-  private Optional<Request> getCurrentRequestExcludingNotRequestedStatus(Integer projectId) {
-    return requestFinder.getByProjectId(projectId).stream()
-        .filter(Request::hasActiveOrCompletedCurrentStatus)
-        .max(Comparator.comparing(Request::getIndex));
+  private Optional<Integer> getCurrentRequestIdExcludingNotRequestedStatus(Integer projectId) {
+    return requestFinder.findCurrentRequestId(projectId);
   }
 }

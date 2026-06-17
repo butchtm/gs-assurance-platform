@@ -1,0 +1,8 @@
+ALTER TABLE gs.energy_project
+RENAME transition_approval_procedure TO transition_approval_procedure_id;
+
+ALTER TABLE gs.energy_project
+RENAME transition_from_other_scheme TO transition_from_other_scheme_id;
+
+ALTER TABLE gs.energy_project
+RENAME transition_pathway TO transition_pathway_id;

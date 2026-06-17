@@ -24,7 +24,6 @@ class _ProjectCreationPage {
 
   navigation = {
     nextButton: () => cy.get('[type="submit"]').contains("Next"),
-    activePage: () => cy.get('[class="MuiStepLabel-root MuiStepLabel-horizontal MuiStepLabel-alternativeLabel css-1abj2s5"]'),
     finishButton: () => cy.get('[type="submit"]').contains("Finish"),
     summaryButton: () => cy.get("span").contains("Review")
   }

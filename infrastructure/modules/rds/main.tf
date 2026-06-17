@@ -25,7 +25,7 @@ resource "aws_db_instance" "db_gs_migration" {
   allocated_storage    = 10
   db_name              = "assuranceDB"
   engine               = "postgres"
-  engine_version       = "15.12"
+  engine_version       = "15.17"
   instance_class       = var.rds_instance_class
   username             = "assurance_dbadmin"
   password             = data.aws_secretsmanager_secret_version.current.secret_string

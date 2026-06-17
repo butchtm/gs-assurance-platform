@@ -45,6 +45,7 @@ public class RequestDTO {
   private final Collection<RequestMethodologyDTO> methodologies;
   private final Boolean fastTracked;
   private final Boolean internal;
+  private final boolean paa;
   private final RequestActivityDTO latestRequestActivity;
   private final MonitoringPeriodDTO monitoringPeriod;
   private final RequestConversationDTO conversation;

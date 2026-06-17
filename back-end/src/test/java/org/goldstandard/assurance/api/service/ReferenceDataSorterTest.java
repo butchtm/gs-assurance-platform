@@ -13,15 +13,19 @@ class ReferenceDataSorterTest {
 
   @Test
   void shouldSortCarbonStreamsInSpecificOrder() {
+    var gsTverPt = typeWithCode("GS_TVER_PT");
+    var gsTverIt = typeWithCode("GS_TVER_IT");
     var reportingOnly = typeWithCode("REPORTING_ONLY");
     var gsVer = typeWithCode("GS_VER");
     var gsCer = typeWithCode("GS_CER");
     var key = "CarbonStream";
-    var refData = Map.of(key, List.of(reportingOnly, gsVer, gsCer));
+    var refData = Map.of(key, List.of(gsTverPt, gsTverIt, reportingOnly, gsVer, gsCer));
 
     var sortedRefData = sorter.sort(refData);
 
-    assertThat(sortedRefData).hasSize(1).containsEntry(key, List.of(gsVer, gsCer, reportingOnly));
+    assertThat(sortedRefData)
+        .hasSize(1)
+        .containsEntry(key, List.of(gsVer, gsCer, reportingOnly, gsTverIt, gsTverPt));
   }
 
   @Test

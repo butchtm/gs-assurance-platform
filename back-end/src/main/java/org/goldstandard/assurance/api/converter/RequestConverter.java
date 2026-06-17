@@ -69,6 +69,7 @@ public class RequestConverter {
       builder.fastTracked(request.getFastTracked());
     }
     builder.internal(request.getInternal());
+    builder.paa(request.isPaa());
     activityFinder
         .getLatestRequestActivity(request)
         .ifPresent(

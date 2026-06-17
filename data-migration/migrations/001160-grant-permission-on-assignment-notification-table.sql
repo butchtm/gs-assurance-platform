@@ -1,0 +1,1 @@
+GRANT SELECT ON gs.assignment_status_notification TO gs_assurance_db_writer;

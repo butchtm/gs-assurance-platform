@@ -41,7 +41,7 @@ And("I confirm my intent to re-open conversation to prevent anyone sending messa
 })
 
 When("I select the rich text area and type {string}", (message) => {
-  requestConversationModal.richTextArea.mainTypeArea().click().type(message)
+  requestConversationModal.richTextArea.mainTypeArea().click().type(message, {delay: 100})
 })
 
 And("I select the send message button", () => {
@@ -107,5 +107,7 @@ Then("I can see {string} as the message sender", (displayName) => {
 
 And("I can see the pd and vvb user has read my message", () => {
   cy.wait(250)
-  requestConversationModal.openModal.readReceipt("Seen by: VVB, Project Developer")
+  requestConversationModal.openModal.readReceipt("Seen by:")
+  requestConversationModal.openModal.readReceipt("VVB")
+  requestConversationModal.openModal.readReceipt("Project Developer")
 })

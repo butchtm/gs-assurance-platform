@@ -19,7 +19,7 @@ describe("CreateEditMethodologyModal", () => {
     const descriptionInput = screen.getByLabelText("Description *");
     fireEvent.change(descriptionInput, { target: { value: "This is my description" } });
 
-    const activeInput = screen.getByRole("checkbox");
+    const activeInput = screen.getByRole("checkbox", { name: "Active" });
     fireEvent.click(activeInput);
 
     fireEvent.click(screen.getByText("Create"));
@@ -28,6 +28,7 @@ describe("CreateEditMethodologyModal", () => {
       expect(createMethodology as jest.Mock).toHaveBeenCalledWith({
         description: "This is my description",
         active: true,
+        paa: true,
       });
     });
   });
@@ -55,7 +56,7 @@ describe("CreateEditMethodologyModal", () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText("Description *")).toHaveValue("Methodology1");
-      expect(screen.getByRole("checkbox")).toHaveProperty("checked", true);
+      expect(screen.getByRole("checkbox", { name: "Active" })).toHaveProperty("checked", true);
     });
 
     fireEvent.click(screen.getByText("Edit"));
@@ -65,6 +66,7 @@ describe("CreateEditMethodologyModal", () => {
         id: 1,
         description: "Methodology1",
         active: true,
+        paa: true,
       });
     });
   });
@@ -83,16 +85,16 @@ describe("CreateEditMethodologyModal", () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText("Description *")).toHaveValue("Methodology1");
-      expect(screen.getByRole("checkbox")).toHaveProperty("checked", true);
+      expect(screen.getByRole("checkbox", { name: "Active" })).toHaveProperty("checked", true);
     });
 
-    fireEvent.click(screen.getByText("Delete"));
+    fireEvent.click(screen.getByTestId("methodology-delete-button"));
 
     await waitFor(() => {
       expect(screen.getByText("Confirm Delete")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getAllByText("Delete")[1]);
+    fireEvent.click(screen.getByTestId("confirm-delete-button"));
 
     await waitFor(() => {
       expect(deleteMethodology as jest.Mock).toHaveBeenCalledWith(1);
@@ -113,6 +115,81 @@ describe("CreateEditMethodologyModal", () => {
     await waitFor(() => {
       expect(screen.getByText("Delete")).toBeDisabled();
       expect(screen.getByText("Methodologies in use cannot be deleted")).toBeInTheDocument();
+    });
+  });
+
+  it("should allow for toggling of the PAA checkbox", async () => {
+    render(
+      <CreateEditMethodologyModal
+        open={true}
+        onClose={() => null}
+        methodology={{
+          ...mockActiveReferenceTypes.Methodology[0],
+          inUse: true,
+          paa: true,
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("PAA (Paris Agreement Alignment)")).toHaveProperty("checked", true);
+    });
+
+    const paaInput = screen.getByLabelText("PAA (Paris Agreement Alignment)");
+    fireEvent.click(paaInput);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("PAA (Paris Agreement Alignment)")).toHaveProperty("checked", false);
+    });
+  });
+
+  it("should default the PAA checkbox to true when creating a new methodology", async () => {
+    render(<CreateEditMethodologyModal open={true} onClose={() => null} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("PAA (Paris Agreement Alignment)")).toHaveProperty("checked", true);
+    });
+  });
+
+  it("should default the PAA checkbox to the methodology value when editing", async () => {
+    render(
+      <CreateEditMethodologyModal
+        open={true}
+        onClose={() => null}
+        methodology={{
+          ...mockActiveReferenceTypes.Methodology[0],
+          inUse: true,
+          paa: false,
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("PAA (Paris Agreement Alignment)")).toHaveProperty("checked", false);
+    });
+  });
+
+  it("should prevent submission if description is removed on edit", async () => {
+    render(
+      <CreateEditMethodologyModal
+        open={true}
+        onClose={() => null}
+        methodology={{
+          ...mockActiveReferenceTypes.Methodology[0],
+          inUse: true,
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Description *")).toHaveValue("Methodology1");
+    });
+
+    const descriptionInput = screen.getByLabelText("Description *");
+    fireEvent.change(descriptionInput, { target: { value: "" } });
+
+    await waitFor(() => {
+      expect(screen.getByText("Edit")).toBeDisabled();
     });
   });
 });

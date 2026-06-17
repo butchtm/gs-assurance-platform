@@ -3,20 +3,21 @@ import { useField, useFormikContext } from "formik";
 
 import { computeDeferredBatchError } from "../../../common/form/deferredBatchErrors";
 import { CreateRequestForm } from "../../requests/create-request/Wizard/Request";
-import { isForIssuanceRequest } from "../../../common/request/GSRequest";
+import { isForEmissionsRemovalRequest, isForIssuanceRequest } from "../../../common/request/GSRequest";
+import { requestsHelperText } from "../../requests/create-request/RequestHelpers";
 
 import CustomHelperText, { CustomTooltip } from "./CustomTooltipText";
 
 export const EmissionsReductionInput = ({
+  requestType,
   fieldValue,
-  helpText,
   onChange,
   name = "emissionReductionAmount",
   deferUntilFinalSubmit = false,
   required = false,
 }: {
+  requestType?: string;
   fieldValue: number | null | undefined;
-  helpText: string | JSX.Element;
   onChange: (value: number) => void;
   name?: string;
   deferUntilFinalSubmit?: boolean;
@@ -50,14 +51,32 @@ export const EmissionsReductionInput = ({
   });
   const errorText = errorMessage;
 
-  const toEmissionsLabel = (createRequestForm: CreateRequestForm) => {
-    if (isForIssuanceRequest(createRequestForm)) {
+  const toEmissionsLabel = (requestType?: string) => {
+    if (!requestType || isNaN(Number(requestType))) {
+      return "Estimated Annual Emission Reduction/Removal";
+    }
+    const requestTypeId = parseInt(requestType, 10);
+    if (isForEmissionsRemovalRequest(requestTypeId)) {
+      return "Emissions Reduction/Removal for this request";
+    }
+    if (isForIssuanceRequest(requestTypeId)) {
       return "Verified Total Emission Reduction/Removal";
     }
     return "Estimated Annual Emission Reduction/Removal";
   };
 
-  const label = toEmissionsLabel(values);
+  const toHelpText = (requestType?: string): string | JSX.Element => {
+    if (!requestType || isNaN(Number(requestType))) {
+      return "Please indicate the average annual emission reductions or removals for this crediting period";
+    }
+    const requestTypeId = parseInt(requestType, 10);
+    if (isForEmissionsRemovalRequest(requestTypeId)) {
+      return "Please state the total emission reductions of the monitoring period covered under this request";
+    }
+    return requestsHelperText.emissionsReduction();
+  };
+
+  const label = toEmissionsLabel(requestType);
 
   return (
     <>
@@ -85,7 +104,7 @@ export const EmissionsReductionInput = ({
             "aria-describedby": meta.touched && meta.error ? `${name}-error` : undefined,
           }}
           InputProps={{
-            endAdornment: <CustomHelperText text={helpText} type={CustomTooltip.HELP} />,
+            endAdornment: <CustomHelperText text={toHelpText(requestType)} type={CustomTooltip.HELP} />,
           }}
         />
       </Box>

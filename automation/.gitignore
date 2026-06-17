@@ -6,3 +6,5 @@ cypress/screenshots
 cypress/screenshots/selectedProject.feature/projectsGS#### page -- 'REALCASE' loads for 'ARM TEAM' (example #27) (failed).png
 .gitlab-ci copy.yml
 cypress/downloads/downloads.htm
+reporting/
+.vscode/

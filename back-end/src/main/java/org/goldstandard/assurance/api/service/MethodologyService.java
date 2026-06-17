@@ -5,6 +5,7 @@ import static org.springframework.data.domain.Sort.Direction.ASC;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.goldstandard.assurance.api.dto.MethodologyManagementDTO;
@@ -29,8 +30,8 @@ public class MethodologyService {
   private final ProjectCreditingPeriodMethodologyRepository periodMethodologyRepository;
   private final ProjectFinder projectFinder;
 
-  public Page<Methodology> getAll(Pageable pageable, String description) {
-    return repository.findAll(descriptionContains(description), pageable);
+  public Page<Methodology> getAll(Pageable pageable, String description, Boolean paa) {
+    return repository.findAll(descriptionContains(description).and(filterByPaa(paa)), pageable);
   }
 
   public Collection<Methodology> getAll() {
@@ -79,6 +80,15 @@ public class MethodologyService {
       return criteria.like(
           criteria.lower(root.get("description")),
           criteria.lower(criteria.literal(likeDescription)));
+    };
+  }
+
+  private static Specification<Methodology> filterByPaa(Boolean paa) {
+    return (root, query, criteria) -> {
+      if (Objects.isNull(paa)) {
+        return criteria.conjunction();
+      }
+      return criteria.equal(root.get("paa"), paa);
     };
   }
 

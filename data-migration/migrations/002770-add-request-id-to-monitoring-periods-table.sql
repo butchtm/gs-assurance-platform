@@ -1,0 +1,2 @@
+ALTER TABLE gs.project_crediting_monitoring_period
+ADD COLUMN origin_request_id integer;

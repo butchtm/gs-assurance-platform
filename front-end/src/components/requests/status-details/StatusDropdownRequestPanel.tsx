@@ -34,6 +34,7 @@ export const StatusDropdownRequestPanel = (props: {
           icon={<CalendarToday />}
         />
       )}
+      <RequestField name="PAA request" value={props.request.paa ? "Yes" : "No"} icon={<Article />} />
     </Grid>
   );
 };

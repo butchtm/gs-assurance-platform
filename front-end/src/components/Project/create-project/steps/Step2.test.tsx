@@ -1,12 +1,13 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import dayjs from "dayjs";
 import { Formik, useFormikContext } from "formik";
 
-import { ReferenceDataIdsOrId, ReferenceTypeContext } from "../../../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
-import { getInitialEmptyValues } from "../../Project";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceDataIdsOrId } from "@/common/data-types/DataReferenceTypes";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { getInitialEmptyValues } from "@/components/Project/Project";
 
 import { Step2 } from "./Step2";
 
@@ -79,24 +80,22 @@ describe("Step2", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: mockActiveReferenceTypes,
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step2 />
-          </LocalizationProvider>
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step2 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
+
     await waitFor(() => {
       expect(screen.getByLabelText("Project Description")).toBeInTheDocument();
       expect(screen.getByLabelText("Project Location")).toBeInTheDocument();
@@ -118,24 +117,20 @@ describe("Step2", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: mockActiveReferenceTypes,
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step2 />
-          </LocalizationProvider>
-        </Formik>
-        ,
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step2 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     const projectStartDate = screen.getByLabelText(/Project Start Date/i);
@@ -170,23 +165,20 @@ describe("Step2", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: mockActiveReferenceTypes,
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step2 />
-          </LocalizationProvider>
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step2 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -208,23 +200,20 @@ describe("Step2", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: mockActiveReferenceTypes,
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step2 />
-          </LocalizationProvider>
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step2 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     await waitFor(() => {
@@ -249,23 +238,20 @@ describe("Step2", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: mockActiveReferenceTypes,
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step2 />
-          </LocalizationProvider>
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={getInitialEmptyValues()} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step2 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            activeReferenceTypes: mockActiveReferenceTypes,
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     await waitFor(() => {

@@ -23,41 +23,17 @@ When("I select {string} from accounts page", (object) => {
   }
 })
 
+And("I delete all test accounts using the API", () => {
+  cy.deleteTestPlatformAccountsApi()
+})
+
+Then("No platform accounts are found", () => {
+  cy.contains("No results found").should("be.visible")
+})
+
 Then("account name {string} is displayed in the list", (accountName) => {
-  cy.wait(1000)
-  let found = false
-
-  function checkPage(pageIndex = 1) {
-    cy.get("tbody")
-      .within(() => {
-        cy.get("tr").each(($row) => {
-          cy.wrap($row)
-            .find("td")
-            .eq(2)
-            .then(($cell) => {
-              if ($cell.text().includes(accountName)) {
-                found = true
-              }
-            })
-        })
-      })
-      .then(() => {
-        if (found) {
-          expect(found).to.be.true
-          return
-        }
-
-        if (pageIndex < 8) {
-          cy.get(`[data-testid="page-${pageIndex + 1}"]`).click()
-          cy.wait(500)
-          checkPage(pageIndex + 1)
-        } else {
-          expect(found).to.be.true
-        }
-      })
-  }
-
-  checkPage()
+  cy.waitForNetworkIdle(1000)
+  cy.get(`td[data-index="2"]`).contains(accountName).should('exist')
 })
 
 And("I select {string} from account type filter", (object) => {
@@ -86,6 +62,22 @@ And("I select {string} from rows drop down", (rowNumber) => {
   platformAccountsPage.rowsPerPage.numberOfRows(rowNumber).click()
 })
 
+Then("More than {int} rows are on the page", (expectedCount) => {
+  cy.wait(1000)
+  let count = 0
+
+  cy.get("tbody")
+    .within(() => {
+      cy.get("tr").each(() => {
+        count += 1
+      })
+    })
+    .then(() => {
+      expect(count).to.be.greaterThan(expectedCount)
+    })
+})
+
+
 Then("{int} rows are on the page", (expectedCount) => {
   cy.wait(1000)
   let count = 0
@@ -100,6 +92,7 @@ Then("{int} rows are on the page", (expectedCount) => {
       expect(count).to.equal(expectedCount)
     })
 })
+
 
 When("I select {string} account from displayed list", (accountName) => {
   cy.get(`td[data-index="2"]`).contains(accountName).click({ force: true })
@@ -120,7 +113,7 @@ And("edit account text is at header of modal", () => {
 And("I select update button to apply new account details", () => {
   cy.wait(1500)
   cy.get(`button`).contains("Update").click()
-  cy.wait(1500)
+  cy.contains("Account Updated Successfully!").should('not.exist')
 })
 
 And("I type {string} into account name field", (name) => {
@@ -132,7 +125,7 @@ And("I input my details for {string} account", (accountType) => {
   platformAccountsPage.createPlatformAccount.typeSelection(accountType).click()
 
   let accountName = `autotest-${accountType}`
-  let mainContactEmail = `testuser@example.com`
+  let mainContactEmail = `gjennings@caci.co.uk`
   let mainContactAddress = `testAddress`
 
   platformAccountsPage.createPlatformAccount.accountName().click({ force: true }).type(accountName)

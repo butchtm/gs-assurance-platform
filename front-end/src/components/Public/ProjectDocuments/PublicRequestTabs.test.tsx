@@ -30,7 +30,7 @@ describe("PublicRequestTabs", () => {
 
   it("should allow for document downloading", async () => {
     (downloadPublicDocument as jest.Mock).mockResolvedValue(undefined);
-    global.URL.revokeObjectURL = jest.fn();
+    URL.revokeObjectURL = jest.fn();
     HTMLAnchorElement.prototype.click = jest.fn();
 
     render(

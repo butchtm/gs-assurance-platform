@@ -1,0 +1,1 @@
+GRANT SELECT ON gs.project_status_update_mapping TO gs_assurance_db_writer;

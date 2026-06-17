@@ -1,0 +1,23 @@
+services:
+  db:
+    build:
+      context: .
+      args:
+        - sc_db_username=${SC_DB_USERNAME}
+        - sc_db_password=${SC_DB_PASSWORD}
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=MySuperSafePostgresPassword
+      - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - ../local/dump:/tmp
+
+  liquibase:
+    image: liquibase/liquibase:4.29.2
+    volumes:
+      - ../../data-migration/migrations:/liquibase/changelog
+    command: --searchPath="./changelog" update --url="jdbc:postgresql://db:5432/assurance_db" --changelog-file=changelog.yaml --username=postgres --password=MySuperSafePostgresPassword --contexts="local"
+    depends_on:
+      - db

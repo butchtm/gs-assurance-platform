@@ -20,8 +20,10 @@ export const ConfirmDeleteDialog = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between" }}>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={onConfirm} color="error" autoFocus>
+        <Button onClick={onClose} data-testid="confirm-delete-cancel-button">
+          Cancel
+        </Button>
+        <Button onClick={onConfirm} color="error" autoFocus data-testid="confirm-delete-button">
           Delete
         </Button>
       </DialogActions>

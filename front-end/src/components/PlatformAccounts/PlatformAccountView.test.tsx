@@ -1,13 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { useParams } from "react-router-dom";
 
-import { ReferenceTypeContext, ReferenceTypes } from "../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes } from "../../common/data-types/DebugReferenceTypes";
-import { mockPlatformAccounts } from "../../common/platform-accounts/DebugPlatformAccounts";
-import { debugProject } from "../../common/project/DebugProject";
-import { AuthContext, AuthContextType } from "../Auth/Login/AuthProvider";
-import { getAccount, getAccountCompetencies, getAccounts } from "../PlatformAccounts/PlatformAccount";
-import { getAllProjects } from "../Project/Project";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceTypes } from "@/common/data-types/DataReferenceTypes";
+import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceTypes";
+import { mockPlatformAccounts } from "@/common/platform-accounts/DebugPlatformAccounts";
+import { debugProject } from "@/common/project/DebugProject";
+import { AuthContextType } from "@/components/Auth/Login/AuthProvider";
+import { getAccount, getAccountCompetencies, getAccounts } from "@/components/PlatformAccounts/PlatformAccount";
+import { getAllProjects } from "@/components/Project/Project";
 
 import PlatformAccountView from "./PlatformAccountView";
 
@@ -96,44 +97,32 @@ describe("PlatformAccountsView", () => {
   });
 
   it("renders correctly", async () => {
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
-            activeReferenceTypes: requiredReferenceTypes,
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <PlatformAccountView />
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<PlatformAccountView />, {
+      providerOverrides: {
+        auth: {
+          isAdminUser: jest.fn().mockReturnValue(true),
+        },
+        reference: {
+          activeReferenceTypes: requiredReferenceTypes,
+        },
+      },
+    });
 
     expect(await screen.findAllByText("Account One")).toHaveLength(2);
     expect(await screen.findByText("Desc1")).toBeInTheDocument();
   });
 
   it("renders competencies correctly", async () => {
-    render(
-      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
-        <ReferenceTypeContext.Provider
-          value={{
-            activeReferenceTypes: requiredReferenceTypes,
-            inactiveReferenceTypes: {},
-            allReferenceTypes: {},
-            referenceMethodologies: [],
-            getCustomReferenceOptions: () => [],
-            refreshReferenceData: () => Promise.resolve(),
-          }}
-        >
-          <PlatformAccountView />
-        </ReferenceTypeContext.Provider>
-      </AuthContext.Provider>,
-    );
+    renderWithProviders(<PlatformAccountView />, {
+      providerOverrides: {
+        auth: {
+          isAdminUser: jest.fn().mockReturnValue(true),
+        },
+        reference: {
+          activeReferenceTypes: requiredReferenceTypes,
+        },
+      },
+    });
 
     await waitFor(() => {
       expect(screen.getByText("Estimated Annual Emission Reduction Amount")).toBeInTheDocument();

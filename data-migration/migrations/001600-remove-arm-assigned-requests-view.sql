@@ -1,0 +1,1 @@
+DROP VIEW gs.v_arm_assigned_requests;

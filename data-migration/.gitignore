@@ -1,0 +1,16 @@
+**/jobInfo.properties
+.JETEmitters/
+.Java/
+.metadata/
+code/routines/system/*.*
+temp/
+sqlPatterns/
+.settings
+poms/
+.idea
+/local/dump/*.sql
+**.iml
+.vscode/settings.json
+**/__pycache__
+**/venv
+**/.env

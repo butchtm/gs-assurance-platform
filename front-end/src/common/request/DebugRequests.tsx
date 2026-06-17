@@ -1,756 +1,314 @@
 import dayjs from "dayjs";
+import _ from "lodash";
 
 import { RequestComment } from "../../components/requests/comments/RequestComments";
+import { CreateRequestForm } from "../../components/requests/create-request/Wizard/Request";
 import {
   CommonDashboardRequestResponse,
   RequestStatusResponse,
   TacRequestsResponse,
 } from "../../components/requests/Requests";
-import { ReferenceType } from "../data-types/DataReferenceTypes";
+import { ReferenceType, RequestType } from "../data-types/DataReferenceTypes";
 import { mockActiveReferenceTypes } from "../data-types/DebugReferenceTypes";
 import { PiiActionCode } from "../piiAnalysis/PiiAction";
-import { CreateRequestForm } from "../../components/requests/create-request/Wizard/Request";
 
 import { GSRequest, RequestConsultation, TimelineActivity } from "./GSRequest";
 
-export const debugRequests: GSRequest[] = [
-  {
-    id: 35562,
+const BASE_CREDITING_PERIOD = {
+  periodId: null,
+  startDate: null,
+  endDate: null,
+};
+
+const BASE_MONITORING_PERIOD = {
+  id: null,
+  startDate: null,
+  endDate: null,
+  feeSchedule: null,
+};
+
+export const BASE_REQUEST_TYPE = (code: string, id: number = 1, overrides: Partial<RequestType> = {}): RequestType => ({
+  id,
+  code,
+  description: _.startCase(code.toLowerCase()).replace(/\s/g, ""),
+  supportsPAA: false,
+  isActive: true,
+  ...overrides,
+});
+
+const createDebugRequest = (overrides: Partial<GSRequest>) =>
+  ({
     startDate: "",
     endDate: "",
     bookingDate: "",
-    requestType: {
-      id: 1,
-      code: "TYPE1",
-      description: "Type1",
-    },
+    creditingPeriod: BASE_CREDITING_PERIOD,
+    monitoringPeriod: BASE_MONITORING_PERIOD,
+    manuallyAdded: false,
+    requestStatusHistory: [],
+    currentRoundIndex: null,
+    requestRounds: [
+      {
+        roundIndex: 0,
+        startDate: dayjs.utc().toISOString(),
+        endDate: dayjs.utc().toISOString(),
+        statusId: 0,
+      },
+    ],
+    inStakeholderConsultation: false,
+    emissionReductionAmount: 10000,
+    batchId: 5,
+    batchTypeId: 1,
+    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
+    migrated: true,
+    ...overrides,
+  }) as GSRequest;
+
+export const debugRequests: GSRequest[] = [
+  createDebugRequest({
+    id: 35562,
     index: 1,
     reviewName: "Request 1",
-    sameReviewTypeCount: 1,
-    reviewDocumentStatus: 123,
-    invoiceId: null,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
+    requestType: BASE_REQUEST_TYPE("TYPE1", 1),
     projectId: 586,
-    project: {
-      gsid: "1000",
-      id: 1,
-      name: "project 1",
-      programmeOfActivitiesId: 1,
-      piiMetadata: {
-        piiPresent: false,
-        piiDetail: [],
-        action: null,
-      },
-    },
-    requestStatus: {
-      id: 9,
-      code: "COMPLETENESS_CHECK",
-      description: "GS for completeness check",
-    },
-    currentRoundIndex: null,
-    requestRounds: [
-      {
-        roundIndex: 0,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
-    ],
+    project: { gsid: "1000", id: 1, name: "project 1", programmeOfActivitiesId: 1 },
+    requestStatus: { id: 9, code: "COMPLETENESS_CHECK", description: "GS for completeness check" },
     inStakeholderConsultation: true,
-    emissionReductionAmount: 10000,
-    batchId: 5,
-    batchTypeId: 1,
     currentConsultationStartDate: dayjs.utc().toISOString(),
     currentConsultationEndDate: dayjs.utc().add(1, "day").toString(),
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
-  {
+    paa: true,
+  }),
+  createDebugRequest({
     id: 1,
-    startDate: "",
-    endDate: "",
-    bookingDate: "",
-    requestType: {
-      id: 1,
-      code: "TYPE2",
-      description: "Type2",
-    },
     index: 1,
     reviewName: "Request 2",
-    invoiceId: 2,
-    sameReviewTypeCount: 1,
-    reviewDocumentStatus: 123,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
+    requestType: BASE_REQUEST_TYPE("TYPE2", 1),
     projectId: 3,
-    project: {
-      gsid: "3000",
-      id: 3,
-      name: "project 3",
-      programmeOfActivitiesId: 2,
-    },
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "Project developer for preparation",
-    },
-    currentRoundIndex: null,
-    requestRounds: [
-      {
-        roundIndex: 1,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
-    ],
-    inStakeholderConsultation: false,
-    emissionReductionAmount: 10000,
-    batchId: 5,
-    batchTypeId: 1,
-    currentConsultationStartDate: dayjs.utc().add(-1, "day").toString(),
-    currentConsultationEndDate: dayjs.utc().add(2, "day").toString(),
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
-  {
-    id: 2,
-    startDate: "",
-    endDate: "",
-    bookingDate: "",
-    requestType: {
-      id: 3,
-      code: "TYPE3",
-      description: "Type3",
-    },
-    index: 1,
-    invoiceId: 3,
-    reviewName: "Request 3",
-    sameReviewTypeCount: 1,
-    reviewDocumentStatus: 123,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
-    projectId: 2,
-    project: {
-      gsid: "1000",
-      id: 2,
-      name: "project 2",
-      programmeOfActivitiesId: 1,
-    },
-    requestStatus: {
-      id: 9,
-      code: "COMPLETENESS_CHECK",
-      description: "GS for completeness check",
-    },
-    currentRoundIndex: null,
-    requestRounds: [
-      {
-        roundIndex: 0,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
-    ],
-    inStakeholderConsultation: false,
-    emissionReductionAmount: 10000,
-    batchId: 5,
-    batchTypeId: 1,
-    currentConsultationStartDate: dayjs.utc().add(-2, "day").toString(),
-    currentConsultationEndDate: dayjs.utc().add(3, "day").toString(),
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
+    project: { gsid: "3000", id: 3, name: "project 3", programmeOfActivitiesId: 2 },
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "Project developer for preparation" },
+    invoiceId: 2,
+  }),
 ];
 
-const defaultRequestStatusRequestInfo: GSRequest = {
+const defaultRequestStatusRequestInfo = createDebugRequest({
   id: 5,
-  startDate: "",
-  endDate: "",
-  bookingDate: "",
-  requestType: {
-    id: 1013,
-    code: "GENERIC",
-    description: "Generic",
-  },
   index: 1,
   invoiceId: 3,
   reviewName: "Request 3",
   sameReviewTypeCount: 1,
   reviewDocumentStatus: 123,
-  creditingPeriod: {
-    periodId: null,
-    startDate: null,
-    endDate: null,
-  },
-  monitoringPeriod: {
-    id: null,
-    startDate: null,
-    endDate: null,
-    feeSchedule: null,
-  },
-  manuallyAdded: false,
-  requestStatusHistory: [],
+  requestType: BASE_REQUEST_TYPE("GENERIC", 1013),
   projectId: 1,
-  project: {
-    gsid: "1000",
-    id: 1,
-    name: "project 1",
-    programmeOfActivitiesId: 1,
-  },
-  requestStatus: {
-    id: 6,
-    code: "IN_AUDIT",
-    description: "In audit",
-  },
+  project: { gsid: "1000", id: 1, name: "project 1", programmeOfActivitiesId: 1 },
+  requestStatus: { id: 6, code: "IN_AUDIT", description: "In audit" },
   currentRoundIndex: 2,
   requestRounds: [
-    {
-      roundIndex: 2,
-      startDate: dayjs.utc().toISOString(),
-      endDate: dayjs.utc().toISOString(),
-      statusId: 0,
-    },
+    { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
   ],
-  inStakeholderConsultation: false,
-  emissionReductionAmount: 10000,
-  batchId: 5,
-  batchTypeId: 1,
-  methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-  migrated: true,
-};
+});
 
 export const debugInAuditRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 11,
-      code: "IN_AUDIT",
-      description: "In audit",
-    },
+    requestStatus: { id: 11, code: "IN_AUDIT", description: "In audit" },
     currentRoundIndex: 1,
-    requestStatusHistory: [
-      {
-        id: 0,
-        previousStatusId: 6, // In Preparation
-        nextStatusId: 11, // In Audit
-        changedAt: "2024-10-2",
-      },
-    ],
+    requestStatusHistory: [{ id: 0, previousStatusId: 6, nextStatusId: 11, changedAt: "2024-10-2" }],
     requestRounds: [
-      {
-        roundIndex: 1,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
+      { roundIndex: 1, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
     ],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 11,
-      code: "IN_AUDIT",
-      description: "In audit",
-    },
+    requestStatus: { id: 11, code: "IN_AUDIT", description: "In audit" },
     currentRoundIndex: 2,
     requestStatusHistory: [
-      {
-        previousStatusId: 9,
-        nextStatusId: 12,
-        id: 1,
-        changedAt: "",
-      },
-      {
-        previousStatusId: 13,
-        nextStatusId: 11,
-        id: 1,
-        changedAt: "",
-      },
+      { previousStatusId: 9, nextStatusId: 12, id: 1, changedAt: "" },
+      { previousStatusId: 13, nextStatusId: 11, id: 1, changedAt: "" },
     ],
     requestRounds: [
-      {
-        roundIndex: 2,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
+      { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
     ],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 11,
-      code: "IN_AUDIT",
-      description: "In audit",
-    },
+    requestStatus: { id: 11, code: "IN_AUDIT", description: "In audit" },
     currentRoundIndex: 2,
     requestStatusHistory: [
-      {
-        previousStatusId: 11,
-        nextStatusId: 10,
-        id: 1,
-        changedAt: "",
-      },
-      {
-        previousStatusId: 9,
-        nextStatusId: 4,
-        id: 1,
-        changedAt: "",
-      },
-      {
-        previousStatusId: 13,
-        nextStatusId: 6,
-        id: 1,
-        changedAt: "",
-      },
+      { previousStatusId: 11, nextStatusId: 10, id: 1, changedAt: "" },
+      { previousStatusId: 9, nextStatusId: 4, id: 1, changedAt: "" },
+      { previousStatusId: 13, nextStatusId: 6, id: 1, changedAt: "" },
     ],
     requestRounds: [
-      {
-        roundIndex: 2,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 1,
-      },
+      { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 1 },
     ],
-  },
+  }),
 ];
 
 export const debugInPreparationRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 0,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
     requestRounds: [],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 2,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
     requestStatusHistory: [
-      {
-        previousStatusId: 6,
-        nextStatusId: 11,
-        changedAt: "",
-        id: 1,
-      },
-      {
-        previousStatusId: 10,
-        nextStatusId: 13,
-        changedAt: "",
-        id: 1,
-      },
+      { previousStatusId: 6, nextStatusId: 11, changedAt: "", id: 1 },
+      { previousStatusId: 10, nextStatusId: 13, changedAt: "", id: 1 },
     ],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 2,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
-    requestStatusHistory: [
-      {
-        previousStatusId: 5,
-        nextStatusId: 4,
-        changedAt: "",
-        id: 1,
-      },
-    ],
-  },
-  {
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
+    requestStatusHistory: [{ previousStatusId: 5, nextStatusId: 4, changedAt: "", id: 1 }],
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 2,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
-    requestStatusHistory: [
-      {
-        previousStatusId: 5,
-        nextStatusId: 4,
-        changedAt: "",
-        id: 1,
-      },
-    ],
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
+    requestStatusHistory: [{ previousStatusId: 5, nextStatusId: 4, changedAt: "", id: 1 }],
     fastTracked: true,
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 0,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
-    requestStatusHistory: [
-      {
-        previousStatusId: 6,
-        changedAt: "",
-        id: 1,
-        nextStatusId: 10,
-      },
-    ],
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
+    requestStatusHistory: [{ previousStatusId: 6, changedAt: "", id: 1, nextStatusId: 10 }],
     requestRounds: [],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: null,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
     requestStatusHistory: [
-      {
-        previousStatusId: 6,
-        changedAt: "",
-        id: 1,
-        nextStatusId: 9,
-      },
-      {
-        previousStatusId: 9,
-        changedAt: "",
-        id: 2,
-        nextStatusId: 6,
-      },
+      { previousStatusId: 6, changedAt: "", id: 1, nextStatusId: 9 },
+      { previousStatusId: 9, changedAt: "", id: 2, nextStatusId: 6 },
     ],
     requestRounds: [],
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     currentRoundIndex: 2,
-    requestStatus: {
-      id: 6,
-      code: "IN_PREPARATION",
-      description: "In Preparation",
-    },
+    requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
     requestStatusHistory: [
-      {
-        previousStatusId: 6,
-        changedAt: "",
-        id: 1,
-        nextStatusId: 10,
-      },
-      {
-        previousStatusId: 10,
-        changedAt: "",
-        id: 2,
-        nextStatusId: 6,
-      },
+      { previousStatusId: 6, changedAt: "", id: 1, nextStatusId: 10 },
+      { previousStatusId: 10, changedAt: "", id: 2, nextStatusId: 6 },
     ],
     requestRounds: [
-      {
-        roundIndex: 2,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
+      { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
     ],
-  },
+  }),
 ];
 
 export const debugInAssignmentRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 12,
-      code: "IN_ASSIGNMENT",
-      description: "In Assignment",
-    },
-  },
-  {
+    requestStatus: { id: 12, code: "IN_ASSIGNMENT", description: "In Assignment" },
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 12,
-      code: "IN_ASSIGNMENT",
-      description: "In Assignment",
-    },
-  },
+    requestStatus: { id: 12, code: "IN_ASSIGNMENT", description: "In Assignment" },
+  }),
 ];
 
 export const debugInProgressRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 10,
-      code: "IN_PROGRESS",
-      description: "In Progress",
-    },
-    requestStatusHistory: [
-      {
-        id: 0,
-        previousStatusId: 12, // In Assignment
-        nextStatusId: 10, // In Progress
-        changedAt: "2024-10-2",
-      },
-    ],
-  },
+    requestStatus: { id: 10, code: "IN_PROGRESS", description: "In Progress" },
+    requestStatusHistory: [{ id: 0, previousStatusId: 12, nextStatusId: 10, changedAt: "2024-10-2" }],
+  }),
 ];
 
 export const debugInRoundCompletionRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
-    requestStatus: {
-      id: 13,
-      code: "IN_ROUND_COMPLETION",
-      description: "In Round Completion",
-    },
-    requestStatusHistory: [
-      {
-        id: 1,
-        previousStatusId: 10,
-        nextStatusId: 13,
-        changedAt: dayjs.utc().toISOString(),
-      },
-    ],
-  },
-  {
+    requestStatus: { id: 13, code: "IN_ROUND_COMPLETION", description: "In Round Completion" },
+    requestStatusHistory: [{ id: 1, previousStatusId: 10, nextStatusId: 13, changedAt: dayjs.utc().toISOString() }],
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     inStakeholderConsultation: true,
-    requestStatus: {
-      id: 13,
-      code: "IN_ROUND_COMPLETION",
-      description: "In Round Completion",
-    },
-    requestStatusHistory: [
-      {
-        id: 2,
-        previousStatusId: 10,
-        nextStatusId: 13,
-        changedAt: dayjs.utc().toISOString(),
-      },
-    ],
-  },
+    requestStatus: { id: 13, code: "IN_ROUND_COMPLETION", description: "In Round Completion" },
+    requestStatusHistory: [{ id: 2, previousStatusId: 10, nextStatusId: 13, changedAt: dayjs.utc().toISOString() }],
+  }),
 ];
 
 export const debugInCompletenessRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     requestStatusHistory: [],
-    requestStatus: {
-      id: 9,
-      code: "COMPLETENESS_CHECK",
-      description: "In Completeness",
-    },
-  },
-  {
+    requestStatus: { id: 9, code: "COMPLETENESS_CHECK", description: "In Completeness" },
+  }),
+  createDebugRequest({
     ...defaultRequestStatusRequestInfo,
     requestStatusHistory: [
-      {
-        id: 1,
-        previousStatusId: mockActiveReferenceTypes.RequestStatus[11].id, //In Audit
-        nextStatusId: 7,
-        changedAt: "",
-      },
+      { id: 1, previousStatusId: mockActiveReferenceTypes.RequestStatus[11].id, nextStatusId: 7, changedAt: "" },
     ],
-    requestStatus: {
-      id: 9,
-      code: "COMPLETENESS_CHECK",
-      description: "In Completeness",
-    },
-  },
+    requestStatus: { id: 9, code: "COMPLETENESS_CHECK", description: "In Completeness" },
+  }),
 ];
 
-const defaultClosedRequest: GSRequest = {
+const defaultClosedRequest = createDebugRequest({
   id: 5,
-  startDate: "",
-  endDate: "",
-  bookingDate: "",
-  requestType: {
-    id: 111,
-    code: "TYPE111",
-    description: "Type111",
-  },
   index: 1,
   invoiceId: 3,
   reviewName: "Request 3",
   sameReviewTypeCount: 1,
   reviewDocumentStatus: 123,
-  creditingPeriod: {
-    periodId: null,
-    startDate: null,
-    endDate: null,
-  },
-  monitoringPeriod: {
-    id: null,
-    startDate: null,
-    endDate: null,
-    feeSchedule: null,
-  },
-  manuallyAdded: false,
-  requestStatusHistory: [],
+  requestType: BASE_REQUEST_TYPE("TYPE111", 111),
   projectId: 1,
-  project: {
-    gsid: "1000",
-    id: 1,
-    name: "project 1",
-    programmeOfActivitiesId: 1,
-  },
-  requestStatus: {
-    id: 4,
-    code: "COMPLETED_APPROVED",
-    description: "Completed - Approved",
-  },
+  project: { gsid: "1000", id: 1, name: "project 1", programmeOfActivitiesId: 1 },
+  requestStatus: { id: 4, code: "COMPLETED_APPROVED", description: "Completed - Approved" },
   currentRoundIndex: 2,
   requestRounds: [
-    {
-      roundIndex: 2,
-      startDate: dayjs.utc().toISOString(),
-      endDate: dayjs.utc().toISOString(),
-      statusId: 0,
-    },
+    { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
   ],
-  inStakeholderConsultation: false,
-  emissionReductionAmount: 10000,
-  batchId: 5,
-  batchTypeId: 1,
-  methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-  migrated: true,
-};
+});
 
-export const debugNotRequestedRequest = {
+export const debugNotRequestedRequest = createDebugRequest({
   ...defaultClosedRequest,
-  requestStatus: {
-    id: 0,
-    code: "NOT_REQUESTED",
-    description: "Not requested",
-  },
-} as GSRequest;
+  requestStatus: { id: 0, code: "NOT_REQUESTED", description: "Not requested" },
+});
 
-export const debugNotClosedRequest: GSRequest = {
+export const debugNotClosedRequest = createDebugRequest({
   id: 5,
-  startDate: "",
-  endDate: "",
-  bookingDate: "",
-  requestType: {
-    id: 111,
-    code: "TYPE111",
-    description: "Type111",
-  },
   index: 1,
   invoiceId: 3,
   reviewName: "Request 3",
   sameReviewTypeCount: 1,
   reviewDocumentStatus: 123,
-  creditingPeriod: {
-    periodId: null,
-    startDate: null,
-    endDate: null,
-  },
-  monitoringPeriod: {
-    id: null,
-    startDate: null,
-    endDate: null,
-    feeSchedule: null,
-  },
-  manuallyAdded: false,
-  requestStatusHistory: [],
+  requestType: BASE_REQUEST_TYPE("TYPE111", 111),
   projectId: 1,
-  project: {
-    gsid: "1000",
-    id: 1,
-    name: "project 1",
-    programmeOfActivitiesId: 1,
-  },
-  requestStatus: {
-    id: 6,
-    code: "IN_PREPARATION",
-    description: "In Preparation",
-  },
+  project: { gsid: "1000", id: 1, name: "project 1", programmeOfActivitiesId: 1 },
+  requestStatus: { id: 6, code: "IN_PREPARATION", description: "In Preparation" },
   currentRoundIndex: 2,
   requestRounds: [
-    {
-      roundIndex: 2,
-      startDate: dayjs.utc().toISOString(),
-      endDate: dayjs.utc().toISOString(),
-      statusId: 0,
-    },
+    { roundIndex: 2, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
   ],
-  inStakeholderConsultation: false,
-  emissionReductionAmount: 10000,
-  batchId: 5,
-  batchTypeId: 1,
-  methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
   migrated: false,
-};
+});
 
 export const debugClosedRequests: GSRequest[] = [
-  {
+  createDebugRequest({
     ...defaultClosedRequest,
-    requestStatus: {
-      id: 4,
-      code: "COMPLETED_APPROVED",
-      description: "Completed - Approved",
-    },
+    requestStatus: { id: 4, code: "COMPLETED_APPROVED", description: "Completed - Approved" },
     migrated: false,
-  },
-  {
+  }),
+  createDebugRequest({
     ...defaultClosedRequest,
-    requestStatus: {
-      id: 5,
-      code: "COMPLETED_REJECTED",
-      description: "Completed - Rejected",
-    },
-  },
-  {
+    requestStatus: { id: 5, code: "COMPLETED_REJECTED", description: "Completed - Rejected" },
+  }),
+  createDebugRequest({
     ...defaultClosedRequest,
-    requestStatus: {
-      id: 8,
-      code: "CANCELLED",
-      description: "Cancelled",
-    },
-  },
-  {
+    requestStatus: { id: 8, code: "CANCELLED", description: "Cancelled" },
+  }),
+  createDebugRequest({
     ...defaultClosedRequest,
-    requestStatus: {
-      id: 7,
-      code: "OMITTED",
-      description: "Omitted",
-    },
-  },
+    requestStatus: { id: 7, code: "OMITTED", description: "Omitted" },
+  }),
 ];
 
 export const debugRequestComments: RequestComment[] = [
@@ -895,173 +453,47 @@ const mockPublicConsultation: RequestConsultation = {
 
 export const mockRequestConsultations: RequestConsultation[] = [mockPrivateConsultation, mockPublicConsultation];
 
-export const mockBatchProjectsRequests: GSRequest[] = [
-  {
-    id: 35562,
-    startDate: "",
-    endDate: "",
-    bookingDate: "",
-    requestType: {
-      id: 1,
-      code: "TYPE1",
-      description: "Type1",
-    },
+const createBatchRequest = (id: number, projectId: number, name: string, legacyIds?: number[]) =>
+  createDebugRequest({
+    id,
     index: 1,
-    reviewName: "Request 1",
+    reviewName: name,
     sameReviewTypeCount: 1,
     reviewDocumentStatus: 123,
     invoiceId: null,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
-    projectId: 1,
-    project: {
-      gsid: "1000",
-      id: 1,
-      name: "project 1",
-      programmeOfActivitiesId: 1,
-    },
-    requestStatus: {
-      id: 10,
-      code: "IN_PROGRESS",
-      description: "In Progress",
-    },
+    requestType: BASE_REQUEST_TYPE("TYPE1", 1),
+    projectId,
+    project: { gsid: "1000", id: projectId, name, programmeOfActivitiesId: 1 },
+    requestStatus: { id: 10, code: "IN_PROGRESS", description: "In Progress" },
     currentRoundIndex: null,
     requestRounds: [
-      {
-        roundIndex: 0,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
+      { roundIndex: 0, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
     ],
     inStakeholderConsultation: true,
     emissionReductionAmount: 10000,
     batchId: 5,
-    batchTypeId: 1,
     currentConsultationStartDate: dayjs.utc().toISOString(),
     currentConsultationEndDate: dayjs.utc().add(1, "day").toString(),
-    legacyBatchProjectIds: [1, 2, 3],
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
-  {
-    id: 35563,
-    startDate: "",
-    endDate: "",
-    bookingDate: "",
-    requestType: {
-      id: 1,
-      code: "TYPE1",
-      description: "Type1",
-    },
-    index: 1,
-    reviewName: "Request 2",
-    sameReviewTypeCount: 1,
-    reviewDocumentStatus: 123,
-    invoiceId: null,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
-    projectId: 4,
-    project: {
-      gsid: "1000",
-      id: 4,
-      name: "project 4",
-      programmeOfActivitiesId: 1,
-    },
-    requestStatus: {
-      id: 10,
-      code: "IN_PROGRESS",
-      description: "In Progress",
-    },
-    currentRoundIndex: null,
-    requestRounds: [
-      {
-        roundIndex: 0,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
-    ],
-    inStakeholderConsultation: true,
-    emissionReductionAmount: 10000,
-    batchId: 6,
-    batchTypeId: 1,
-    currentConsultationStartDate: dayjs.utc().toISOString(),
-    currentConsultationEndDate: dayjs.utc().add(1, "day").toString(),
-    legacyBatchProjectIds: [4],
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
-  {
+    ...(legacyIds && { legacyBatchProjectIds: legacyIds }),
+  });
+
+export const mockBatchProjectsRequests: GSRequest[] = [
+  createBatchRequest(35562, 1, "project 1", [1, 2, 3]),
+  createBatchRequest(35563, 4, "project 4", [4]),
+  createDebugRequest({
     id: 35564,
-    startDate: "",
-    endDate: "",
-    bookingDate: "",
-    requestType: {
-      id: 1,
-      code: "TYPE1",
-      description: "Type1",
-    },
     index: 1,
     reviewName: "Request 2",
     sameReviewTypeCount: 1,
     reviewDocumentStatus: 123,
     invoiceId: null,
-    creditingPeriod: {
-      periodId: null,
-      startDate: null,
-      endDate: null,
-    },
-    monitoringPeriod: {
-      id: null,
-      startDate: null,
-      endDate: null,
-      feeSchedule: null,
-    },
-    manuallyAdded: false,
-    requestStatusHistory: [],
+    requestType: BASE_REQUEST_TYPE("TYPE1", 1),
     projectId: 5,
-    project: {
-      gsid: "1000",
-      id: 5,
-      name: "project 5",
-      programmeOfActivitiesId: 1,
-    },
-    requestStatus: {
-      id: 10,
-      code: "IN_PROGRESS",
-      description: "In Progress",
-    },
+    project: { gsid: "1000", id: 5, name: "project 5", programmeOfActivitiesId: 1 },
+    requestStatus: { id: 10, code: "IN_PROGRESS", description: "In Progress" },
     currentRoundIndex: null,
     requestRounds: [
-      {
-        roundIndex: 0,
-        startDate: dayjs.utc().toISOString(),
-        endDate: dayjs.utc().toISOString(),
-        statusId: 0,
-      },
+      { roundIndex: 0, startDate: dayjs.utc().toISOString(), endDate: dayjs.utc().toISOString(), statusId: 0 },
     ],
     inStakeholderConsultation: true,
     emissionReductionAmount: 10000,
@@ -1069,9 +501,7 @@ export const mockBatchProjectsRequests: GSRequest[] = [
     batchTypeId: 1,
     currentConsultationStartDate: dayjs.utc().toISOString(),
     currentConsultationEndDate: dayjs.utc().add(1, "day").toString(),
-    methodologies: [{ methodologyId: 0, methodologyVersion: 2.4, creditingPeriodId: 0 }],
-    migrated: true,
-  },
+  }),
 ];
 
 export const mockTacDashboardRequests: TacRequestsResponse[] = [
@@ -1264,4 +694,5 @@ export const mockCreateRequestFormInitialValues: CreateRequestForm = {
   newMonitoringPeriodStartDate: null,
   newMonitoringPeriodEndDate: null,
   feeSchedule: null,
+  paa: false,
 };

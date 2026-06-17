@@ -782,13 +782,21 @@ public class ApiClient {
   }
 
   public ResponseEntity<PagedResource<MethodologyManagementDTO>> getAllMethodologiesPagedAsAdmin() {
-    return getAllMethodologiesPagedAsAdmin("");
+    return getAllMethodologiesPagedAsAdmin("", null);
   }
 
   public ResponseEntity<PagedResource<MethodologyManagementDTO>> getAllMethodologiesPagedAsAdmin(
       String description) {
+    return getAllMethodologiesPagedAsAdmin(description, null);
+  }
+
+  public ResponseEntity<PagedResource<MethodologyManagementDTO>> getAllMethodologiesPagedAsAdmin(
+      String description, Boolean paa) {
     var entity = getHttpEntityWithTokenForRole(ADMIN_ROLE);
-    var url = String.format("%s/methodologies/pages?description=%s", baseUrl, description);
+    var url =
+        String.format(
+            "%s/methodologies/pages?description=%s%s",
+            baseUrl, description, paa != null ? "&paa=" + paa : "");
     var response = restTemplate.exchange(url, GET, entity, String.class);
     return toPagedResourceResponse(response, MethodologyManagementDTO.class);
   }

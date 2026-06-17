@@ -1,0 +1,2 @@
+ALTER TABLE gs.invoice
+ALTER COLUMN amount SET NOT NULL;

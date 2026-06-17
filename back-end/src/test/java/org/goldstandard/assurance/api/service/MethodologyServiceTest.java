@@ -42,7 +42,7 @@ class MethodologyServiceTest {
 
   @Test
   void shouldCreateNewMethodology() {
-    var dto = MethodologyManagementDTO.builder().description("test").active(true).build();
+    var dto = MethodologyManagementDTO.builder().description("test").active(true).paa(true).build();
     service.create(dto);
 
     verify(repository).save(methodologyCaptor.capture());
@@ -51,6 +51,7 @@ class MethodologyServiceTest {
     assertThat(actual.getDescription()).isEqualTo(dto.getDescription());
     assertThat(actual.getCode()).isEqualTo(dto.getDescription().toUpperCase());
     assertThat(actual.getActive()).isEqualTo(dto.getActive());
+    assertThat(actual.isPaa()).isEqualTo(dto.isPaa());
   }
 
   @Test
@@ -58,7 +59,13 @@ class MethodologyServiceTest {
     var id = 1000;
     var dto = MethodologyManagementDTO.builder().description("test").active(true).build();
     var existing =
-        Methodology.builder().id(id).description("initial").code("INITIAL").isActive(false).build();
+        Methodology.builder()
+            .id(id)
+            .description("initial")
+            .code("INITIAL")
+            .isActive(false)
+            .paa(true)
+            .build();
     when(repository.forceFindById(id)).thenReturn(existing);
     service.update(id, dto);
 
@@ -69,6 +76,7 @@ class MethodologyServiceTest {
     assertThat(actual.getDescription()).isEqualTo(dto.getDescription());
     assertThat(actual.getCode()).isEqualTo(dto.getDescription().toUpperCase());
     assertThat(actual.getActive()).isEqualTo(dto.getActive());
+    assertThat(actual.isPaa()).isEqualTo(dto.isPaa());
   }
 
   @Test

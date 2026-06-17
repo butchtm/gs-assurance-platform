@@ -15,7 +15,7 @@ export const BatchCreateUsersModalsManager: React.FC<{
   const [isBatchCreateUsersModalOpen, setIsBatchCreateUsersModalOpen] = useState<boolean>(false);
   const [isBatchUsersSummaryModalOpen, setIsBatchUsersSummaryModalOpen] = useState<boolean>(false);
   const [isCreatingBatch, setIsCreatingBatch] = useState<boolean>(true);
-  const batchPoller = useRef<NodeJS.Timeout>();
+  const batchPoller = useRef<number | undefined>();
   const [batchUserResponse, setBatchUserResponse] = useState<BatchUserResponse>();
 
   useEffect(() => {

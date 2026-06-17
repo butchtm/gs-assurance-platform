@@ -23,7 +23,6 @@ import {
 } from "../../../../common/request/GSRequest";
 import { EmissionsReductionInput } from "../../../Reusable/FormFields/EmissionsReductionInput";
 import { BatchedProjectRequest } from "../../Requests";
-import { requestsHelperText } from "../RequestHelpers";
 
 import { CreateRequestForm } from "./Request";
 import { CustomBatchedCreditingPeriodSelect } from "./crediting-periods/CustomBatchedCreditingPeriodSelect";
@@ -349,8 +348,8 @@ export const StepBatched: React.FC<StepBatchedProps> = ({ requestTypeId, project
               )}
             <Grid item xs={12}>
               <EmissionsReductionInput
+                requestType={values.requestType}
                 fieldValue={values.batchStepProjectValues?.batch?.[project.id]?.emissionReductionAmount}
-                helpText={requestsHelperText.emissionsReduction()}
                 onChange={handleEmissionReductionChange}
                 name={`${currentProjectSelector}.emissionReductionAmount`}
                 deferUntilFinalSubmit

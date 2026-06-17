@@ -1,0 +1,2 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON gs.project_crediting_monitoring_period TO gs_assurance_db_writer;
+GRANT SELECT, INSERT, UPDATE, DELETE ON gs.request_monitoring_period TO gs_assurance_db_writer;

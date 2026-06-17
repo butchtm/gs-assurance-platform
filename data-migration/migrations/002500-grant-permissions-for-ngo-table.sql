@@ -1,0 +1,1 @@
+GRANT SELECT ON gs.ngo TO gs_assurance_db_writer;

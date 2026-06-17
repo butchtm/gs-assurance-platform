@@ -67,6 +67,9 @@ When("I click {string} from request creation page", (field) => {
     case "version":
       requestCreationPage.methodologies.methodologyVersion().click({ force: true })
       break
+    case "next":
+      requestCreationPage.navigation.nextButton().click()
+      break
     case "2nd methodology version":
       requestCreationPage.methodologies.methodologyVersionNth(1).click({ force: true })
       break
@@ -185,5 +188,37 @@ Then("Field contains {string} for request type {string}", (choice, requestType) 
     cy.log("Issuance does not require this field, skip")
   } else {
     cy.get("div").contains(`${choice}`)
+  }
+})
+
+Then("I am taken to request creation page {string}", (page) => {
+  const validPages = ["2", "3", "4", "5", "6", "Methodologies"]
+
+  if (validPages.includes(page)) {
+    switch(page) {
+      case "2":
+        cy.get('table').contains('Required Documents')
+        break
+      case "Methodologies":
+        cy.contains('Add Methodology').should('be.visible')
+    }
+  } else {
+    throw new Error(`page ${page} not found`)
+  }
+})
+
+When("I select PAA aligned to be {string}", (paaStatus) => {
+  switch(paaStatus) {
+    case "na": 
+      requestCreationPage.fields.paaStatus().should('not.exist')
+      break
+    case "true":
+      requestCreationPage.fields.paaStatus().parent().click()
+      requestCreationPage.fields.paaStatusYes().click()
+      break
+    case "false": 
+      requestCreationPage.fields.paaStatus().parent().click()
+      requestCreationPage.fields.paaStatusNo().click()
+      break
   }
 })

@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON gs.methodology TO gs_assurance_db_writer;

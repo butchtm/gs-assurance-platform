@@ -21,6 +21,7 @@ public class MethodologyFactory {
         .description(methodology.getDescription())
         .code(buildCode(methodology.getDescription()))
         .isActive(methodology.getActive())
+        .paa(methodology.isPaa())
         .build();
   }
 
@@ -30,6 +31,7 @@ public class MethodologyFactory {
           existing.toBuilder()
               .description(update.getDescription())
               .code(buildCode(update.getDescription()))
+              .paa(update.isPaa())
               .build();
     }
     if (Objects.nonNull(update.getActive())) {

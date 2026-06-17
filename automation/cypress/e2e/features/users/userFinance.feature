@@ -28,7 +28,7 @@ Feature: finance user specific tests
         Then request information can be seen
 
         When I select update invoice status from request actions
-        And I enter "5,555" as my invoice amount 
+        And I enter "5555" as my invoice amount 
         And I can save my invoice update
         And I can see invoice updated toast popup
         Then Invoice amount shows as "5,555" in request status area

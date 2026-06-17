@@ -1,0 +1,16 @@
+databaseChangeLog:
+- changeSet:
+    author: "ghaslett"
+    id: "003660-request-is-paa"
+    changes:
+    - addColumn:
+        schemaName: gs
+        tableName: request
+        columns:
+        - column:
+            name: paa
+            type: boolean
+            valueBoolean: false
+            defaultValueBoolean: false
+            constraints:
+              nullable: false

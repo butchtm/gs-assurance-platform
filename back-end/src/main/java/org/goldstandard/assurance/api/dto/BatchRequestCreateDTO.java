@@ -19,6 +19,7 @@ public class BatchRequestCreateDTO {
   private final int requestTypeId;
   private final int batchTypeId;
   private final List<@Valid ProjectRequestInfo> projectRequestInfos;
+  private final boolean paa;
 
   public int getNumberOfProjects() {
     if (CollectionUtils.isEmpty(projectRequestInfos)) {

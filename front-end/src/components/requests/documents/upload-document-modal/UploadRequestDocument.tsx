@@ -17,7 +17,7 @@ interface UploadSuccess {
 interface UploadFailure {
   success: false;
   detail: string;
-  serverHeader?: string;
+  serverHeader?: unknown;
 }
 
 type UploadResult = UploadSuccess | UploadFailure;
@@ -40,14 +40,14 @@ export async function uploadDocument(
     return { success: true };
   } catch (error) {
     let detail = "Error uploading document.";
-    let serverHeader: string | undefined;
+    let serverHeader: unknown;
 
     if (isAxiosError(error) && error.response) {
       const apiDetail = error.response.data?.detail;
       if (typeof apiDetail === "string" && apiDetail.trim() !== "") {
         detail = apiDetail;
       }
-      const errorWithHeader = error as Error & { serverHeader?: string };
+      const errorWithHeader = error as Error & { serverHeader?: unknown };
       serverHeader = errorWithHeader.serverHeader || error.response.headers?.server;
     } else {
       console.error("Unexpected error uploading document:", error);

@@ -48,13 +48,6 @@ class _NavigationBars {
     }
   }
 
-  primaryConfigureIntercept(method, url, extraBracket) {
-    if (extraBracket) {
-      cy.intercept(method, `**/${url}/**`).as("apiCheck")
-    } else {
-      cy.intercept(method, `**/${url}**`).as("apiCheck")
-    }
-  }
 }
 
 const navigationBar = new _NavigationBars()

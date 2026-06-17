@@ -25,9 +25,9 @@ When("I type {string} {string} GSID into search filter on {string} request dashb
     cy.log("Located: " + gsid)
 
     if (dashboardType == "all") {
-      allRequestDashboard.filters.projectNameOrGsid().type(gsid)
+      allRequestDashboard.filters.projectNameOrGsid().type(gsid, {delay: 100})
     } else {
-      myRequestDashboard.filters.projectNameOrGsidInput().type(gsid)
+      myRequestDashboard.filters.projectNameOrGsidInput().type(gsid, {delay: 100})
     }
   })
 })

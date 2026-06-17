@@ -138,3 +138,29 @@ When("I click {string} from project creation nav buttons", (text) => {
     throw new Error(`field ${text} not found`)
   }
 })
+
+Then("I am taken to page {string}", (page) => {
+  const validPages = ["2", "3", "4", "5", "6"]
+
+  if (validPages.includes(page)) {
+    switch(page) {
+      case "2":
+        cy.contains('Project Description')
+        break
+      case "3":
+        cy.contains('Crediting Periods')
+        break
+      case "4":
+        cy.contains('Transitioning Project')
+        break
+      case "5":
+        cy.get('[data-testid="Sustainable Development Goals-input"]').should('be.visible')
+        break
+      case "6":
+        cy.contains('Review Your Information')
+        break
+    }
+  } else {
+    throw new Error(`page ${page} not found`)
+  }
+})

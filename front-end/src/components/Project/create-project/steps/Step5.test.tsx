@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { Formik, useFormikContext } from "formik";
 
-import { ReferenceDataIdsOrId, ReferenceTypeContext } from "../../../../common/data-types/DataReferenceTypes";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceDataIdsOrId } from "@/common/data-types/DataReferenceTypes";
 
 import { Step5 } from "./Step5";
 
@@ -71,22 +72,17 @@ describe("Step5", () => {
         }
       });
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Step5 />
-        </Formik>
-        ,
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step5 />
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     expect(screen.getByLabelText("Estimated Annual Emission Reduction/Removal")).toBeInTheDocument();
@@ -141,22 +137,17 @@ describe("Step5", () => {
       setFieldValue: mockSetFieldValue,
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Step5 />
-        </Formik>
-        ,
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step5 />
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     const warningIcons = screen.getAllByTestId("warning-icon");
@@ -200,22 +191,17 @@ describe("Step5", () => {
       setFieldValue: mockSetFieldValue,
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Step5 />
-        </Formik>
-        ,
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step5 />
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     const warningIcons = screen.queryAllByTestId("warning-icon");
@@ -257,22 +243,17 @@ describe("Step5", () => {
       setFieldValue: mockSetFieldValue,
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Step5 />
-        </Formik>
-        ,
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step5 />
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
 
     const warningIcons = screen.queryAllByTestId("warning-icon");

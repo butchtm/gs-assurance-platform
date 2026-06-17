@@ -15,6 +15,11 @@ jest.mock("../../../../common/data-types/DataReferenceTypes", () => ({
   useReferenceTypes: () => ({
     activeReferenceTypes: mockActiveReferenceTypes,
     allReferenceTypes: mockActiveReferenceTypes,
+    activeRequestTypes: mockActiveReferenceTypes.RequestType.map((type) => ({
+      ...type,
+      isActive: true,
+      supportsPAA: true,
+    })),
   }),
 }));
 

@@ -6,8 +6,7 @@ import viewAssignmentsModal from "../../pages/wizardsAndModals/viewAssignmentsMo
 
 When("I am {string} who wants to submit a {string} on a {string}", (username, request, project) => {
   cy.loginAsUser(username)
-  cy.wait(2500)
-
+  cy.waitForNetworkIdle(1000)
   switch (username) {
     case "ARM TEAM":
       myRequestDashboard.filterPageForRequestLink(project, request, 3)
@@ -15,12 +14,6 @@ When("I am {string} who wants to submit a {string} on a {string}", (username, re
     case "VVB":
     case "REVIEWER":
     case "PD":
-      /*
-      myRequestDashboard.filterUsingGSID(project)
-      cy.wait(2500)
-
-      myRequestDashboard.locateRequestFromDashboard(request).invoke("removeAttr", "target").click({ force: true })
-      cy.wait(2500) */
       myRequestDashboard.filterPageForRequestLink(project, request, 2)
       break
     default:

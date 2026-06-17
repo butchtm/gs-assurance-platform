@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+#
+# Assurance DB wrapper for Liquibase in Docker
+#
+
+LIQUIBASE_COMMAND_URL=${LIQUIBASE_COMMAND_URL:-jdbc:postgresql://localhost:5432/postgres}
+LIQUIBASE_COMMAND_USERNAME=${LIQUIBASE_COMMAND_USERNAME:-postgres}
+LIQUIBASE_COMMAND_PASSWORD=${LIQUIBASE_COMMAND_PASSWORD:-HEREBEDRAGONS}
+LIQUIBASE_COMMAND_CONTEXTS=${LIQUIBASE_COMMAND_CONTEXTS:-good-tds-fdw,dev}
+
+docker run \
+  --rm \
+  -v .:/liquibase/changelog \
+  liquibase/liquibase \
+  --url=${LIQUIBASE_COMMAND_URL} \
+  --username=${LIQUIBASE_COMMAND_USERNAME} \
+  --password=${LIQUIBASE_COMMAND_PASSWORD} \
+  --changeLogFile=./changelog.yaml \
+  --contexts="${LIQUIBASE_COMMAND_CONTEXTS}" \
+  $*

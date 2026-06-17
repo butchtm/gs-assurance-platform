@@ -1,0 +1,1 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON gs.request_crediting_period TO gs_assurance_db_writer;

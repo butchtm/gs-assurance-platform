@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-env node */
 
 const path = require("path");
@@ -31,7 +30,7 @@ app.use(
 app.use(
   "/api",
   createProxyMiddleware({
-    target: "http://localhost:8080",
+    target: "http://localhost:8080/api",
     changeOrigin: true,
   }),
 );
@@ -49,7 +48,7 @@ app.use(
   }),
 );
 
-app.get("*", (req, res) => {
+app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(buildPath, "index.html"));
 });
 

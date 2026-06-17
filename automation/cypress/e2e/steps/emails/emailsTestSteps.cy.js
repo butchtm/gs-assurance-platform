@@ -26,9 +26,7 @@ Then("I can capture my last {string} email notifications", (numberOfNotification
 Then("I check my email notifications {string} for {string} to {string}", (templates, requestTypeSubmission, targetStatus) => {
   cy.readFile("cypress/fixtures/caughtEmailNotifications.json").then((emailsFile) => {
     const emails = emailsFile.body.content
-    //const changelogData = emailHelper.getChangelogRowsForStatus(targetStatus)
     const keys = templates.split(",").map((k) => k.trim())
-
     cy.fixture("platformInfo").then((platformInfo) => {
       const runNumber = platformInfo["Run Number"]
       const gsid = platformInfo["Listed POA GSID"]
@@ -43,6 +41,9 @@ Then("I check my email notifications {string} for {string} to {string}", (templa
           const recipient = emailHelper.determineRecipient(targetStatus, templateKey)
           const feedbackRound = emailHelper.determineFeedbackRound(targetStatus)
           const dynamicLink = emailHelper.determineLink(emails)
+          const dynamicLinkPOA = emailHelper.determineLinkPOA(emails)
+          const dynamicLinkProjectActivity = emailHelper.determineLinkProjectActivity(emails)
+          const reviewDueDate = emailHelper.generateReviewDate()
 
           const dynamicData = {
             recipient,
@@ -52,26 +53,31 @@ Then("I check my email notifications {string} for {string} to {string}", (templa
             projectType: "Agriculture",
             feedbackRound,
             dynamicLink,
-            //reviewDueDate: "",
+            dynamicLinkPOA,
+            dynamicLinkProjectActivity,
+            reviewDueDate,
             projectStatus: "Listed"
             //requestChangelog: changelogData
           }
 
           const expectedTextBody = emailHelper.fillEmailTemplate(template, dynamicData).trim()
-
-          //const matchedEmail = emails.find((email) => email.textBody.includes(expectedTextBody))
+          const expectedJson = JSON.stringify(expectedTextBody)
+          const actualTextBody = JSON.stringify(emails)
+          cy.writeFile(`cypress/fixtures/${templateKey}emailCompare.json`, `Expected: ${expectedJson} \n\n Received: ${actualTextBody}`)
+          
           const matchedEmail = emails.find((email) => email.textBody.startsWith(expectedTextBody))
+          
 
           // Logging for debugging
-          console.log(`🔍 Checking template: "${templateKey}"`)
-          console.log(`📨 Expected email body:\n${expectedTextBody}`)
+          cy.task('log',`🔍 Checking template: "${templateKey}"`)
+          cy.task('log',`📨 Expected email body:\n${expectedTextBody}`)
           if (matchedEmail) {
-            console.log(`✅ Matched email body:\n${matchedEmail.textBody}`)
+            cy.task('log',`✅ Matched email body:\n${matchedEmail.textBody}`)
           } else {
-            console.log(`❌ No match found for template "${templateKey}"`)
-            console.log(`📬 All caught emails:`)
+            cy.task('log',`❌ No match found for template "${templateKey}"`)
+            cy.task('log',`📬 All caught emails:`)
             emails.forEach((email, index) => {
-              console.log(`--- Email ${index + 1} ---\n${email.textBody}`)
+              cy.task('log',`--- Email ${index + 1} ---\n${email.textBody}`)
             })
           }
 

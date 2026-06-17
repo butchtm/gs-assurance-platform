@@ -1,4 +1,4 @@
-import { debugRequests } from "../../../../common/request/DebugRequests";
+import { BASE_REQUEST_TYPE, debugRequests } from "../../../../common/request/DebugRequests";
 import { BatchedProjectRequest } from "../../Requests";
 
 import { getBatchedFeeScheduleValue, getStandaloneFeeScheduleValue } from "./FeeSchedule";
@@ -132,10 +132,6 @@ const getMockRequest = (requestFeeSchedule: number | null, projectFeeSchedule: n
         },
       ],
     },
-    requestType: {
-      id: 1,
-      code: requestType,
-      description: "",
-    },
+    requestType: BASE_REQUEST_TYPE(requestType, 1),
   };
 };

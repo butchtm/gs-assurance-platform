@@ -1,9 +1,10 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { Formik, useFormikContext } from "formik";
 
-import { ReferenceDataIdsOrId, ReferenceTypeContext } from "../../../../common/data-types/DataReferenceTypes";
+import { renderWithProviders } from "@/test/test-utils";
+import { ReferenceDataIdsOrId } from "@/common/data-types/DataReferenceTypes";
 
 import { Step4 } from "./Step4";
 
@@ -42,22 +43,12 @@ jest.mock("../../../../common/data-types/DataReferenceTypes", () => ({
 
 describe("Step4", () => {
   it("Step4 renders initial select correctly", () => {
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: () => [],
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{}} onSubmit={jest.fn()}>
-          <Step4 />
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step4 />
+      </Formik>,
     );
+
     expect(screen.getByRole("combobox", { name: "Transitioning Project" })).toBeInTheDocument();
   });
 
@@ -109,24 +100,21 @@ describe("Step4", () => {
       setFieldValue: jest.fn(),
     }));
 
-    render(
-      <ReferenceTypeContext.Provider
-        value={{
-          activeReferenceTypes: {},
-          inactiveReferenceTypes: {},
-          allReferenceTypes: {},
-          referenceMethodologies: [],
-          getCustomReferenceOptions: mockGetCustomReferenceOptions,
-          refreshReferenceData: () => Promise.resolve(),
-        }}
-      >
-        <Formik initialValues={{ transitioningProject: "yes" }} onSubmit={jest.fn()}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Step4 />
-          </LocalizationProvider>
-        </Formik>
-      </ReferenceTypeContext.Provider>,
+    renderWithProviders(
+      <Formik initialValues={{ transitioningProject: "yes" }} onSubmit={jest.fn()}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Step4 />
+        </LocalizationProvider>
+      </Formik>,
+      {
+        providerOverrides: {
+          reference: {
+            getCustomReferenceOptions: mockGetCustomReferenceOptions,
+          },
+        },
+      },
     );
+
     expect(screen.getByRole("combobox", { name: "Transitioning Project" })).toBeInTheDocument();
     expect(screen.getByLabelText("Other Standard*")).toBeInTheDocument();
     expect(screen.getByLabelText("Other Schemes Crediting Period Start Date*")).toBeInTheDocument();

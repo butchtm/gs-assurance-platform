@@ -1,0 +1,1 @@
+GRANT SELECT ON gs.assignment_type_account_type TO gs_assurance_db_writer;
