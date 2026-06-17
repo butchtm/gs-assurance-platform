@@ -248,7 +248,7 @@ class BatchRequestApiIntegrationTest extends AbstractApiTest {
     int requestTypeId = 1000;
     return Stream.of(
         Arguments.of(requestTypeId, TEST_PROJECTS.getFirst(), List.of(0, 1)),
-        Arguments.of(requestTypeId, TEST_PROJECTS.get(1), List.of(0)),
-        Arguments.of(requestTypeId, TEST_PROJECTS.get(2), List.of()));
+        Arguments.of(requestTypeId, TEST_PROJECTS.get(1), List.of(0, 2)),
+        Arguments.of(requestTypeId, TEST_PROJECTS.get(2), List.of(3)));
   }
 }

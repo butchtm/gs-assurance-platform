@@ -1819,3 +1819,8 @@ databaseChangeLog:
       changes:
         - tagDatabase:
             tag: 1.22.1
+  - changeSet:
+      author: "patslaurel"
+      id: "003680-add-cross-linking-project-classifications"
+      sqlFile:
+        path: "003680-add-cross-linking-project-classifications.sql"

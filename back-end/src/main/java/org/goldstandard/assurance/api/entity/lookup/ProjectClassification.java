@@ -17,11 +17,15 @@ public class ProjectClassification extends ExtendedReferenceDataType {
 
   private static final int LEGACY_REAL_CASE_VPA_ID = 3;
   private static final int REAL_CASE_VPA_ID = 8;
+  private static final int REAL_CASE_VPA_CROSS_LINKAGE_ID = 10;
   private static final Collection<Integer> REAL_CASE_VPA_IDS =
-      List.of(LEGACY_REAL_CASE_VPA_ID, REAL_CASE_VPA_ID);
+      List.of(LEGACY_REAL_CASE_VPA_ID, REAL_CASE_VPA_ID, REAL_CASE_VPA_CROSS_LINKAGE_ID);
 
   private static final int LEGACY_REGULAR_CASE_VPA_ID = 4;
   private static final int REGULAR_CASE_VPA_ID = 9;
+  private static final int REGULAR_VPA_CROSS_LINKAGE_ID = 11;
+  private static final Collection<Integer> REGULAR_CASE_VPA_IDS =
+      List.of(LEGACY_REGULAR_CASE_VPA_ID, REGULAR_CASE_VPA_ID, REGULAR_VPA_CROSS_LINKAGE_ID);
 
   private static final int LEGACY_VPA_CPA = 2;
 
@@ -32,11 +36,11 @@ public class ProjectClassification extends ExtendedReferenceDataType {
   }
 
   public boolean isRealCaseVpa() {
-    return id == REAL_CASE_VPA_ID || id == LEGACY_REAL_CASE_VPA_ID;
+    return REAL_CASE_VPA_IDS.contains(id);
   }
 
   public boolean isRegularCaseVpa() {
-    return id == REGULAR_CASE_VPA_ID || id == LEGACY_REGULAR_CASE_VPA_ID;
+    return REGULAR_CASE_VPA_IDS.contains(id);
   }
 
   public boolean isLegacyVpaCpa() {
