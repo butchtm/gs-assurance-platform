@@ -207,4 +207,47 @@ describe("Step3 Component", () => {
       expect(screen.getByRole("option", { name: "Option 2" })).toBeInTheDocument();
     });
   });
+
+  it("should allow selection of active top-level parent methodologies for child projects", async () => {
+    (getCandidateParentDetails as jest.Mock).mockResolvedValueOnce({
+      creditingPeriods: [],
+      methodologies: [{ id: 3, code: "OPTION_3", description: "Option 3" }],
+    });
+
+    render(
+      <RenderFormikWithLocalization
+        initialValues={{
+          accountId: 1,
+          projectClassificationId: 10,
+          parentProjectId: 1,
+          creditingPeriods: [
+            {
+              periodId: 1,
+              startDate: "2024-01-01",
+              endDate: "2025-01-01",
+              methodologies: [{ id: null, version: null }],
+            },
+          ],
+        }}
+      >
+        <Step3 />
+      </RenderFormikWithLocalization>,
+    );
+
+    await waitFor(() => {
+      expect(getCandidateParentDetails).toHaveBeenCalledWith({
+        accountId: 1,
+        classificationId: 10,
+        candidateProjectId: 1,
+      });
+    });
+
+    fireEvent.mouseDown(screen.getByTestId("methodology-input-0"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Option 3" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Option 1" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Option 2" })).not.toBeInTheDocument();
+    });
+  });
 });

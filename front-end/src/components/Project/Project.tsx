@@ -181,6 +181,7 @@ export type CandidateParentProjectDetails = Pick<
   | "projectLocations"
   | "projectAssets"
   | "sustainableDevelopmentGoals"
+  | "methodologies"
   | "creditingPeriods"
 >;
 

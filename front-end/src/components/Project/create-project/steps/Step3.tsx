@@ -34,7 +34,10 @@ export const Step3 = ({ isUpdate }: Step3Props) => {
       if (ignore) {
         return;
       }
-      const parentProjectMethodologyIds = findAllMethodologyIds(parentProject.creditingPeriods);
+      const parentProjectMethodologyIds = [
+        ...findAllMethodologyIds(parentProject.creditingPeriods),
+        ...(parentProject.methodologies?.map((methodology) => methodology.id) ?? []),
+      ];
 
       const parentProjectMethodologyIdsActive = referenceMethodologies
         .filter((m) => m.active && parentProjectMethodologyIds.includes(Number(m.id)))

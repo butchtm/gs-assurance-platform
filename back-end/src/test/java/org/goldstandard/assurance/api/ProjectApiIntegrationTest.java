@@ -140,6 +140,7 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
           "projectLocations",
           "projectAssets",
           "sustainableDevelopmentGoals",
+          "methodologies",
           "creditingPeriods");
 
   private static final Set<String> CANDIDATE_PARENT_DETAIL_FORBIDDEN_FIELDS =
@@ -1029,9 +1030,19 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
     assertThat(detailResponse.getBody().getId())
         .isEqualTo(projects.betaNewPoaWithoutRealCase().getId());
     assertThat(detailResponse.getBody().getProjectAssets()).isNotEmpty();
+    assertThat(detailResponse.getBody().getMethodologies())
+        .singleElement()
+        .satisfies(
+            methodology -> {
+              assertThat(methodology.getId()).isEqualTo(0);
+              assertThat(methodology.getCode()).isEqualTo("ACM0001_FLARING_OR_USE_OF_LANDFILL_GAS");
+              assertThat(methodology.getDescription())
+                  .isEqualTo("ACM0001 Flaring or use of landfill gas");
+            });
     assertThat(detailResponse.getBody().getCreditingPeriods()).isEmpty();
     assertThat(rawDetailResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertCandidateParentDetailJsonContract(rawDetailResponse.getBody());
+    assertCandidateParentMethodologyJsonContract(rawDetailResponse.getBody());
     assertThat(normalGetResponse.getStatusCode()).isEqualTo(UNAUTHORIZED);
   }
 
@@ -1151,6 +1162,15 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
 
     assertThat(fields).containsExactlyInAnyOrderElementsOf(CANDIDATE_PARENT_DETAIL_ALLOWED_FIELDS);
     assertThat(fields).doesNotContainAnyElementsOf(CANDIDATE_PARENT_DETAIL_FORBIDDEN_FIELDS);
+  }
+
+  @SuppressWarnings("unchecked")
+  private void assertCandidateParentMethodologyJsonContract(String responseBody) {
+    var fields = jsonConverter.toMap(responseBody);
+    var methodologies = (List<Map<String, Object>>) fields.get("methodologies");
+
+    assertThat(methodologies).hasSize(1);
+    assertThat(methodologies.getFirst()).containsOnlyKeys("id", "code", "description");
   }
 
   private void cleanupCrossLinkingFixture(

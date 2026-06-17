@@ -34,5 +34,6 @@ public class CandidateParentProjectDetailsDTO {
   private final List<ProjectLocation> projectLocations;
   private final List<ProjectAsset> projectAssets;
   private final List<SustainableDevelopmentGoal> sustainableDevelopmentGoals;
+  private final List<CandidateParentMethodologyDTO> methodologies;
   private final List<CreditingPeriodDTO> creditingPeriods;
 }

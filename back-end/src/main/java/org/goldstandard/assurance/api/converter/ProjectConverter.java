@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.goldstandard.assurance.api.dto.BundleDTO;
+import org.goldstandard.assurance.api.dto.CandidateParentMethodologyDTO;
 import org.goldstandard.assurance.api.dto.CandidateParentProjectDetailsDTO;
 import org.goldstandard.assurance.api.dto.MethodologyHistoryDTO;
 import org.goldstandard.assurance.api.dto.MethodologyUpdateDTO;
@@ -64,6 +65,15 @@ public class ProjectConverter {
         .projectLocations(project.getProjectLocations())
         .projectAssets(project.getProjectAssets())
         .sustainableDevelopmentGoals(project.getSustainableDevelopmentGoals())
+        .methodologies(
+            project.getMethodologies().stream()
+                .map(
+                    methodology ->
+                        new CandidateParentMethodologyDTO(
+                            methodology.getId(),
+                            methodology.getCode(),
+                            methodology.getDescription()))
+                .toList())
         .creditingPeriods(creditingPeriodConverter.toDtos(project.getCreditingPeriods()))
         .build();
   }
