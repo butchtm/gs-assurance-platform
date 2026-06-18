@@ -814,6 +814,81 @@ describe("Step1", () => {
     expect(formValues.creditingPeriods[0].monitoringPeriods).toBeUndefined();
   });
 
+  it("uses capability props to disable protected update fields", async () => {
+    (getReferenceValueCodeById as jest.Mock).mockImplementation((classificationId: number | null) => {
+      return mockProjectClassificationReferenceTypes.find((classification) => classification.id === classificationId)
+        ?.code;
+    });
+    mockGetCustomReferenceOptions.mockReturnValue([{ value: 9, label: "Regular VPA" }]);
+    (getCandidatePOAs as jest.Mock).mockResolvedValue([{ id: 900, gsid: "GS-POA", name: "Protected POA" }]);
+    (getCandidateRealCaseVPAs as jest.Mock).mockResolvedValue([
+      { id: 901, gsid: "GS-REAL", name: "Protected Real Case VPA" },
+    ]);
+    mockFormikValues({
+      accountId: 1,
+      accountName: "Account One",
+      projectClassificationId: 9,
+      masterProjectId: 900,
+      parentProjectId: 901,
+      name: "Editable Title",
+      projectStatusId: 1,
+    });
+
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1
+          isUpdate={true}
+          canEditDeveloperAccount={false}
+          canEditProjectClassification={true}
+          canEditProjectTitle={true}
+          canEditParentHierarchy={false}
+        />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(false),
+            isAdminUser: jest.fn().mockReturnValue(true),
+            isArmUser: jest.fn().mockReturnValue(false),
+          },
+          reference: {
+            activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
+          },
+        },
+      },
+    );
+
+    expect(await screen.findByTestId("account-search-input")).toBeDisabled();
+    expect(screen.getByLabelText("Project Classification*")).not.toBeDisabled();
+    expect(screen.getByLabelText("Project Title*")).not.toBeDisabled();
+    expect(await screen.findByLabelText("Real Case VPA*")).toBeDisabled();
+    expect(screen.getAllByLabelText("Programme of Activities*")[0]).toBeDisabled();
+  });
+
+  it("keeps create mode fields editable by default", async () => {
+    renderWithProviders(
+      <Formik initialValues={{}} onSubmit={jest.fn()}>
+        <Step1 />
+      </Formik>,
+      {
+        providerOverrides: {
+          auth: {
+            isProjectDeveloperUser: jest.fn().mockReturnValue(false),
+            isAdminUser: jest.fn().mockReturnValue(true),
+            isArmUser: jest.fn().mockReturnValue(false),
+          },
+          reference: {
+            activeReferenceTypes: { ProjectState: [{ id: 1, code: "NEW", description: "New" }] },
+          },
+        },
+      },
+    );
+
+    expect(await screen.findByTestId("account-search-input")).not.toBeDisabled();
+    expect(screen.getByLabelText("Project Classification*")).not.toBeDisabled();
+    expect(screen.getByLabelText("Project Title*")).not.toBeDisabled();
+  });
+
   it("Uses chosen POA project information by default when type is REAL_CASE_VPA", async () => {
     const mockGetReferenceValueCodeById = getReferenceValueCodeById as jest.Mock;
     mockGetReferenceValueCodeById.mockImplementation(() => {

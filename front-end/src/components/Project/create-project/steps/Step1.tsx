@@ -39,11 +39,23 @@ interface Step1Props {
   projectId?: number;
   isUpdate?: boolean;
   probablePii?: ProbablePii[];
+  canEditDeveloperAccount?: boolean;
+  canEditProjectClassification?: boolean;
+  canEditProjectTitle?: boolean;
+  canEditParentHierarchy?: boolean;
 }
 
 type ProjectOption = Pick<Project, "id" | "gsid" | "name">;
 
-export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => {
+export const Step1 = ({
+  projectId,
+  isUpdate,
+  probablePii = [],
+  canEditDeveloperAccount = true,
+  canEditProjectClassification = true,
+  canEditProjectTitle = true,
+  canEditParentHierarchy = true,
+}: Step1Props) => {
   const navigate = useNavigate();
   const [accountName, setAccountName] = useState<string>("");
   const [candidatePOAs, setCandidatePOAs] = useState<ProjectOption[]>([]);
@@ -272,7 +284,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
   };
 
   const handleClassificationChange = (projectClassificationId: number | null) => {
-    if (projectClassificationId !== classificationId) {
+    if (projectClassificationId !== classificationId && canEditParentHierarchy) {
       clearParentProjectState();
     }
     setFieldValue("projectClassificationId", projectClassificationId);
@@ -317,7 +329,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
               onChange={handleAccountChange}
               accountTypeId={AccountTypeIds.PROJECT_DEVELOPER}
               required
-              disabled={isUpdate}
+              disabled={!canEditDeveloperAccount}
             />
           )}
           {!canSelectDeveloperAccount() && (
@@ -342,7 +354,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
             onChange={handleClassificationChange}
             helperText={helperTexts.projectClassification()}
             required
-            disabled={isUpdate}
+            disabled={!canEditProjectClassification}
           />
         </Grid>
         {shouldDisplayPOAInput && (
@@ -354,7 +366,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
               onChange={handleMasterProjectChange}
               helperText={helperTexts.programmeOfActivities()}
               required
-              disabled={isUpdate}
+              disabled={!canEditParentHierarchy}
             />
           </Grid>
         )}
@@ -367,7 +379,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
               onChange={handleParentProjectChange}
               helperText={helperTexts.realCaseVPA()}
               required
-              disabled={isUpdate}
+              disabled={!canEditParentHierarchy}
             />
           </Grid>
         )}
@@ -377,6 +389,7 @@ export const Step1 = ({ projectId, isUpdate, probablePii = [] }: Step1Props) => 
             parentPoa={getParentPoa()}
             parentRealCase={getParentRealCase()}
             isUpdate={isUpdate}
+            disabled={!canEditProjectTitle}
           />
         </Grid>
         <Grid item xs={12} md={6} display="flex" justifyContent="space-between">

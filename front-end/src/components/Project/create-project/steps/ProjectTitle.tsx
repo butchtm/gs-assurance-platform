@@ -26,11 +26,13 @@ export const ProjectTitle = ({
   parentPoa,
   parentRealCase,
   isUpdate,
+  disabled,
 }: {
   probablePii?: ProbablePii[];
   parentPoa?: ProjectTitleParent;
   parentRealCase?: ProjectTitleParent;
   isUpdate?: boolean;
+  disabled?: boolean;
 }) => {
   const [field, meta, helpers] = useField("name");
   const theme = useTheme();
@@ -73,6 +75,7 @@ export const ProjectTitle = ({
           error={meta.touched && Boolean(meta.error)}
           value={field.value}
           onChange={handleTitleChange}
+          disabled={disabled}
           aria-required
           InputProps={{
             endAdornment: <CustomHelperText text={helperTexts.projectTitle()} type={CustomTooltip.HELP} />,
