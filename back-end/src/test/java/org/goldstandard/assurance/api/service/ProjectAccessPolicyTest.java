@@ -123,6 +123,49 @@ class ProjectAccessPolicyTest {
     assertThat(error).isInstanceOf(PermissionException.class);
   }
 
+  @Test
+  void shouldAllowAdminOrArmToUpdateAnyProjectStatus() {
+    Project listedProject = buildProjectWithStatus(new ProjectStatus(ProjectStatus.LISTED));
+    when(permissionsService.isProjectOwner(listedProject)).thenReturn(false);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+
+    ThrowingCallable call = () -> policy.validateCanUpdateProject(listedProject);
+
+    assertThatCode(call).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldAllowProjectDeveloperOwnerToUpdateNewProject() {
+    Project project = buildProject();
+    when(permissionsService.isProjectOwner(project)).thenReturn(true);
+
+    ThrowingCallable call = () -> policy.validateCanUpdateProject(project);
+
+    assertThatCode(call).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldRejectProjectDeveloperOwnerUpdatingListedProject() {
+    Project project = buildProjectWithStatus(new ProjectStatus(ProjectStatus.LISTED));
+    when(permissionsService.isProjectOwner(project)).thenReturn(true);
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+
+    Throwable error = catchThrowable(() -> policy.validateCanUpdateProject(project));
+
+    assertThat(error).isInstanceOf(PermissionException.class);
+  }
+
+  @Test
+  void shouldRejectProjectDeveloperUpdatingNonOwnedProject() {
+    Project project = buildProject();
+    when(permissionsService.isProjectOwner(project)).thenReturn(false);
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+
+    Throwable error = catchThrowable(() -> policy.validateCanUpdateProject(project));
+
+    assertThat(error).isInstanceOf(PermissionException.class);
+  }
+
   private static Project buildProject() {
     return buildProjectWithStatus(new ProjectStatus(ProjectStatus.NEW));
   }

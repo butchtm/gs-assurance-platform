@@ -18,6 +18,7 @@ import org.goldstandard.assurance.api.entity.Project;
 import org.goldstandard.assurance.api.entity.ProjectSearchCriteriaDTO;
 import org.goldstandard.assurance.api.entity.ProjectTree;
 import org.goldstandard.assurance.api.entity.TransitionProject;
+import org.goldstandard.assurance.api.entity.creditingperiod.ProjectCreditingPeriod;
 import org.goldstandard.assurance.api.entity.creditingperiod.ProjectMethodologyUpdate;
 import org.goldstandard.assurance.api.entity.lookup.CarbonStream;
 import org.goldstandard.assurance.api.entity.lookup.CurrentStandardVersion;
@@ -35,7 +36,6 @@ import org.goldstandard.assurance.api.entity.lookup.SustainableDevelopmentGoal;
 import org.goldstandard.assurance.api.entity.lookup.TransitionApprovalProcedure;
 import org.goldstandard.assurance.api.entity.lookup.TransitionFromOtherScheme;
 import org.goldstandard.assurance.api.entity.lookup.TransitionPathway;
-import org.goldstandard.assurance.api.exception.BadRequestException;
 import org.goldstandard.assurance.api.projection.ProjectMinimal;
 import org.goldstandard.assurance.api.service.external.ExternalUpdateExecutor;
 import org.goldstandard.assurance.api.service.permission.AuthenticatedUserSupplier;
@@ -106,17 +106,24 @@ public class ProjectService {
 
   public Project updateProject(Integer projectId, ProjectUpdateDTO projectUpdate) {
     var originalProject = findProjectIfAccessible(projectId);
-    validateUpdateKeepsAccountAndHierarchy(originalProject, projectUpdate);
-    var updatedProject = updateApplier.applyUpdates(originalProject, projectUpdate);
+    var userCanUpdateAllFields = permissionsService.isAdminOrArm();
+    validateUpdateParentEligibilityIfChanged(
+        originalProject, projectUpdate, userCanUpdateAllFields);
+    var updatedProject =
+        userCanUpdateAllFields
+            ? updateApplier.applyUpdates(originalProject, projectUpdate)
+            : updateApplier.applyProjectDeveloperUpdates(originalProject, projectUpdate);
     var creditingPeriods =
-        creditingPeriodFactory.toCreditingPeriods(
-            updatedProject, projectUpdate.getCreditingPeriods());
+        userCanUpdateAllFields
+            ? creditingPeriodFactory.toCreditingPeriods(
+                updatedProject, projectUpdate.getCreditingPeriods())
+            : existingCreditingPeriods(originalProject);
     var savedProjects =
         transaction.performUpdate(
             originalProject,
             updatedProject,
             creditingPeriods,
-            projectUpdate.getTextAnalysisResults());
+            userCanUpdateAllFields ? projectUpdate.getTextAnalysisResults() : null);
     externalUpdateExecutor.executeAsync(savedProjects);
     return IterableUtils.get(savedProjects, 0);
   }
@@ -198,28 +205,56 @@ public class ProjectService {
     return finder.forceGetProjectById(projectId);
   }
 
-  private void validateUpdateKeepsAccountAndHierarchy(
-      Project originalProject, ProjectUpdateDTO projectUpdate) {
-    assertUnchanged("accountId", originalProject.getAccountId(), projectUpdate.getAccountId());
-    assertUnchanged(
-        "projectClassificationId",
-        getReferenceId(originalProject.getProjectClassification()),
-        projectUpdate.getProjectClassificationId());
-    assertUnchanged(
-        "masterProjectId",
-        getReferenceId(originalProject.getMasterProject()),
-        projectUpdate.getMasterProjectId());
-    assertUnchanged(
-        "parentProjectId",
-        getReferenceId(originalProject.getParentProject()),
-        projectUpdate.getParentProjectId());
-  }
-
-  private void assertUnchanged(String fieldName, Integer existingId, Integer requestedId) {
-    if (Objects.equals(existingId, requestedId)) {
+  private void validateUpdateParentEligibilityIfChanged(
+      Project originalProject, ProjectUpdateDTO projectUpdate, boolean userCanUpdateAllFields) {
+    if (!isAccountOrHierarchyChanged(originalProject, projectUpdate, userCanUpdateAllFields)) {
       return;
     }
-    throw new BadRequestException("Project %s cannot be changed by project update", fieldName);
+    var requestedClassification =
+        new ProjectClassification(projectUpdate.getProjectClassificationId());
+    var requestedAccountId =
+        userCanUpdateAllFields ? projectUpdate.getAccountId() : originalProject.getAccountId();
+    var requestedMasterProject =
+        findProjectIfPresent(
+            userCanUpdateAllFields
+                ? projectUpdate.getMasterProjectId()
+                : getReferenceId(originalProject.getMasterProject()));
+    var requestedParentProject =
+        findProjectIfPresent(
+            userCanUpdateAllFields
+                ? projectUpdate.getParentProjectId()
+                : getReferenceId(originalProject.getParentProject()));
+    if (Objects.nonNull(requestedClassification.getId())
+        && !requestedClassification.isRealCaseVpa()
+        && !requestedClassification.isRegularCaseVpa()) {
+      return;
+    }
+    parentEligibilityPolicy.validateParentEligibility(
+        requestedAccountId,
+        requestedClassification,
+        requestedMasterProject,
+        requestedParentProject);
+  }
+
+  private boolean isAccountOrHierarchyChanged(
+      Project originalProject, ProjectUpdateDTO update, boolean userCanUpdateAllFields) {
+    if (!userCanUpdateAllFields) {
+      return isChanged(
+          getReferenceId(originalProject.getProjectClassification()),
+          update.getProjectClassificationId());
+    }
+    return isChanged(originalProject.getAccountId(), update.getAccountId())
+        || isChanged(
+            getReferenceId(originalProject.getProjectClassification()),
+            update.getProjectClassificationId())
+        || isChanged(
+            getReferenceId(originalProject.getMasterProject()), update.getMasterProjectId())
+        || isChanged(
+            getReferenceId(originalProject.getParentProject()), update.getParentProjectId());
+  }
+
+  private boolean isChanged(Integer existingId, Integer requestedId) {
+    return !Objects.equals(existingId, requestedId);
   }
 
   private static Integer getReferenceId(ReferenceDataType reference) {
@@ -228,6 +263,18 @@ public class ProjectService {
 
   private static Integer getReferenceId(Project project) {
     return Objects.isNull(project) ? null : project.getId();
+  }
+
+  private static <T extends ReferenceDataType> List<Integer> toReferenceIds(Collection<T> items) {
+    return Objects.isNull(items)
+        ? List.of()
+        : items.stream().map(ReferenceDataType::getId).toList();
+  }
+
+  private static List<ProjectCreditingPeriod> existingCreditingPeriods(Project project) {
+    return Objects.isNull(project.getCreditingPeriods())
+        ? List.of()
+        : List.copyOf(project.getCreditingPeriods());
   }
 
   private void initialiseProject(

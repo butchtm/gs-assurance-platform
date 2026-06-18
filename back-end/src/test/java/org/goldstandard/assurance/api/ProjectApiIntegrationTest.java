@@ -103,6 +103,7 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
   private static final Project ASSIGNED_PROJECT = TEST_PROJECTS.getFirst();
 
   private static final Integer PROJECT_STATUS_ID = 1;
+  private static final int DE_CERTIFIED_PROJECT_STATUS_ID = 5;
   private static final Set<Integer> PROJECT_CREDITING_PERIODS = Set.of(1);
   private static final Set<Integer> PROJECT_CP_METHODOLOGIES = Set.of(0);
   private static final Set<Integer> PROJECT_PROJECT_TYPES = Set.of(4);
@@ -802,6 +803,66 @@ class ProjectApiIntegrationTest extends AbstractApiTest {
           client.updateProject(project.getId(), patch, testCase.getRole(), testCase.getUserId());
 
       assertThat(response.getStatusCode()).isEqualTo(testCase.getExpectedStatus());
+    } finally {
+      projectPopulator.deleteProject(project.getId());
+    }
+  }
+
+  @Test
+  void testProjectDeveloperCannotTamperProjectUpdateFields() {
+    var project = createAndSaveTestProject();
+    var patch = createProjectPatch(project);
+
+    try {
+      var response =
+          client.updateProject(
+              project.getId(), patch, PROJECT_DEVELOPER_ROLE, ASSIGNED_ACCOUNT1_USER_ID);
+
+      assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+      var persistedProject = projectRepository.findById(project.getId()).orElseThrow();
+      assertThat(persistedProject.getName()).isEqualTo(patch.getName());
+      assertThat(persistedProject.getAccountId()).isEqualTo(project.getAccountId());
+      assertThat(persistedProject.getDescription()).isEqualTo(project.getDescription());
+      assertThat(persistedProject.getCarbonStream()).isNull();
+      assertThat(persistedProject.getNotes()).isEqualTo(project.getNotes());
+    } finally {
+      projectPopulator.deleteProject(project.getId());
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {ProjectStatus.LISTED, DE_CERTIFIED_PROJECT_STATUS_ID})
+  void testAdminCanUpdateListedAndDecertifiedProjects(int projectStatusId) {
+    var project = createAndSaveTestProject();
+    try {
+      project.setProjectStatus(new ProjectStatus(projectStatusId));
+      projectRepository.save(project);
+      var patch = createProjectPatch(project);
+
+      var response = client.updateProject(project.getId(), patch, ADMIN_ROLE, NO_ACCOUNT_USER_ID1);
+
+      assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+      var persistedProject = projectRepository.findById(project.getId()).orElseThrow();
+      assertThat(persistedProject.getName()).isEqualTo(patch.getName());
+    } finally {
+      projectPopulator.deleteProject(project.getId());
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {ProjectStatus.LISTED, DE_CERTIFIED_PROJECT_STATUS_ID})
+  void testProjectDeveloperCannotUpdateListedOrLaterProject(int projectStatusId) {
+    var project = createAndSaveTestProject();
+    try {
+      project.setProjectStatus(new ProjectStatus(projectStatusId));
+      projectRepository.save(project);
+      var patch = createProjectPatch(project);
+
+      var response =
+          client.updateProject(
+              project.getId(), patch, PROJECT_DEVELOPER_ROLE, ASSIGNED_ACCOUNT1_USER_ID);
+
+      assertThat(response.getStatusCode()).isEqualTo(UNAUTHORIZED);
     } finally {
       projectPopulator.deleteProject(project.getId());
     }

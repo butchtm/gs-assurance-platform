@@ -19,6 +19,7 @@ import org.goldstandard.assurance.api.entity.Project;
 import org.goldstandard.assurance.api.entity.ProjectSearchCriteriaDTO;
 import org.goldstandard.assurance.api.entity.creditingperiod.ProjectCreditingPeriod;
 import org.goldstandard.assurance.api.entity.lookup.ProjectClassification;
+import org.goldstandard.assurance.api.entity.lookup.ProjectStatus;
 import org.goldstandard.assurance.api.exception.BadRequestException;
 import org.goldstandard.assurance.api.exception.PermissionException;
 import org.goldstandard.assurance.api.service.external.ExternalUpdateExecutor;
@@ -59,6 +60,8 @@ class ProjectServiceTest {
   @Mock ProjectUpdateApplier updateApplier;
 
   @Mock CandidateParentEligibilityPolicy parentEligibilityPolicy;
+
+  @Mock PermissionsService permissionsService;
 
   @Captor ArgumentCaptor<Project> savedProjectCaptor;
 
@@ -185,6 +188,7 @@ class ProjectServiceTest {
     int projectId = 1;
     var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
     when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
     var update = buildProjectUpdateWithImmutableFields(originalProject);
     var creditingPeriods = givenCreditingPeriods(update.getCreditingPeriods());
     var updatedProject = mock(Project.class);
@@ -205,6 +209,7 @@ class ProjectServiceTest {
     int projectId = 1;
     var originalProject = Project.builder().id(projectId).build();
     when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
     var update = ProjectUpdateDTO.builder().build();
     var updatedProject = mock(Project.class);
     when(updateApplier.applyUpdates(originalProject, update)).thenReturn(updatedProject);
@@ -220,42 +225,196 @@ class ProjectServiceTest {
   }
 
   @Test
-  void updateProjectRejectsAccountChangeBeforeApplyingUpdates() {
+  void updateProjectSanitizesProjectDeveloperTamperedFieldsBeforeApplyingUpdates() {
     int projectId = 1;
     var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    originalProject.setProjectStatus(new ProjectStatus(ProjectStatus.NEW));
+    originalProject.setDescription("Existing description");
     var update =
         ProjectUpdateDTO.builder()
+            .name("Updated title")
             .accountId(99)
-            .projectClassificationId(originalProject.getProjectClassification().getId())
-            .masterProjectId(originalProject.getMasterProject().getId())
-            .parentProjectId(originalProject.getParentProject().getId())
+            .description("Tampered description")
+            .projectClassificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .masterProjectId(99)
+            .parentProjectId(100)
             .build();
+    var creditingPeriods = List.<ProjectCreditingPeriod>of();
+    var updatedProject = mock(Project.class);
     when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(finder.forceGetProjectById(originalProject.getMasterProject().getId()))
+        .thenReturn(originalProject.getMasterProject());
+    when(finder.forceGetProjectById(originalProject.getParentProject().getId()))
+        .thenReturn(originalProject.getParentProject());
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+    when(updateApplier.applyProjectDeveloperUpdates(originalProject, update))
+        .thenReturn(updatedProject);
+    when(transaction.performUpdate(originalProject, updatedProject, creditingPeriods, null))
+        .thenReturn(List.of(new Project()));
 
-    var error = catchThrowable(() -> projectService.updateProject(projectId, update));
+    projectService.updateProject(projectId, update);
 
-    assertThat(error).isInstanceOf(BadRequestException.class).hasMessageContaining("accountId");
-    verifyNoInteractions(updateApplier, transaction);
+    verify(updateApplier).applyProjectDeveloperUpdates(originalProject, update);
   }
 
   @Test
-  void updateProjectRejectsHierarchyChangeBeforeApplyingUpdates() {
+  void updateProjectRejectsClearedVpaHierarchyBeforeApplyingUpdates() {
     int projectId = 1;
     var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
     var update =
         ProjectUpdateDTO.builder()
             .accountId(originalProject.getAccountId())
             .projectClassificationId(originalProject.getProjectClassification().getId())
-            .masterProjectId(99)
-            .parentProjectId(originalProject.getParentProject().getId())
+            .masterProjectId(null)
+            .parentProjectId(null)
             .build();
+    var expectedError = new BadRequestException("invalid parent");
     when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+    doThrow(expectedError)
+        .when(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(originalProject.getAccountId()),
+            any(ProjectClassification.class),
+            eq(null),
+            eq(null));
 
     var error = catchThrowable(() -> projectService.updateProject(projectId, update));
 
-    assertThat(error)
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("masterProjectId");
+    assertThat(error).isEqualTo(expectedError);
+    verifyNoInteractions(updateApplier, transaction);
+  }
+
+  @Test
+  void updateProjectAllowsAdminAccountClassificationAndHierarchyChange() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    var requestedParent =
+        Project.builder()
+            .id(10)
+            .accountId(99)
+            .projectClassification(ProjectClassification.programmeOfActivities())
+            .build();
+    var update =
+        ProjectUpdateDTO.builder()
+            .name("Updated title")
+            .accountId(99)
+            .projectClassificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .masterProjectId(requestedParent.getId())
+            .parentProjectId(requestedParent.getId())
+            .build();
+    var creditingPeriods = givenCreditingPeriods(update.getCreditingPeriods());
+    var updatedProject = mock(Project.class);
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(finder.forceGetProjectById(requestedParent.getId())).thenReturn(requestedParent);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+    when(updateApplier.applyUpdates(originalProject, update)).thenReturn(updatedProject);
+    when(transaction.performUpdate(originalProject, updatedProject, creditingPeriods, null))
+        .thenReturn(List.of(new Project()));
+
+    projectService.updateProject(projectId, update);
+
+    verify(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(99), any(ProjectClassification.class), eq(requestedParent), eq(requestedParent));
+    verify(updateApplier).applyUpdates(originalProject, update);
+  }
+
+  @Test
+  void updateProjectAllowsProjectDeveloperNewProjectTitleAndClassificationChange() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 4);
+    originalProject.setProjectStatus(new ProjectStatus(ProjectStatus.NEW));
+    var update =
+        ProjectUpdateDTO.builder()
+            .name("Updated title")
+            .accountId(originalProject.getAccountId())
+            .projectClassificationId(ProjectClassification.REAL_CASE_VPA_CROSS_LINKAGE_ID)
+            .masterProjectId(originalProject.getMasterProject().getId())
+            .parentProjectId(originalProject.getParentProject().getId())
+            .projectStatusId(originalProject.getProjectStatus().getId())
+            .build();
+    var creditingPeriods = List.<ProjectCreditingPeriod>of();
+    var updatedProject = mock(Project.class);
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(finder.forceGetProjectById(originalProject.getMasterProject().getId()))
+        .thenReturn(originalProject.getMasterProject());
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+    when(updateApplier.applyProjectDeveloperUpdates(originalProject, update))
+        .thenReturn(updatedProject);
+    when(transaction.performUpdate(originalProject, updatedProject, creditingPeriods, null))
+        .thenReturn(List.of(new Project()));
+
+    projectService.updateProject(projectId, update);
+
+    verify(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(originalProject.getAccountId()),
+            any(ProjectClassification.class),
+            eq(originalProject.getMasterProject()),
+            eq(originalProject.getMasterProject()));
+    verify(updateApplier).applyProjectDeveloperUpdates(originalProject, update);
+  }
+
+  @Test
+  void updateProjectSanitizesProjectDeveloperDescriptionChangeBeforeApplyingUpdates() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    originalProject.setProjectStatus(new ProjectStatus(ProjectStatus.NEW));
+    originalProject.setDescription("Existing description");
+    var update =
+        ProjectUpdateDTO.builder()
+            .name("Updated title")
+            .accountId(originalProject.getAccountId())
+            .description("Tampered description")
+            .projectClassificationId(originalProject.getProjectClassification().getId())
+            .masterProjectId(originalProject.getMasterProject().getId())
+            .parentProjectId(originalProject.getParentProject().getId())
+            .projectStatusId(originalProject.getProjectStatus().getId())
+            .build();
+    var creditingPeriods = List.<ProjectCreditingPeriod>of();
+    var updatedProject = mock(Project.class);
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+    when(updateApplier.applyProjectDeveloperUpdates(originalProject, update))
+        .thenReturn(updatedProject);
+    when(transaction.performUpdate(originalProject, updatedProject, creditingPeriods, null))
+        .thenReturn(List.of(new Project()));
+
+    projectService.updateProject(projectId, update);
+
+    verify(updateApplier).applyProjectDeveloperUpdates(originalProject, update);
+  }
+
+  @Test
+  void updateProjectRejectsInvalidHierarchyBeforeApplyingUpdates() {
+    int projectId = 1;
+    var originalProject = buildProjectWithImmutableFields(projectId, 3, 4, 5);
+    var requestedParent =
+        Project.builder()
+            .id(10)
+            .accountId(99)
+            .projectClassification(ProjectClassification.programmeOfActivities())
+            .build();
+    var update =
+        ProjectUpdateDTO.builder()
+            .accountId(99)
+            .projectClassificationId(ProjectClassification.REAL_CASE_VPA_ID)
+            .masterProjectId(requestedParent.getId())
+            .parentProjectId(requestedParent.getId())
+            .build();
+    var expectedError = new BadRequestException("invalid parent");
+    when(finder.forceGetProjectById(projectId)).thenReturn(originalProject);
+    when(finder.forceGetProjectById(requestedParent.getId())).thenReturn(requestedParent);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+    doThrow(expectedError)
+        .when(parentEligibilityPolicy)
+        .validateParentEligibility(
+            eq(99), any(ProjectClassification.class), eq(requestedParent), eq(requestedParent));
+
+    var error = catchThrowable(() -> projectService.updateProject(projectId, update));
+
+    assertThat(error).isEqualTo(expectedError);
     verifyNoInteractions(updateApplier, transaction);
   }
 
