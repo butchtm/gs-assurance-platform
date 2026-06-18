@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Helmet } from "react-helmet-async";
 
-import { ReferenceType, useReferenceTypes } from "../../../common/data-types/DataReferenceTypes";
+import {
+  getReferenceValueDescriptionById,
+  ReferenceType,
+  useReferenceTypes,
+} from "../../../common/data-types/DataReferenceTypes";
 import { BoldTextCell } from "../../../common/filterable-sortable-table/cell/BoldTextCell";
 import { FilterableSortableTable } from "../../../common/filterable-sortable-table/FilterableSortableTable";
 import { Filter } from "../../../common/filterable-sortable-table/model/Filter";
@@ -131,6 +135,20 @@ export const ProjectList: React.FC = () => {
             filterSelectOptions: buildStatusFilterOptions(),
             filterVariant: "multi-select",
           },
+          ...(authContext.isAdminUser() || authContext.isArmUser()
+            ? [
+                {
+                  accessorKey: "projectClassificationId",
+                  accessorFn: (row: Project) =>
+                    getReferenceValueDescriptionById(
+                      row.projectClassificationId,
+                      referenceTypes.allReferenceTypes.ProjectClassification,
+                    ),
+                  header: "Project Classification",
+                  enableColumnFilter: false,
+                },
+              ]
+            : []),
           {
             accessorFn: (row) => row.countries.map((country) => country.name).join(", "),
             header: "Country",
