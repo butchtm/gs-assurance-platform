@@ -48,7 +48,7 @@ Local browser login uses Development Cognito. Database seed rows alone are not e
 
 3. Validate login.
    - Log in at `http://localhost:3000`.
-   - Confirm authenticated user has `ARM-Team` through `/api/auth/verify-token`.
+   - Confirm authenticated user has `ARM-Team` through `/api/public/verify-token`.
    - Confirm the app does not show "account not assigned" behavior.
 
 4. Use the ARM user for parity testing.
@@ -118,9 +118,33 @@ docker exec local-db-1 psql -U postgres -d assurance_db \
 - Local backend sync imports the ARM user.
 - Local `gs."user"` row is active and mapped to account `1`.
 - ARM login works in browser.
-- `/api/auth/verify-token` confirms `ARM-Team`.
+- `/api/public/verify-token` confirms `ARM-Team`.
 - ARM update behavior is documented from current `origin/main`.
 - Feature branch matches the main ARM behavior.
+
+## 2026-06-18 Local Implementation Evidence
+
+Status: local ARM authentication setup is ready for browser parity testing, but full ARM parity is not complete yet.
+
+Completed:
+
+- Development Cognito user `pats-arm` exists in user pool `eu-central-1_XIzobZSx7`.
+- `pats-arm` is enabled, confirmed, and assigned to Cognito group `ARM-Team`.
+- Local `gs."user"` has `pats-arm` active with `groups = {ARM-Team}` and `account_id = 1` (`GS ARM Team`).
+- `POST http://localhost:3000/api/public/login` succeeds for `pats-arm`.
+- `GET http://localhost:3000/api/public/verify-token` returns `authenticated = true`, `groups = ["ARM-Team"]`, and account `GS ARM Team`.
+
+Local-only exception:
+
+- Admin-triggered `POST http://localhost:3000/api/user-synchronizations` returned HTTP 500 during this setup pass.
+- To unblock local validation, the local DB row was repaired manually to mirror the confirmed Cognito identity and map it to `GS ARM Team`.
+- Do not treat that manual repair as proof that the supported user-sync path is healthy; capture the backend 500 root cause before marking this task fully done.
+
+Remaining:
+
+- Run ARM browser parity on current `origin/main` for one `New` project and one `Listed` or later project.
+- Repeat the same ARM browser parity pass on `feat/proposal-2-cross-linking`.
+- Record editability for Project Developer Account, Project Classification, Project Title, linked PoA/Real Case fields, later wizard steps, and submit behavior.
 
 ## Do Not Do
 
