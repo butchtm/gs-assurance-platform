@@ -16,7 +16,7 @@ Use this README as the primary local setup walkthrough.
 - Maven
 - `nvm`
 - Node.js `20.19.0`
-- AWS CLI logged in to the account that can access the Development Cognito user pool
+- AWS CLI configured with SSO access to the account that can access the Development Cognito user pool
 
 Check AWS access:
 
@@ -240,7 +240,7 @@ mvn clean spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=
 
 The AWS export command passes short-lived credentials from the active AWS CLI session into the Java process.
 
-If startup fails with `The security token included in the request is expired`, run your AWS login again and restart the backend from a fresh terminal using the commands above. The backend syncs users from Cognito during startup, so stale AWS credentials will stop the app before login can work.
+If startup fails with `The security token included in the request is expired`, refresh your AWS SSO session and restart the backend from a fresh terminal using the commands above. The backend syncs users from Cognito during startup, so stale AWS credentials will stop the app before login can work.
 
 Health check:
 
