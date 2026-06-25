@@ -70,17 +70,7 @@ export const Step1 = ({
   const projectClassifications = allReferenceTypes?.ProjectClassification ?? [];
   const rawProjectClassificationCode = getReferenceValueCodeById(classificationId, projectClassifications);
   const projectClassificationCode = canonicalProjectClassificationCode(rawProjectClassificationCode);
-  const isSelectedCrossLinkClassification =
-    rawProjectClassificationCode !== undefined && rawProjectClassificationCode !== projectClassificationCode;
-  const selectedClassificationLabel =
-    isUpdate && isSelectedCrossLinkClassification
-      ? projectClassifications.find((classification) => classification.code === projectClassificationCode)?.description
-      : undefined;
-  const classificationOptions = getCustomReferenceOptions("ProjectClassification", classificationId).map((option) =>
-    selectedClassificationLabel && option.value === classificationId
-      ? { ...option, label: selectedClassificationLabel }
-      : option,
-  );
+  const classificationOptions = getCustomReferenceOptions("ProjectClassification", classificationId);
 
   const shouldDisplayPOAInput = projectClassificationCodeRequiresPoa(projectClassificationCode);
   const shouldDisplayRealCaseInput = projectClassificationCodeRequiresRealCaseVpa(projectClassificationCode);

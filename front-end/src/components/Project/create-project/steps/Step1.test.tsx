@@ -274,18 +274,18 @@ describe("Step1", () => {
     {
       rawClassificationId: 10,
       rawClassificationCode: "REAL_CASE_VPA_CROSS_LINKAGE",
-      canonicalClassificationLabel: "Real Case VPA",
+      visibleClassificationLabel: "Real Case VPA Cross Linkage",
       showsRealCaseInput: false,
     },
     {
       rawClassificationId: 11,
       rawClassificationCode: "REGULAR_VPA_CROSS_LINKAGE",
-      canonicalClassificationLabel: "Regular VPA",
+      visibleClassificationLabel: "Regular VPA Cross Linkage",
       showsRealCaseInput: true,
     },
   ])(
-    "renders raw cross-link classification $rawClassificationId as $canonicalClassificationLabel update fields",
-    async ({ rawClassificationId, rawClassificationCode, canonicalClassificationLabel, showsRealCaseInput }) => {
+    "keeps raw cross-link classification label for $rawClassificationId in update fields",
+    async ({ rawClassificationId, rawClassificationCode, visibleClassificationLabel, showsRealCaseInput }) => {
       (getReferenceValueCodeById as jest.Mock).mockImplementation((classificationId: number | null) => {
         if (classificationId === rawClassificationId) {
           return rawClassificationCode;
@@ -350,7 +350,7 @@ describe("Step1", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByDisplayValue(canonicalClassificationLabel)).toBeInTheDocument();
+        expect(screen.getByDisplayValue(visibleClassificationLabel)).toBeInTheDocument();
         expect(screen.getAllByLabelText("Programme of Activities*")).not.toHaveLength(0);
       });
       expect(getCandidatePOAs).toHaveBeenCalledWith(1, rawClassificationId);

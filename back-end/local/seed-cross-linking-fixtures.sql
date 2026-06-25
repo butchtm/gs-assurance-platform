@@ -5,7 +5,8 @@ INSERT INTO gs.account
     (id, name, email_address, account_type_id, created_time, is_active, address)
 VALUES
     (910001, 'Cross Link Alpha PD', 'cross-link-alpha-pd@test', 3, '2024-05-20T00:00:00Z', true, 'Cross Link Alpha PD address'),
-    (910002, 'Cross Link Beta PD', 'cross-link-beta-pd@test', 3, '2024-05-20T00:00:00Z', true, 'Cross Link Beta PD address')
+    (910002, 'Cross Link Beta PD', 'cross-link-beta-pd@test', 3, '2024-05-20T00:00:00Z', true, 'Cross Link Beta PD address'),
+    (910003, 'Pats VVB', 'patslaurel+vvb@thinkingmachin.es', 1, '2024-05-20T00:00:00Z', true, null)
 ON CONFLICT (id) DO UPDATE
 SET
     name = EXCLUDED.name,
@@ -19,7 +20,12 @@ INSERT INTO gs."user"
     (id, user_name, email_address, account_id, is_active, idp_user_id, given_name, family_name, email_verified, groups)
 VALUES
     (910001, 'cross-link-alpha-pd', 'cross-link-alpha-pd@test', 910001, true, 'b1131111-1111-4111-8111-111111111111', 'Alpha', 'PD', true, ARRAY['Project-Developer']),
-    (910002, 'cross-link-beta-pd', 'cross-link-beta-pd@test', 910002, true, 'b1132222-2222-4222-8222-222222222222', 'Beta', 'PD', true, ARRAY['Project-Developer'])
+    (910002, 'cross-link-beta-pd', 'cross-link-beta-pd@test', 910002, true, 'b1132222-2222-4222-8222-222222222222', 'Beta', 'PD', true, ARRAY['Project-Developer']),
+    (910003, 'patslaurel', 'patslaurel@thinkingmachin.es', null, true, '03b48872-a061-703f-f070-5d7f9038261e', 'Pats', 'Laurel', true, ARRAY['GS-Admin']),
+    (910004, 'pats-pd-alpha', 'patslaurel+gs-pd-alpha@thinkingmachin.es', 910001, true, 'c3e47852-5031-7020-9a08-b578a2309fc9', 'Pats', 'PD Alpha', true, ARRAY['Project-Developer']),
+    (910005, 'pats-pd-beta', 'patslaurel+gs-pd-beta@thinkingmachin.es', 910002, true, 'e334d862-c0e1-70e6-3234-291e88259f4b', 'Pats', 'PD Beta', true, ARRAY['Project-Developer']),
+    (910006, 'pats-arm', 'patslaurel+arm@thinkingmachin.es', 1, true, '23343872-f031-70a7-c065-1d4d16f6e58e', 'Pats', 'ARM', true, ARRAY['ARM-Team']),
+    (910051, 'pats-vvb', 'patslaurel+vvb@thinkingmachin.es', 910003, true, 'a3f4c832-80d1-7014-5f8c-8bcee906a8f5', 'Pats', 'VVB', true, ARRAY['VVB'])
 ON CONFLICT (id) DO UPDATE
 SET
     user_name = EXCLUDED.user_name,
@@ -163,7 +169,7 @@ VALUES
     (910104, 1, 0, 1.0),
     (910105, 1, 1, 2.0);
 
-SELECT setval('gs.account_id_seq', GREATEST((SELECT last_value FROM gs.account_id_seq), 910002));
-SELECT setval('gs.user_id_seq', GREATEST((SELECT last_value FROM gs.user_id_seq), 910002));
+SELECT setval('gs.account_id_seq', GREATEST((SELECT last_value FROM gs.account_id_seq), 910003));
+SELECT setval('gs.user_id_seq', GREATEST((SELECT last_value FROM gs.user_id_seq), 910051));
 SELECT setval('gs.project_id_seq', GREATEST((SELECT last_value FROM gs.project_id_seq), 910105));
 SELECT setval('gs.project_gsid_seq', GREATEST((SELECT last_value FROM gs.project_gsid_seq), 910105));
