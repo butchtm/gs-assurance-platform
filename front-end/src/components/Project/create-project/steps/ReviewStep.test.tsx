@@ -1,12 +1,17 @@
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import dayjs from "dayjs";
 import { Formik, useFormikContext } from "formik";
 
 import * as DataReferenceTypes from "../../../../common/data-types/DataReferenceTypes";
-import { mockActiveReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
-import { analyseText, highProbability, mediumProbability } from "../../../../common/piiAnalysis/PiiAnalysis";
+import { mockActiveReferenceTypes, mockAllReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
+import {
+  analyseText,
+  highProbability,
+  mediumProbability,
+  TextAnalysisResponse,
+} from "../../../../common/piiAnalysis/PiiAnalysis";
 import mockProjects, { mockCreateProjectFormValues } from "../../../../common/project/DebugProject";
 import { AuthContext, AuthContextType } from "../../../Auth/Login/AuthProvider";
 import { getAllProjectsForAccount } from "../../Project";
@@ -25,6 +30,12 @@ jest.mock("../../../../common/piiAnalysis/PiiAnalysis", () => ({
 
 const mockGetAllProjectsForAccount = getAllProjectsForAccount as jest.MockedFunction<typeof getAllProjectsForAccount>;
 const mockAnalyseText = analyseText as jest.MockedFunction<typeof analyseText>;
+const mockProjectClassificationReferenceTypes = [
+  { id: 8, code: "REAL_CASE_VPA", description: "Real Case VPA", active: true },
+  { id: 9, code: "REGULAR_VPA", description: "Regular VPA", active: true },
+  { id: 10, code: "REAL_CASE_VPA_CROSS_LINKAGE", description: "Real Case VPA Cross Linkage", active: false },
+  { id: 11, code: "REGULAR_VPA_CROSS_LINKAGE", description: "Regular VPA Cross Linkage", active: false },
+];
 
 jest.mock("formik", () => ({
   ...jest.requireActual("formik"),
@@ -57,7 +68,14 @@ jest.mock("../../../../common/data-types/DataReferenceTypes", () => ({
   ...jest.requireActual("../../../../common/data-types/DataReferenceTypes"),
   getReferenceValueCodeById: jest.fn(),
   useReferenceTypes: () => ({
-    activeReferenceTypes: mockActiveReferenceTypes,
+    activeReferenceTypes: {
+      ...mockActiveReferenceTypes,
+      ProjectClassification: mockProjectClassificationReferenceTypes.filter((classification) => classification.active),
+    },
+    allReferenceTypes: {
+      ...mockAllReferenceTypes,
+      ProjectClassification: mockProjectClassificationReferenceTypes,
+    },
   }),
   useCustomReferenceOptions: jest.fn().mockReturnValue([
     { value: 1, label: "Option 1" },
@@ -70,6 +88,14 @@ const mockAuthProvider = {
   isAdminUser: jest.fn(),
   isArmUser: jest.fn(),
 } as Record<keyof AuthContextType, jest.Mock>;
+
+const createDeferred = <T,>() => {
+  let resolve: (value: T) => void = () => {};
+  const promise = new Promise<T>((promiseResolve) => {
+    resolve = promiseResolve;
+  });
+  return { promise, resolve };
+};
 
 describe("ReviewStep", () => {
   beforeEach(() => {
@@ -198,5 +224,82 @@ describe("ReviewStep", () => {
 
     const warningIcons = screen.getAllByTestId("warning-icon");
     expect(warningIcons.length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    { rawClassificationId: 10, canonicalClassificationLabel: "Real Case VPA" },
+    { rawClassificationId: 11, canonicalClassificationLabel: "Regular VPA" },
+  ])(
+    "renders raw cross-link classification $rawClassificationId as $canonicalClassificationLabel",
+    async ({ rawClassificationId, canonicalClassificationLabel }) => {
+      const useFormikContextMock = useFormikContext as jest.Mock;
+
+      useFormikContextMock.mockImplementation(() => ({
+        values: {
+          ...mockCreateProjectFormValues,
+          projectClassificationId: rawClassificationId,
+          textAnalysisResults: undefined,
+        },
+        setFieldValue: jest.fn(),
+      }));
+
+      render(
+        <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
+          <Formik initialValues={mockCreateProjectFormValues} onSubmit={jest.fn()}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <ReviewStep />
+            </LocalizationProvider>
+          </Formik>
+        </AuthContext.Provider>,
+      );
+
+      expect(await screen.findByText(canonicalClassificationLabel)).toBeInTheDocument();
+    },
+  );
+
+  it("does not update PII analysis results after unmount", async () => {
+    const useFormikContextMock = useFormikContext as jest.Mock;
+    const setFieldValue = jest.fn();
+    const piiAnalysis = createDeferred<TextAnalysisResponse>();
+    mockAnalyseText.mockReturnValue(piiAnalysis.promise);
+    useFormikContextMock.mockImplementation(() => ({
+      values: {
+        ...mockCreateProjectFormValues,
+        name: "Delayed analysis project",
+        description: "Delayed analysis description",
+        notes: "Delayed analysis notes",
+        textAnalysisResults: undefined,
+      },
+      setFieldValue,
+    }));
+
+    const { unmount } = render(
+      <AuthContext.Provider value={mockAuthProvider as unknown as AuthContextType}>
+        <Formik initialValues={mockCreateProjectFormValues} onSubmit={jest.fn()}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <ReviewStep />
+          </LocalizationProvider>
+        </Formik>
+      </AuthContext.Provider>,
+    );
+
+    await waitFor(() => {
+      expect(mockAnalyseText).toHaveBeenCalledWith({
+        fieldsToAnalyse: [
+          { field: "title", text: "Delayed analysis project" },
+          { field: "description", text: "Delayed analysis description" },
+          { field: "notes", text: "Delayed analysis notes" },
+        ],
+      });
+    });
+
+    unmount();
+
+    await act(async () => {
+      piiAnalysis.resolve({ probablePii: [] });
+      await piiAnalysis.promise;
+    });
+
+    expect(setFieldValue).not.toHaveBeenCalledWith("textAnalysisResults", expect.anything());
   });
 });

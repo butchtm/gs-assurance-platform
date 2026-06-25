@@ -21,6 +21,10 @@ export const helperTexts: HelperText = {
       <Link href="https://globalgoals.goldstandard.org/107-par-programme-of-activity-requirements/" target="_blank">
         please see version 2 of the PoA requirements.
       </Link>
+      <br />
+      <br />
+      Cross linkage means the VPA&apos;s PD account is different from the PoA&apos;s PD account, or the Regular Case
+      VPA&apos;s PD account is different from its Real Case VPA&apos;s PD account.
     </>
   ),
   projectTitle: () => (

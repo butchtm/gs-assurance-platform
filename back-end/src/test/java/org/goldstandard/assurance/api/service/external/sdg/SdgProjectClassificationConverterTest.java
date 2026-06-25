@@ -22,6 +22,10 @@ class SdgProjectClassificationConverterTest {
   }
 
   private static Stream<Arguments> assuranceClassificationCodeAndExpectedSdgClassificationCode() {
-    return Stream.of(Arguments.of("STANDALONE_PROJECT", "NONE"), Arguments.of("NONE", "NONE"));
+    return Stream.of(
+        Arguments.of("STANDALONE_PROJECT", "NONE"),
+        Arguments.of("NONE", "NONE"),
+        Arguments.of("REAL_CASE_VPA_CROSS_LINKAGE", "VPA"),
+        Arguments.of("REGULAR_VPA_CROSS_LINKAGE", "VPA"));
   }
 }

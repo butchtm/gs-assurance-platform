@@ -32,9 +32,11 @@ class ExternalProjectClassificationConverterTest {
         Arguments.of("PROGRAMME_OF_ACTIVITIES", "POA"),
         Arguments.of("REAL_OR_REGULAR_CASE_POA", "POA"),
         Arguments.of("REAL_CASE_VPA", "VPA"),
+        Arguments.of("REAL_CASE_VPA_CROSS_LINKAGE", "VPA"),
         Arguments.of("REAL_CASE_VPA_LEGACY", "VPA"),
         Arguments.of("REGULAR_CASE_VPA", "VPA"),
         Arguments.of("REGULAR_VPA", "VPA"),
+        Arguments.of("REGULAR_VPA_CROSS_LINKAGE", "VPA"),
         Arguments.of("VPA_CPA", "VPA"),
         Arguments.of("ANY_OTHER_CODE", "ANY_OTHER_CODE"));
   }

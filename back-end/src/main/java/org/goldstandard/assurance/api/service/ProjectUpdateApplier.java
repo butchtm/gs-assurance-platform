@@ -76,6 +76,15 @@ public class ProjectUpdateApplier {
         updateTransitionProject(updatedProject, dto.getTransitionProject()));
   }
 
+  public Project applyProjectDeveloperUpdates(Project project, ProjectUpdateDTO dto) {
+    return project.toBuilder()
+        .name(dto.getName())
+        .projectClassification(
+            convertIfPresent(dto.getProjectClassificationId(), ProjectClassification::new))
+        .updatedByUserId(authenticatedUserSupplier.forceGetAuthenticatedUserPlatformId())
+        .build();
+  }
+
   private static TransitionProject updateTransitionProject(
       Project project, TransitionProjectDetails newDetail) {
     if (newDetail == null) {

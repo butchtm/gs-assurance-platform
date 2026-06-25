@@ -5,6 +5,8 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class ProjectFinder {
   private final IsDirectChildProjectPredicateFactory isDirectChildPredicateFactory;
   private final ProjectTreeFactory projectTreeFactory;
   private final ProjectTreeNodeViewRepository projectTreeNodeViewRepository;
+  private final PermissionsService permissionsService;
 
   public List<Project> getAllChildProjects(Project parentProject, BatchType batchType) {
     var accountProjects = projectRepository.findAllByAccountId(parentProject.getAccountId());
@@ -71,13 +74,25 @@ public class ProjectFinder {
 
   public Page<ProjectTree> getProjectTrees(
       Pageable pageable, ProjectSearchCriteriaDTO searchCriteria) {
-    var rootProjects = findRootProjects(pageable, searchCriteria);
-    return rootProjects.map(projectTreeFactory::buildProjectTree);
+    var result = searchProjects(searchCriteria);
+    var rootProjects = findRootProjects(pageable, result);
+    if (permissionsService.canAccessAllProjects()) {
+      return rootProjects.map(projectTreeFactory::buildProjectTree);
+    }
+    var accountId = permissionsService.getAccountIdForUser().orElse(null);
+    var authorizedProjectIdsByRootProjectId =
+        permissionsService.isProjectDeveloper() && Objects.nonNull(accountId)
+            ? toProjectIdsByRootProjectId(result, accountId)
+            : toProjectIdsByRootProjectId(result);
+    return rootProjects.map(
+        rootProject ->
+            projectTreeFactory.buildAuthorizedProjectTree(
+                rootProject,
+                authorizedProjectIdsByRootProjectId.getOrDefault(rootProject.getId(), Set.of())));
   }
 
   private Page<ProjectTreeNodeView> findRootProjects(
-      Pageable pageable, ProjectSearchCriteriaDTO searchCriteria) {
-    var result = searchProjects(searchCriteria);
+      Pageable pageable, Collection<SearchableProjectView> result) {
     var rootProjectIds = toUniqueRootProjectIds(result);
     var spec = searchSpecFactory.idIn(rootProjectIds);
     var start = Instant.now();
@@ -123,6 +138,25 @@ public class ProjectFinder {
     return projects.stream()
         .map(SearchableProjectView::getRootProjectId)
         .collect(Collectors.toSet());
+  }
+
+  private Map<Integer, Set<Integer>> toProjectIdsByRootProjectId(
+      Collection<SearchableProjectView> projects) {
+    return projects.stream()
+        .collect(
+            Collectors.groupingBy(
+                SearchableProjectView::getRootProjectId,
+                Collectors.mapping(SearchableProjectView::getId, Collectors.toSet())));
+  }
+
+  private Map<Integer, Set<Integer>> toProjectIdsByRootProjectId(
+      Collection<SearchableProjectView> projects, Integer accountId) {
+    return projects.stream()
+        .filter(project -> Objects.equals(project.getAccountId(), accountId))
+        .collect(
+            Collectors.groupingBy(
+                SearchableProjectView::getRootProjectId,
+                Collectors.mapping(SearchableProjectView::getId, Collectors.toSet())));
   }
 
   private Page<SearchableProjectView> searchProjects(

@@ -14,6 +14,7 @@ interface CustomSelectProps {
   helperText?: string | JSX.Element;
   warningText?: string | JSX.Element;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export const CustomAutoComplete: React.FC<CustomSelectProps> = ({
@@ -24,6 +25,7 @@ export const CustomAutoComplete: React.FC<CustomSelectProps> = ({
   helperText,
   warningText,
   required,
+  disabled,
 }) => {
   const [field, meta, helpers] = useField(name);
 
@@ -53,6 +55,7 @@ export const CustomAutoComplete: React.FC<CustomSelectProps> = ({
           value={valueFromField}
           onChange={handleOnChange}
           aria-required={!!required}
+          disabled={disabled}
           renderInput={(params) => (
             <TextField
               {...params}

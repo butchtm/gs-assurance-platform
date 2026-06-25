@@ -8,7 +8,7 @@ import React from "react";
 
 import { mockActiveReferenceTypes } from "../../../../common/data-types/DebugReferenceTypes";
 import { CreateProjectForm } from "../../../../common/project/Project";
-import { getProject } from "../../Project";
+import { getCandidateParentDetails } from "../../Project";
 
 import { Step3 } from "./Step3";
 
@@ -47,7 +47,7 @@ const mockProject = {
 };
 
 jest.mock("../../Project", () => ({
-  getProject: jest.fn(),
+  getCandidateParentDetails: jest.fn(),
 }));
 
 const FormStateDisplay: React.FC = () => {
@@ -70,6 +70,11 @@ const RenderFormikWithLocalization: React.FC<TestFormProps> = ({ initialValues, 
 );
 
 describe("Step3 Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getCandidateParentDetails as jest.Mock).mockResolvedValue(mockProject);
+  });
+
   const initialFormValues = {
     parentProjectId: undefined,
     creditingPeriods: [
@@ -135,7 +140,6 @@ describe("Step3 Component", () => {
   });
 
   it("should only allow selection of active and any existing methodologies for non-child projects", async () => {
-    (getProject as jest.Mock).mockResolvedValue(mockProject);
     render(
       <RenderFormikWithLocalization
         initialValues={{
@@ -167,10 +171,12 @@ describe("Step3 Component", () => {
   });
 
   it("should only allow selection of parent and any existing methodologies for child projects", async () => {
-    (getProject as jest.Mock).mockResolvedValue(mockProject);
     render(
       <RenderFormikWithLocalization
         initialValues={{
+          accountId: 1,
+          projectClassificationId: 11,
+          masterProjectId: 900,
           parentProjectId: 1,
           creditingPeriods: [
             {
@@ -187,13 +193,61 @@ describe("Step3 Component", () => {
     );
     await waitFor(() => {
       const methodologySelect = screen.getByTestId("methodology-input-0");
-      expect(getProject).toHaveBeenCalled();
+      expect(getCandidateParentDetails).toHaveBeenCalledWith({
+        accountId: 1,
+        classificationId: 11,
+        candidateProjectId: 1,
+        masterProjectId: 900,
+      });
       expect(methodologySelect).toHaveValue("Option 2");
       fireEvent.mouseDown(methodologySelect);
       const options = screen.getAllByRole("option");
       expect(options.length).toBe(2);
       expect(screen.getByRole("option", { name: "Option 1" })).toBeInTheDocument();
       expect(screen.getByRole("option", { name: "Option 2" })).toBeInTheDocument();
+    });
+  });
+
+  it("should allow selection of active top-level parent methodologies for child projects", async () => {
+    (getCandidateParentDetails as jest.Mock).mockResolvedValueOnce({
+      creditingPeriods: [],
+      methodologies: [{ id: 3, code: "OPTION_3", description: "Option 3" }],
+    });
+
+    render(
+      <RenderFormikWithLocalization
+        initialValues={{
+          accountId: 1,
+          projectClassificationId: 10,
+          parentProjectId: 1,
+          creditingPeriods: [
+            {
+              periodId: 1,
+              startDate: "2024-01-01",
+              endDate: "2025-01-01",
+              methodologies: [{ id: null, version: null }],
+            },
+          ],
+        }}
+      >
+        <Step3 />
+      </RenderFormikWithLocalization>,
+    );
+
+    await waitFor(() => {
+      expect(getCandidateParentDetails).toHaveBeenCalledWith({
+        accountId: 1,
+        classificationId: 10,
+        candidateProjectId: 1,
+      });
+    });
+
+    fireEvent.mouseDown(screen.getByTestId("methodology-input-0"));
+
+    await waitFor(() => {
+      expect(screen.getByRole("option", { name: "Option 3" })).toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Option 1" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("option", { name: "Option 2" })).not.toBeInTheDocument();
     });
   });
 });

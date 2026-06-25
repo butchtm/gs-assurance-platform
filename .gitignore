@@ -13,6 +13,7 @@ archive/
 
 # Local database dumps and oversized load-test fixtures
 data-migration/dump_prod_db/
+back-end/local/backups/
 load-test/src/resources/very_large_document.txt
 
 # OS/editor files

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.goldstandard.assurance.api.entity.Project;
 import org.goldstandard.assurance.api.entity.lookup.ProjectStatus;
@@ -87,6 +88,80 @@ class ProjectAccessPolicyTest {
     when(permissionsService.isReviewerOrVVBOrRegistry()).thenReturn(false);
 
     Throwable error = catchThrowable(() -> policy.validateUserCanViewProject(project));
+
+    assertThat(error).isInstanceOf(PermissionException.class);
+  }
+
+  @Test
+  void shouldResolveRequestedAccountForAdminOrArmProjectMutation() {
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+
+    var accountId = policy.resolveProjectAccountId(42);
+
+    assertThat(accountId).isEqualTo(42);
+  }
+
+  @Test
+  void shouldResolveAuthenticatedAccountForProjectDeveloperProjectMutation() {
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+    when(permissionsService.isProjectDeveloper()).thenReturn(true);
+    when(permissionsService.getAccountIdForUser()).thenReturn(Optional.of(7));
+
+    var accountId = policy.resolveProjectAccountId(null);
+
+    assertThat(accountId).isEqualTo(7);
+  }
+
+  @Test
+  void shouldRejectProjectDeveloperProjectMutationForAnotherAccount() {
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+    when(permissionsService.isProjectDeveloper()).thenReturn(true);
+    when(permissionsService.getAccountIdForUser()).thenReturn(Optional.of(7));
+
+    var error = catchThrowable(() -> policy.resolveProjectAccountId(8));
+
+    assertThat(error).isInstanceOf(PermissionException.class);
+  }
+
+  @Test
+  void shouldAllowAdminOrArmToUpdateAnyProjectStatus() {
+    Project listedProject = buildProjectWithStatus(new ProjectStatus(ProjectStatus.LISTED));
+    when(permissionsService.isProjectOwner(listedProject)).thenReturn(false);
+    when(permissionsService.isAdminOrArm()).thenReturn(true);
+
+    ThrowingCallable call = () -> policy.validateCanUpdateProject(listedProject);
+
+    assertThatCode(call).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldAllowProjectDeveloperOwnerToUpdateNewProject() {
+    Project project = buildProject();
+    when(permissionsService.isProjectOwner(project)).thenReturn(true);
+
+    ThrowingCallable call = () -> policy.validateCanUpdateProject(project);
+
+    assertThatCode(call).doesNotThrowAnyException();
+  }
+
+  @Test
+  void shouldRejectProjectDeveloperOwnerUpdatingListedProject() {
+    Project project = buildProjectWithStatus(new ProjectStatus(ProjectStatus.LISTED));
+    when(permissionsService.isProjectOwner(project)).thenReturn(true);
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+
+    Throwable error = catchThrowable(() -> policy.validateCanUpdateProject(project));
+
+    assertThat(error).isInstanceOf(PermissionException.class);
+  }
+
+  @Test
+  void shouldRejectProjectDeveloperUpdatingNonOwnedProject() {
+    Project project = buildProject();
+    when(permissionsService.isProjectOwner(project)).thenReturn(false);
+    when(permissionsService.isAdminOrArm()).thenReturn(false);
+
+    Throwable error = catchThrowable(() -> policy.validateCanUpdateProject(project));
 
     assertThat(error).isInstanceOf(PermissionException.class);
   }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.entity.lookup.ReferenceDataType;
 import org.goldstandard.assurance.api.entity.view.CommonDashboardView;
 
@@ -29,7 +30,10 @@ public class CommonDashboardReportRowPopulator {
     dateTimeCell(row, columnIndex++, view.getCurrentRoundEndDate());
     numberCell(row, columnIndex++, view.getCurrentRoundIndex());
     dateTimeCell(row, columnIndex++, view.getRequestEndDate());
-    stringCell(row, columnIndex++, toDescriptionIfPresent(view.getProjectClassification()));
+    stringCell(
+        row,
+        columnIndex++,
+        ProjectClassificationSemantics.toDisplayDescription(view.getProjectClassification()));
     stringCell(row, columnIndex++, toDescriptionsString(view.getProjectTypes()));
     stringCell(row, columnIndex++, toDescriptionIfPresent(view.getInvoiceStatus()));
     numberCell(row, columnIndex++, view.getRequestId());

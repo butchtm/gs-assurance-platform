@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Options, useReferenceTypes } from "../../../../common/data-types/DataReferenceTypes";
 import { CreateProjectForm, findAllMethodologyIds } from "../../../../common/project/Project";
-import { getProject } from "../../Project";
+import { getCandidateParentDetails } from "../../Project";
 
 import { CreateCreditingPeriod } from "./CreateCreditingPeriod";
 
@@ -18,22 +18,38 @@ export const Step3 = ({ isUpdate }: Step3Props) => {
   const { referenceMethodologies, getCustomReferenceOptions } = useReferenceTypes();
   const allMethodologyOptions = getCustomReferenceOptions("Methodology", []);
 
-  const getParentProjectMethodologies = async (parentProjectId: number, existingMethodologyIds: number[]) => {
-    const parentProject = await getProject(parentProjectId);
-    const parentProjectMethodologyIds = findAllMethodologyIds(parentProject.creditingPeriods);
-
-    const parentProjectMethodologyIdsActive = referenceMethodologies
-      .filter((m) => m.active && parentProjectMethodologyIds.includes(Number(m.id)))
-      .map((m) => m.id);
-
-    const allowedMethodologyIds = [...new Set([...existingMethodologyIds, ...parentProjectMethodologyIdsActive])];
-
-    setMethodologyOptions(
-      allMethodologyOptions.filter((option) => allowedMethodologyIds.includes(Number(option.value))),
-    );
-  };
-
   useEffect(() => {
+    let ignore = false;
+
+    const getParentProjectMethodologies = async (parentProjectId: number, existingMethodologyIds: number[]) => {
+      if (values.accountId == null || values.projectClassificationId == null) {
+        return;
+      }
+      const parentProject = await getCandidateParentDetails({
+        accountId: values.accountId,
+        classificationId: values.projectClassificationId,
+        candidateProjectId: parentProjectId,
+        masterProjectId: values.masterProjectId,
+      });
+      if (ignore) {
+        return;
+      }
+      const parentProjectMethodologyIds = [
+        ...findAllMethodologyIds(parentProject.creditingPeriods),
+        ...(parentProject.methodologies?.map((methodology) => methodology.id) ?? []),
+      ];
+
+      const parentProjectMethodologyIdsActive = referenceMethodologies
+        .filter((m) => m.active && parentProjectMethodologyIds.includes(Number(m.id)))
+        .map((m) => m.id);
+
+      const allowedMethodologyIds = [...new Set([...existingMethodologyIds, ...parentProjectMethodologyIdsActive])];
+
+      setMethodologyOptions(
+        allMethodologyOptions.filter((option) => allowedMethodologyIds.includes(Number(option.value))),
+      );
+    };
+
     if (!allMethodologyOptions) {
       return;
     }
@@ -47,7 +63,11 @@ export const Step3 = ({ isUpdate }: Step3Props) => {
         allMethodologyOptions.filter((option) => allowedMethodologyIds.includes(Number(option.value))),
       );
     }
-  }, [values.parentProjectId]);
+
+    return () => {
+      ignore = true;
+    };
+  }, [values.accountId, values.masterProjectId, values.parentProjectId, values.projectClassificationId]);
 
   return (
     <Box p={4}>

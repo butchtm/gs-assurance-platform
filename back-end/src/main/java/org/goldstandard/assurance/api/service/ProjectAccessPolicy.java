@@ -1,6 +1,7 @@
 package org.goldstandard.assurance.api.service;
 
 import java.util.Collection;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goldstandard.assurance.api.entity.Project;
@@ -27,11 +28,25 @@ public class ProjectAccessPolicy {
         "User not permitted to update project project %s", project.getGsid());
   }
 
-  public void validateCanCreateProjectForAccount(Integer accountId) {
-    if (canCreateProjectForAccount(accountId)) {
-      return;
+  public Integer resolveProjectAccountId(Integer requestedAccountId) {
+    if (permissionsService.isAdminOrArm()) {
+      return requestedAccountId;
     }
-    throw new PermissionException("User not permitted to create project for account %d", accountId);
+    if (!permissionsService.isProjectDeveloper()) {
+      throw new PermissionException(
+          "User not permitted to use project account %d", requestedAccountId);
+    }
+
+    var authenticatedAccountId =
+        permissionsService
+            .getAccountIdForUser()
+            .orElseThrow(() -> new PermissionException("user account not found"));
+    if (Objects.nonNull(requestedAccountId)
+        && !Objects.equals(authenticatedAccountId, requestedAccountId)) {
+      throw new PermissionException(
+          "User not permitted to use project account %d", requestedAccountId);
+    }
+    return authenticatedAccountId;
   }
 
   public void validateUserCanViewProject(Project project) {
@@ -53,14 +68,6 @@ public class ProjectAccessPolicy {
       return;
     }
     throw new PermissionException("user not permitted to view project %s", project.getGsid());
-  }
-
-  private boolean canCreateProjectForAccount(Integer accountId) {
-    if (permissionsService.isAdminOrArm()) {
-      return true;
-    }
-    return permissionsService.isProjectDeveloper()
-        && permissionsService.currentUserInAccount(accountId);
   }
 
   private boolean canUpdateProject(Project project) {

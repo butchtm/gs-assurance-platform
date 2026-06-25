@@ -10,8 +10,9 @@ import { mockActiveReferenceTypes } from "@/common/data-types/DebugReferenceType
 import { mockCreateProjectFormValues } from "@/common/project/DebugProject";
 import { FormikStep } from "@/components/Reusable/Formik/FormikStep";
 import { FormikStepper } from "@/components/Reusable/Formik/FormikStepper";
+import type { AuthContextType } from "@/components/Auth/Login/AuthProvider";
 
-import { getWarningForProjectTypes, warningText } from "./CreateProject";
+import { buildCreateProjectPayload, getWarningForProjectTypes, warningText } from "./CreateProject";
 import { ReviewStep } from "./steps/ReviewStep";
 import { Step1 } from "./steps/Step1";
 import { Step2 } from "./steps/Step2";
@@ -31,6 +32,7 @@ jest.mock("../../../common/piiAnalysis/PiiAnalysis", () => ({
 jest.mock("../Project", () => ({
   ...jest.requireActual("../Project"),
   getProject: jest.fn().mockResolvedValue(mockCreateProjectFormValues),
+  getCandidateParentDetails: jest.fn().mockResolvedValue(mockCreateProjectFormValues),
   getCandidatePOAs: jest.fn(),
   getCandidateRealCaseVPAs: jest.fn(),
 }));
@@ -91,6 +93,44 @@ jest.mock("../../../common/data-types/DataReferenceTypes", () => ({
 }));
 
 describe("CreateProject", () => {
+  it("uses the selected developer account in the create payload for ARM users", () => {
+    const armAuthContext: Pick<AuthContextType, "isAdminUser" | "isArmUser" | "user"> = {
+      isAdminUser: jest.fn().mockReturnValue(false),
+      isArmUser: jest.fn().mockReturnValue(true),
+      user: {
+        id: 1,
+        userName: "arm-user",
+        emailAddress: "arm@example.com",
+        isActive: true,
+        givenName: "Arm",
+        familyName: "User",
+        groups: [],
+        account: {
+          id: 7,
+          name: "Fallback Account",
+          emailAddress: "fallback@example.com",
+          active: true,
+          address: "Fallback address",
+          accountType: {
+            id: 1,
+            code: "PROJECT_DEVELOPER",
+            description: "Project Developer",
+          },
+        },
+      },
+    };
+
+    const payload = buildCreateProjectPayload(
+      {
+        ...mockCreateProjectFormValues,
+        accountId: 42,
+      },
+      armAuthContext,
+    );
+
+    expect(payload.accountId).toBe(42);
+  });
+
   it.each([
     { id: "Project Title", expectedText: "Project Title*" },
     { id: "Project Scale", expectedText: "Project Scale", comboBox: true },

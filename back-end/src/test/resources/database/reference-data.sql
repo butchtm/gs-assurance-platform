@@ -29,18 +29,20 @@ VALUES
     (2,'ACM0003_PARTIAL_SUBSTITUTION_OF_FOSSIL_FUELS_WITH_ALTERNATIVE_FUELS_OR_LESS_CARBON_INTENSIVE_FUELS_IN_CEMENT_MANUFACTURE','ACM0003 Partial substitution of fossil fuels with alternative fuels or less carbon intensive fuels in cement manufacture', false);
 
 INSERT INTO gs.project_classification
-	(id, code, description)
+	(id, code, description, is_active)
 VALUES
-     (0, 'NONE', 'None'),
-     (1, 'POA', 'Master Legacy'),
-     (2, 'VPA_CPA', 'VPA/CPA'),
-     (3, 'REAL_CASE_VPA', 'Real case VPA'),
-     (4, 'REGULAR_CASE_VPA', 'Regular case VPA'),
-     (5, 'POA', 'POA'),
-     (6, 'STANDALONE_PROJECT', 'Standalone Project'),
-     (7, 'PROGRAMME_OF_ACTIVITIES', 'Programme of Activities'),
-     (8, 'REAL_CASE_VPA', 'Real Case VPA'),
-     (9, 'REGULAR_VPA', 'Regular VPA');
+     (0, 'NONE', 'None', false),
+     (1, 'POA', 'Master Legacy', false),
+     (2, 'VPA_CPA', 'VPA/CPA', false),
+     (3, 'REAL_CASE_VPA_LEGACY', 'Real case VPA', false),
+     (4, 'REGULAR_CASE_VPA', 'Regular case VPA', false),
+     (5, 'POA', 'POA', false),
+     (6, 'STANDALONE_PROJECT', 'Standalone Project', true),
+     (7, 'PROGRAMME_OF_ACTIVITIES', 'Programme of Activities', true),
+     (8, 'REAL_CASE_VPA', 'Real Case VPA', true),
+     (9, 'REGULAR_VPA', 'Regular VPA', true),
+     (10, 'REAL_CASE_VPA_CROSS_LINKAGE', 'Real Case VPA (cross linkage)', false),
+     (11, 'REGULAR_VPA_CROSS_LINKAGE', 'Regular Case VPA (cross linkage)', false);
 
 INSERT INTO gs.project_asset
 	(id, code, description)
@@ -259,9 +261,17 @@ VALUES
     (0, 1000, 7),
     (1, 1000, 7),
     (0, 1000, 8),
+    (2, 1000, 8),
     (1, 1001, 8),
     (0, 1001, 9),
     (1, 1001, 9),
+    (3, 1000, 9),
+    (0, 1000, 10),
+    (2, 1000, 10),
+    (1, 1001, 10),
+    (0, 1001, 11),
+    (1, 1001, 11),
+    (3, 1000, 11),
     (0, 1000, 5);
 
 INSERT INTO gs.request_round_status

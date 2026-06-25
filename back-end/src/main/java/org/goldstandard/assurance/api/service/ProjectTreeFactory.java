@@ -5,11 +5,13 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.goldstandard.assurance.api.entity.ProjectTree;
 import org.goldstandard.assurance.api.entity.ProjectTreeNode;
 import org.goldstandard.assurance.api.entity.ProjectTreeNode.ProjectTreeNodeBuilder;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.entity.view.ProjectTreeNodeView;
 import org.goldstandard.assurance.api.repository.ProjectTreeNodeViewRepository;
 import org.springframework.stereotype.Component;
@@ -24,6 +26,12 @@ public class ProjectTreeFactory {
   public ProjectTree buildProjectTree(Integer projectId) {
     var project = repository.forceGetById(projectId);
     return buildProjectTree(project);
+  }
+
+  public ProjectTree buildAuthorizedProjectTree(
+      Integer projectId, Collection<Integer> authorizedProjectIds) {
+    var project = repository.forceGetById(projectId);
+    return buildAuthorizedProjectTree(project, authorizedProjectIds);
   }
 
   public ProjectTree buildProjectTree(ProjectTreeNodeView project) {
@@ -52,6 +60,25 @@ public class ProjectTreeFactory {
     }
   }
 
+  public ProjectTree buildAuthorizedProjectTree(
+      ProjectTreeNodeView project, Collection<Integer> authorizedProjectIds) {
+    var start = Instant.now();
+    try {
+      var masterProject = toMasterProject(project);
+      if (Objects.isNull(masterProject)) {
+        return new ProjectTree(toProjectTreeNode(project));
+      }
+      var childProjects = repository.findAllByMasterProjectId(masterProject.getId());
+      return buildPrunedTree(masterProject, childProjects, authorizedProjectIds);
+    } finally {
+      log.info(
+          "build authorized project tree for project {} {} took {}ms",
+          project.getId(),
+          project.getGsid(),
+          Duration.between(start, Instant.now()).toMillis());
+    }
+  }
+
   private static ProjectTreeNodeView toMasterProject(ProjectTreeNodeView project) {
     if (project.isPoa()) {
       return project;
@@ -74,6 +101,30 @@ public class ProjectTreeFactory {
     return new ProjectTree(masterNode);
   }
 
+  private static ProjectTree buildPrunedTree(
+      ProjectTreeNodeView masterProject,
+      Collection<ProjectTreeNodeView> childProjects,
+      Collection<Integer> authorizedProjectIds) {
+    var authorizedIds = Set.copyOf(authorizedProjectIds);
+    var visibleChildren =
+        childProjects.stream()
+            .filter(project -> shouldIncludeProject(project, childProjects, authorizedIds))
+            .toList();
+    return buildTree(masterProject, visibleChildren);
+  }
+
+  private static boolean shouldIncludeProject(
+      ProjectTreeNodeView project,
+      Collection<ProjectTreeNodeView> candidateChildProjects,
+      Set<Integer> authorizedProjectIds) {
+    return authorizedProjectIds.contains(project.getId())
+        || candidateChildProjects.stream()
+            .anyMatch(
+                childProject ->
+                    childProject.hasParentProjectId(project.getId())
+                        && authorizedProjectIds.contains(childProject.getId()));
+  }
+
   private static ProjectTreeNode toProjectTreeNode(
       ProjectTreeNodeView parent, Collection<ProjectTreeNodeView> candidateChildProjects) {
     var children =
@@ -94,7 +145,8 @@ public class ProjectTreeFactory {
         .gsid(project.getGsid())
         .name(project.getName())
         .accountId(project.getAccountId())
-        .classificationId(project.getProjectClassification().getId())
+        .classificationId(
+            ProjectClassificationSemantics.toDisplayId(project.getProjectClassification().getId()))
         .bundle(project.getBundle())
         .status(project.getProjectStatus())
         .locations(project.getProjectLocations())

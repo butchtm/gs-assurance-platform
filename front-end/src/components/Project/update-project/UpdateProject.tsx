@@ -11,12 +11,7 @@ import * as Yup from "yup";
 
 import { ReferenceType, useReferenceTypes } from "../../../common/data-types/DataReferenceTypes";
 import FullScreenMessage from "../../../common/full-screen-message/FullScreenMessage";
-import {
-  CreateProjectForm,
-  Project,
-  TransitionProjectDetails,
-  UpdateProjectPayload,
-} from "../../../common/project/Project";
+import { CreateProjectForm, Project } from "../../../common/project/Project";
 import { theme } from "../../../theme";
 import { AuthContext } from "../../Auth/Login/AuthProvider";
 import { Step1 } from "../create-project/steps/Step1";
@@ -33,6 +28,12 @@ import {
 } from "../ProjectFormValidationSchema";
 
 import { StepUpdateFields } from "./steps/StepUpdateFields";
+import {
+  buildUpdateProjectPayload,
+  getUpdateProjectFieldCapabilities,
+  hasAnyUpdateCapability,
+} from "./UpdateProjectEditability";
+import type { UpdateProjectFieldCapabilities } from "./UpdateProjectEditability";
 import { mapProjectDataToFormValues } from "./UpdateProjectHelper";
 import { usePiiAnalysis } from "./usePiiAnalysis";
 
@@ -41,7 +42,8 @@ const FormContent: React.FC<{
   setFieldValue: (field: string, value: unknown) => void;
   project: Project | undefined;
   projectStatus: ReferenceType | undefined;
-}> = ({ values, project, projectStatus, setFieldValue }) => {
+  capabilities: UpdateProjectFieldCapabilities;
+}> = ({ values, project, projectStatus, setFieldValue, capabilities }) => {
   const piiAnalysis = usePiiAnalysis(
     {
       name: values.name,
@@ -61,7 +63,7 @@ const FormContent: React.FC<{
 
   return (
     <Form autoComplete="off">
-      <Step1 projectId={project?.id} isUpdate={true} probablePii={piiAnalysis.probablePii} />
+      <Step1 projectId={project?.id} isUpdate={true} probablePii={piiAnalysis.probablePii} {...capabilities} />
       <Step2 probablePii={piiAnalysis.probablePii} />
       <Step3 isUpdate={true} />
       <Step4 />
@@ -133,23 +135,7 @@ const UpdateProject: React.FC = () => {
   }
 
   const handleSubmit = async (formValues: CreateProjectForm): Promise<boolean> => {
-    const isAtLeastOneDetailDefined = (details: TransitionProjectDetails) => {
-      return Object.values(details).some((value) => value !== undefined && value !== null && value !== "");
-    };
-
-    const transitionProjectDetails: TransitionProjectDetails = {
-      projectLinkInOtherScheme: formValues.projectLinkInOtherScheme,
-      creditingPeriodStartDateOtherSchemes: formValues.creditingPeriodStartDateOtherSchemes,
-      creditingPeriodEndDateOtherSchemes: formValues.creditingPeriodEndDateOtherSchemes,
-      transitionApprovalProcedureId: formValues.transitionApprovalProcedureId,
-      transitionFromOtherSchemeId: formValues.transitionFromOtherSchemeId,
-      transitionPathwayId: formValues.transitionPathwayId,
-    };
-
-    const payload: UpdateProjectPayload = {
-      ...formValues,
-      transitionProject: isAtLeastOneDetailDefined(transitionProjectDetails) ? transitionProjectDetails : null,
-    };
+    const payload = buildUpdateProjectPayload(formValues, initialValueData, capabilities);
 
     try {
       const project = await updateProject(payload, projectId);
@@ -175,22 +161,9 @@ const UpdateProject: React.FC = () => {
     navigate(`/projects/${projectId}`);
   };
 
-  const currentUserIsLinkedDeveloper = (formValues: CreateProjectForm): boolean => {
-    return !!formValues.accountId && authContext.isUserOwnerOf(formValues.accountId);
-  };
+  const capabilities = getUpdateProjectFieldCapabilities(initialValueData, authContext);
 
-  const projectIsNew = (formValues: CreateProjectForm): boolean => {
-    return formValues.projectStatusId == 1;
-  };
-
-  const canUpdateProject = (formValues: CreateProjectForm): boolean => {
-    if (authContext.isAdminUser() || authContext.isArmUser()) {
-      return true;
-    }
-    return currentUserIsLinkedDeveloper(formValues) && projectIsNew(formValues);
-  };
-
-  if (!canUpdateProject(initialValueData)) {
+  if (!hasAnyUpdateCapability(capabilities)) {
     return (
       <FullScreenMessage headline={"Project Update Unavailable"} body={"Incorrect permissions or Project Status"} />
     );
@@ -220,6 +193,7 @@ const UpdateProject: React.FC = () => {
                   project={project}
                   projectStatus={projectStatus}
                   setFieldValue={setFieldValue}
+                  capabilities={capabilities}
                 />
               )}
             </Formik>

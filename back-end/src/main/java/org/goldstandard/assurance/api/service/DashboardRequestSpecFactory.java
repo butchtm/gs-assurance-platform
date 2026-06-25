@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.goldstandard.assurance.api.dto.CommonDashboardRequestFiltersDTO;
 import org.goldstandard.assurance.api.dto.SpecificDashboardRequestFiltersDTO;
+import org.goldstandard.assurance.api.entity.lookup.ProjectClassificationSemantics;
 import org.goldstandard.assurance.api.entity.view.AllRequestView;
 import org.goldstandard.assurance.api.entity.view.AssignedRequestView;
 import org.goldstandard.assurance.api.entity.view.CommonDashboardView;
@@ -75,7 +76,11 @@ public class DashboardRequestSpecFactory {
     specs.add(in("requestStatusId", filters.getRequestStatusIds()));
     specs.add(in("invoiceStatusId", filters.getInvoiceStatusIds()));
     specs.add(in("requestTypeId", filters.getRequestTypeIds()));
-    specs.add(in("projectClassificationId", filters.getProjectClassificationIds()));
+    specs.add(
+        in(
+            "projectClassificationId",
+            ProjectClassificationSemantics.expandDisplayFilterIds(
+                filters.getProjectClassificationIds())));
     specs.add(in("currentRoundIndex", filters.getRoundOfReviewCounts()));
     specs.add(hasProjectTypeId(filters.getProjectTypeIds()));
     filters

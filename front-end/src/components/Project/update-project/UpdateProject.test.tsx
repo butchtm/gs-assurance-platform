@@ -16,6 +16,11 @@ import { Step3 } from "../create-project/steps/Step3";
 import { Step4 } from "../create-project/steps/Step4";
 import { Step5 } from "../create-project/steps/Step5";
 
+import {
+  buildUpdateProjectPayload,
+  getUpdateProjectFieldCapabilities,
+  hasAnyUpdateCapability,
+} from "./UpdateProjectEditability";
 import { StepUpdateFields } from "./steps/StepUpdateFields";
 import { usePiiAnalysis } from "./usePiiAnalysis";
 
@@ -40,6 +45,7 @@ jest.mock("../Project", () => ({
   updateProject: jest.fn().mockResolvedValue(true),
   getInitialEmptyValues: jest.fn().mockReturnValue(mockCreateProjectFormValues),
   getCandidatePOAs: jest.fn().mockResolvedValue([]),
+  getCandidateParentDetails: jest.fn().mockResolvedValue(mockCreateProjectFormValues),
   getCandidateRealCaseVPAs: jest.fn().mockResolvedValue([]),
 }));
 
@@ -143,6 +149,184 @@ const mockPiiData: ProbablePii[] = [
     probability: "0.89",
   },
 ];
+
+describe("UpdateProject editability and payload", () => {
+  const buildAuth = ({
+    admin = false,
+    arm = false,
+    owner = false,
+  }: {
+    admin?: boolean;
+    arm?: boolean;
+    owner?: boolean;
+  }) => ({
+    isAdminUser: jest.fn().mockReturnValue(admin),
+    isArmUser: jest.fn().mockReturnValue(arm),
+    isUserOwnerOf: jest.fn().mockReturnValue(owner),
+  });
+
+  it.each([1, 2, 99])("gives Admin full update capabilities for status %s", (projectStatusId) => {
+    const capabilities = getUpdateProjectFieldCapabilities(
+      { ...mockCreateProjectFormValues, projectStatusId },
+      buildAuth({ admin: true }),
+    );
+
+    expect(capabilities).toEqual({
+      canEditDeveloperAccount: true,
+      canEditProjectClassification: true,
+      canEditProjectTitle: true,
+      canEditParentHierarchy: true,
+    });
+  });
+
+  it("treats ARM like Admin for frontend update capabilities", () => {
+    const capabilities = getUpdateProjectFieldCapabilities(mockCreateProjectFormValues, buildAuth({ arm: true }));
+
+    expect(capabilities).toEqual({
+      canEditDeveloperAccount: true,
+      canEditProjectClassification: true,
+      canEditProjectTitle: true,
+      canEditParentHierarchy: true,
+    });
+  });
+
+  it("allows owning PD New updates only for title and classification", () => {
+    const capabilities = getUpdateProjectFieldCapabilities(
+      { ...mockCreateProjectFormValues, accountId: 1, projectStatusId: 1 },
+      buildAuth({ owner: true }),
+    );
+
+    expect(capabilities).toEqual({
+      canEditDeveloperAccount: false,
+      canEditProjectClassification: true,
+      canEditProjectTitle: true,
+      canEditParentHierarchy: false,
+    });
+  });
+
+  it("keeps owning PD Listed and non-owning PD updates unavailable", () => {
+    expect(
+      hasAnyUpdateCapability(
+        getUpdateProjectFieldCapabilities(
+          { ...mockCreateProjectFormValues, accountId: 1, projectStatusId: 2 },
+          buildAuth({ owner: true }),
+        ),
+      ),
+    ).toBe(false);
+    expect(
+      hasAnyUpdateCapability(
+        getUpdateProjectFieldCapabilities(
+          { ...mockCreateProjectFormValues, accountId: 1, projectStatusId: 1 },
+          buildAuth({ owner: false }),
+        ),
+      ),
+    ).toBe(false);
+  });
+
+  it("submits changed Admin account, classification, title, and parent hierarchy fields", () => {
+    const originalValues = {
+      ...mockCreateProjectFormValues,
+      accountId: 1,
+      projectClassificationId: 8,
+      masterProjectId: 100,
+      parentProjectId: 101,
+      name: "Original Title",
+      description: "Original Description",
+    };
+    const formValues = {
+      ...originalValues,
+      accountId: 2,
+      projectClassificationId: 9,
+      masterProjectId: 200,
+      parentProjectId: 201,
+      name: "Updated Title",
+      description: "Updated Description",
+    };
+    const payload = buildUpdateProjectPayload(
+      formValues,
+      originalValues,
+      getUpdateProjectFieldCapabilities(originalValues, buildAuth({ admin: true })),
+    );
+
+    expect(payload.accountId).toBe(2);
+    expect(payload.projectClassificationId).toBe(9);
+    expect(payload.masterProjectId).toBe(200);
+    expect(payload.parentProjectId).toBe(201);
+    expect(payload.name).toBe("Updated Title");
+    expect(payload.description).toBe("Updated Description");
+  });
+
+  it("preserves protected fields when owning PD submits a New update", () => {
+    const originalValues = {
+      ...mockCreateProjectFormValues,
+      accountId: 1,
+      projectClassificationId: 8,
+      masterProjectId: 100,
+      parentProjectId: 101,
+      name: "Original Title",
+      description: "Original Description",
+      locationIds: [1],
+      projectAssetIds: [1],
+      notes: "Original Notes",
+    };
+    const formValues = {
+      ...originalValues,
+      accountId: 2,
+      projectClassificationId: 9,
+      masterProjectId: 200,
+      parentProjectId: 201,
+      name: "Updated Title",
+      description: "Updated Description",
+      locationIds: [2],
+      projectAssetIds: [2],
+      notes: "Updated Notes",
+    };
+    const payload = buildUpdateProjectPayload(
+      formValues,
+      originalValues,
+      getUpdateProjectFieldCapabilities(originalValues, buildAuth({ owner: true })),
+    );
+
+    expect(payload.name).toBe("Updated Title");
+    expect(payload.projectClassificationId).toBe(9);
+    expect(payload.accountId).toBe(1);
+    expect(payload.masterProjectId).toBe(100);
+    expect(payload.parentProjectId).toBe(101);
+    expect(payload.description).toBe("Original Description");
+    expect(payload.locationIds).toEqual([1]);
+    expect(payload.projectAssetIds).toEqual([1]);
+    expect(payload.notes).toBe("Original Notes");
+  });
+
+  it("normalizes absent parent hierarchy IDs to null in editable and protected payloads", () => {
+    const originalValues = {
+      ...mockCreateProjectFormValues,
+      accountId: 1,
+      masterProjectId: undefined,
+      parentProjectId: undefined,
+    } as unknown as typeof mockCreateProjectFormValues;
+    const formValues = {
+      ...originalValues,
+      masterProjectId: undefined,
+      parentProjectId: undefined,
+    } as unknown as typeof mockCreateProjectFormValues;
+    const adminPayload = buildUpdateProjectPayload(
+      formValues,
+      originalValues,
+      getUpdateProjectFieldCapabilities(originalValues, buildAuth({ admin: true })),
+    );
+    const protectedPayload = buildUpdateProjectPayload(
+      { ...formValues, masterProjectId: 200, parentProjectId: 201 },
+      originalValues,
+      getUpdateProjectFieldCapabilities(originalValues, buildAuth({ owner: true })),
+    );
+
+    expect(adminPayload.masterProjectId).toBeNull();
+    expect(adminPayload.parentProjectId).toBeNull();
+    expect(protectedPayload.masterProjectId).toBeNull();
+    expect(protectedPayload.parentProjectId).toBeNull();
+  });
+});
 
 const FormContent: React.FC<{ probablePii: ProbablePii[] }> = ({ probablePii }) => {
   const mockUsePiiAnalysis = usePiiAnalysis as jest.MockedFunction<typeof usePiiAnalysis>;

@@ -117,6 +117,11 @@ const filterActiveReferenceTypes = (types: ReferenceTypes, active: boolean): Ref
 };
 
 const staleTimeFiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds, easier to read and maintain than a large number literal
+const selectableInactiveProjectClassificationCodes = new Set([
+  "VPA_CPA",
+  "REAL_CASE_VPA_CROSS_LINKAGE",
+  "REGULAR_VPA_CROSS_LINKAGE",
+]);
 
 export const ReferenceTypeProvider: React.FC<{
   children: ReactNode;
@@ -180,7 +185,12 @@ export const ReferenceTypeProvider: React.FC<{
       if (!referenceTypeData) return [];
 
       return referenceTypeData
-        .filter((item) => reference !== "ProjectClassification" || item.active || item.code === "VPA_CPA")
+        .filter(
+          (item) =>
+            reference !== "ProjectClassification" ||
+            item.active ||
+            selectableInactiveProjectClassificationCodes.has(item.code),
+        )
         .map((item) => {
           return {
             value: item.id,
