@@ -12,7 +12,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     password: MySuperSafePostgresPassword
-    url: jdbc:postgresql://localhost:5432/assurance_db
+    url: jdbc:postgresql://localhost:15432/assurance_db
     username: postgres
   security:
     oauth2:
