@@ -16,7 +16,9 @@ import org.goldstandard.assurance.api.dto.auth.VerifyTokenResponse;
 import org.goldstandard.assurance.api.entity.User;
 import org.goldstandard.assurance.api.service.auth.AuthService;
 import org.goldstandard.assurance.api.service.auth.CookieService;
+import org.goldstandard.assurance.api.service.auth.LocalAuthService;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,11 +33,16 @@ public class AuthController {
   private final AuthService authService;
   private final CookieService cookieService;
   private final AuthUserConverter accountMapper;
+  private final ObjectProvider<LocalAuthService> localAuthService;
 
   @PostMapping("/login")
   public LoginResponseDTO login(
       @RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse servletResponse) {
-    var result = authService.login(loginRequestDTO);
+    var localService = localAuthService.getIfAvailable();
+    var result =
+        localService == null
+            ? authService.login(loginRequestDTO)
+            : localService.login(loginRequestDTO);
     if (result.isNewPasswordRequired()) {
       servletResponse.addCookie(cookieService.buildPasswordSessionIdCookie(result.getSession()));
       return new LoginResponseDTO();
@@ -49,6 +56,9 @@ public class AuthController {
           .build();
     }
     var user = findUserAndPopulateCookies(result, servletResponse);
+    if (localService != null) {
+      cookieService.removeRefreshTokenCookie(servletResponse);
+    }
     populateLoggingContext(user);
     return new LoginResponseDTO(toUserDto(user));
   }
@@ -155,6 +165,10 @@ public class AuthController {
   private VerifyTokenResponse verifyAccessToken(
       String accessToken, HttpServletRequest request, HttpServletResponse response) {
     if (authService.isExpired(accessToken)) {
+      if (localAuthService.getIfAvailable() != null) {
+        cookieService.removeCookies(response);
+        return new VerifyTokenResponse();
+      }
       var refreshToken = cookieService.findRefreshTokenValue(request);
       if (refreshToken.isPresent()) {
         var result = authService.refreshToken(refreshToken.get());
@@ -164,6 +178,9 @@ public class AuthController {
           populateLoggingContext(user);
           return new VerifyTokenResponse(toUserDto(user));
         }
+      } else {
+        cookieService.removeCookies(response);
+        return new VerifyTokenResponse();
       }
     }
     var user = authService.findUserByToken(accessToken);

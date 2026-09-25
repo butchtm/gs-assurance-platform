@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: "local & local-auth"
+
+local-auth:
+  enabled: true
+  jwt-secret: ${LOCAL_AUTH_JWT_SECRET}
+  # Configure credentials in external config as local-auth.credentials.<alias>.
+  # Each entry requires password and database-user-name, mapping the alias to an
+  # active persisted user. No credentials are checked into the repository.
+  credentials: {}
+
+user-sync:
+  check-cron: '-'

@@ -1,0 +1,17 @@
+local-auth:
+  credentials:
+    pats-pd-alpha:
+      password: "KamoteMan123!"
+      database-user-name: "pats-pd-alpha"
+    pats-pd-beta:
+      password: "KamoteMan123!"
+      database-user-name: "pats-pd-beta"
+    pats-arm:
+      password: "KamoteMan123!"
+      database-user-name: "pats-arm"
+    pats-vvb:
+      password: "KamoteMan123!"
+      database-user-name: "pats-vvb"
+    patslaurel:
+      password: "KamoteMan123!"
+      database-user-name: "patslaurel"

@@ -5,12 +5,14 @@ import static org.goldstandard.assurance.api.service.PermissionsService.ADMIN_RO
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import org.goldstandard.assurance.api.service.user.UserSyncService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Profile("!local-auth | !local")
 public class UserSyncController {
 
   private final UserSyncService service;

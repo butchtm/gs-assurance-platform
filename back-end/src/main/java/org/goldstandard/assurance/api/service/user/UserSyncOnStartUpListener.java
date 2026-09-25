@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Profile("!test")
+@Profile("!test & (!local-auth | !local)")
 public class UserSyncOnStartUpListener implements ApplicationListener<ContextRefreshedEvent> {
 
   private final UserSyncService service;

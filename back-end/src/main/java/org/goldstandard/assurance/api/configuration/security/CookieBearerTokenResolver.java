@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.goldstandard.assurance.api.dto.auth.AuthResultDTO;
 import org.goldstandard.assurance.api.service.auth.AuthService;
 import org.goldstandard.assurance.api.service.auth.CookieService;
+import org.goldstandard.assurance.api.service.auth.LocalAuthService;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -19,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class CookieBearerTokenResolver implements BearerTokenResolver {
   private final AuthService authService;
   private final CookieService cookieService;
+  private final ObjectProvider<LocalAuthService> localAuthService;
 
   @Override
   public String resolve(HttpServletRequest request) {
@@ -40,12 +43,20 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
     if (!authService.isExpired(accessToken)) {
       return Optional.of(accessToken);
     }
+    if (localAuthService.getIfAvailable() != null) {
+      removeCookiesIfPossible();
+      return Optional.empty();
+    }
     return refreshToken(request);
   }
 
   private Optional<String> refreshToken(HttpServletRequest request) {
-    var refreshToken = cookieService.forceFindRefreshTokenValue(request);
-    var result = authService.refreshToken(refreshToken);
+    var refreshToken = cookieService.findRefreshTokenValue(request);
+    if (refreshToken.isEmpty()) {
+      removeCookiesIfPossible();
+      return Optional.empty();
+    }
+    var result = authService.refreshToken(refreshToken.get());
     if (!result.isSuccessful()) {
       return Optional.empty();
     }
@@ -53,6 +64,17 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
     authService.findUserByToken(refreshedAccessToken);
     populateCookiesIfPossible(result);
     return Optional.of(refreshedAccessToken);
+  }
+
+  private void removeCookiesIfPossible() {
+    var requestAttributes = RequestContextHolder.getRequestAttributes();
+    if (!(requestAttributes instanceof ServletRequestAttributes attributes)) {
+      return;
+    }
+    var response = attributes.getResponse();
+    if (response != null) {
+      cookieService.removeCookies(response);
+    }
   }
 
   private void populateCookiesIfPossible(AuthResultDTO result) {

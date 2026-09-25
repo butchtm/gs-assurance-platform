@@ -60,4 +60,8 @@ public class CookieService {
   public void removeMfaSessionIdCookie(HttpServletResponse response) {
     response.addCookie(factory.buildMfaSessionIdRemovalCookie());
   }
+
+  public void removeRefreshTokenCookie(HttpServletResponse response) {
+    response.addCookie(factory.buildRefreshTokenRemovalCookie());
+  }
 }

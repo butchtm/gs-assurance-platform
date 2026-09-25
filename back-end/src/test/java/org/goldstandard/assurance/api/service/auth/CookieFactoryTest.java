@@ -9,6 +9,11 @@ import static org.goldstandard.assurance.api.service.auth.CookieName.REFRESH_TOK
 
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 class CookieFactoryTest {
 
@@ -78,6 +83,63 @@ class CookieFactoryTest {
         .containsExactly(
             PASSWORD_SESSION_ID, MFA_SESSION_ID, ID_TOKEN, ACCESS_TOKEN, REFRESH_TOKEN);
     cookies.forEach(this::assertRemovalCookie);
+  }
+
+  @Test
+  void localAuthAllowsInsecureCookiesForLocalhostOnly() {
+    ReflectionTestUtils.setField(factory, "localAuthEnabled", true);
+    var request = new MockHttpServletRequest();
+    request.setServerName("localhost");
+    request.setSecure(false);
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(request, new MockHttpServletResponse()));
+
+    try {
+      assertThat(factory.buildAccessTokenCookie("token").getSecure()).isFalse();
+      assertThat(factory.buildRefreshTokenRemovalCookie().getSecure()).isFalse();
+    } finally {
+      RequestContextHolder.resetRequestAttributes();
+    }
+  }
+
+  @Test
+  void localAuthKeepsCookiesSecureForRemoteOrHttpsRequests() {
+    ReflectionTestUtils.setField(factory, "localAuthEnabled", true);
+    var request = new MockHttpServletRequest();
+    request.setServerName("dev.example.com");
+    request.setSecure(false);
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(request, new MockHttpServletResponse()));
+    try {
+      assertThat(factory.buildAccessTokenCookie("token").getSecure()).isTrue();
+    } finally {
+      RequestContextHolder.resetRequestAttributes();
+    }
+
+    request.setServerName("localhost");
+    request.setSecure(true);
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(request, new MockHttpServletResponse()));
+    try {
+      assertThat(factory.buildAccessTokenCookie("token").getSecure()).isTrue();
+    } finally {
+      RequestContextHolder.resetRequestAttributes();
+    }
+  }
+
+  @Test
+  void cookiesStaySecureWhenLocalAuthPropertyIsNotEnabled() {
+    ReflectionTestUtils.setField(factory, "localAuthEnabled", false);
+    var request = new MockHttpServletRequest();
+    request.setServerName("localhost");
+    request.setSecure(false);
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(request, new MockHttpServletResponse()));
+    try {
+      assertThat(factory.buildAccessTokenCookie("token").getSecure()).isTrue();
+    } finally {
+      RequestContextHolder.resetRequestAttributes();
+    }
   }
 
   private void assertRemovalCookie(Cookie cookie) {

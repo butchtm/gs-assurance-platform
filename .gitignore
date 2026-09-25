@@ -49,3 +49,6 @@ cypress/videos/
 terraform.tfstate
 terraform.tfstate.*
 *.tfplan
+
+# Developer-local fake authentication credentials
+/back-end/config/application-local-auth.yml
