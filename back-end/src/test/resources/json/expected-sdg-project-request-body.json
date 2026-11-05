@@ -1,46 +1,24 @@
 {
-  "poa_project_id": null,
-  "name": "test project name",
-  "description": "test project description",
+  "poa_project_id": 23980,
+  "name": "GS23980-GS23982-My Regular VPA for testing",
+  "description": "My Regular VPA for my Real VPA for my Test POA Updated Description",
   "status": "NEW_PROJECT",
-  "country_codes": ["XZ", "GB"],
-  "annual_estimated_credits": 987,
-  "carbon_stream": "GS_CER",
-  "types": ["A_R", "BIOGAS_ELECTRICITY"],
-  "project_developer": "test account name",
-  "programme_of_activities": "POA",
+  "country_codes": ["AF"],
+  "annual_estimated_credits": 50000,
+  "carbon_stream": "GS_VER",
+  "types": ["PV"],
+  "project_developer": "TestPD",
+  "programme_of_activities": "VPA",
   "crediting_periods": [
     {
       "id": 1,
-      "start_date": "2024-01-01",
-      "end_date": "2025-12-31",
+      "start_date": "2022-07-07",
+      "end_date": "2027-07-08",
       "methodologies": [
         {
-          "id": 1,
-          "description": "AMC1 - methodology 1",
-          "version": 1.1
-        },
-        {
-          "id": 2,
-          "description": "AMC2 - methodology 2",
-          "version": 2.1
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "start_date": "2026-01-01",
-      "end_date": "2028-01-01",
-      "methodologies": [
-        {
-          "id": 1,
-          "description": "AMC1 - methodology 1",
-          "version": 1.1
-        },
-        {
-          "id": 2,
-          "description": "AMC2 - methodology 2",
-          "version": 2.1
+          "id": 62,
+          "description": "AM0091 Energy efficiency technologies and fuel switching in new buildings",
+          "version": 1.0
         }
       ]
     }
