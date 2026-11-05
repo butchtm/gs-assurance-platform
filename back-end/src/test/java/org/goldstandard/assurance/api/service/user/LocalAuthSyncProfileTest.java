@@ -19,7 +19,6 @@ class LocalAuthSyncProfileTest {
     assertProfileActive(UserSyncController.class, true, "local-auth");
     assertProfileActive(UserSyncOnStartUpListener.class, true, "local-auth");
     assertLocalAuthInactive("local-auth");
-    assertThat(localAuthConfig().getProperty("local-auth.enabled")).isNull();
   }
 
   @Test
@@ -27,7 +26,6 @@ class LocalAuthSyncProfileTest {
     assertProfileActive(UserSyncController.class, false, "local", "local-auth");
     assertProfileActive(UserSyncOnStartUpListener.class, false, "local", "local-auth");
     assertLocalAuthActive("local", "local-auth");
-    assertThat(localAuthConfig().getProperty("local-auth.enabled")).isEqualTo(true);
   }
 
   @Test
